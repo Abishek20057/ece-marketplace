@@ -120,8 +120,8 @@
     .pay-btn {
       width: 100%;
       padding: 1rem;
-      background: linear-gradient(135deg, var(--electric), #2563eb);
-      color: white;
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      color: #ffffff;
       border: none;
       border-radius: 12px;
       font-family: var(--font-display);
@@ -130,8 +130,10 @@
       cursor: pointer;
       transition: all 0.2s;
       margin-top: 1rem;
+      box-shadow: 0 4px 16px rgba(15,23,42,0.35);
+      letter-spacing: 0.02em;
     }
-    .pay-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(56,130,246,0.35); }
+    .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(15,23,42,0.45); }
     .secure-note {
       display: flex;
       align-items: center;
@@ -491,26 +493,50 @@
     </div>
   </div>
 
-  <!-- ══ QR Code Modal (Temporary UPI) ══ -->
+  <!-- ══ QR Code Modal ══ -->
   <div class="qr-overlay" id="qr-overlay">
     <div class="qr-box">
       <h2>📱 Scan &amp; Pay</h2>
       <div class="qr-amount">₹<span id="qr-amount-label">20</span></div>
 
       <div class="qr-img-wrap">
-        <!-- QR generated via Google Charts API for ecehub@oksbi -->
         <img id="qr-img" src="" alt="UPI QR Code" />
       </div>
 
       <div class="upi-id-display" id="upi-display">ecehub@oksbi</div>
 
       <p class="qr-note">
-        Open any UPI app (GPay, PhonePe, Paytm, etc.),<br>
-        scan this QR and pay <strong>₹<span id="qr-note-amount">20</span></strong>.<br>
-        Click <strong>"I've Paid"</strong> only after payment is done.
+        Open GPay / PhonePe / Paytm, scan &amp; pay <strong>₹<span id="qr-note-amount">20</span></strong>.<br>
+        After payment, paste your <strong>UTR / Transaction ID</strong> below.
       </p>
 
-      <button class="qr-confirm-btn" onclick="confirmPayment()">✅ I've Paid — Confirm</button>
+      <!-- UTR input -->
+      <div style="margin-bottom:1rem;text-align:left;">
+        <label style="font-size:0.82rem;font-weight:700;color:#1e293b;display:block;margin-bottom:0.4rem;">
+          🔢 UTR / Transaction ID
+        </label>
+        <input
+          type="tel"
+          id="utr-input"
+          placeholder="Enter 12-digit transaction ID"
+          maxlength="12"
+          oninput="onUTRInput(this)"
+          style="width:100%;padding:0.75rem 1rem;border:2px solid #e2e8f0;border-radius:10px;
+                 font-size:1rem;font-family:monospace;color:#1e293b;box-sizing:border-box;
+                 transition:border-color 0.2s;letter-spacing:0.05em;"
+        />
+        <p id="utr-hint" style="font-size:0.78rem;color:#94a3b8;margin-top:0.35rem;margin-bottom:0;">
+          Find it in your UPI app → Payment History → Transaction ID
+        </p>
+      </div>
+
+      <button
+        class="qr-confirm-btn"
+        id="confirm-btn"
+        onclick="confirmPayment()"
+        disabled
+        style="opacity:0.38;cursor:not-allowed;margin-bottom:0.6rem;"
+      >✅ Confirm Payment</button>
       <button class="qr-cancel-btn" onclick="closeQR()">✕ Cancel</button>
     </div>
   </div>
@@ -536,9 +562,10 @@
     const params    = new URLSearchParams(window.location.search);
     const compName  = decodeURIComponent(params.get('name')  || 'Component');
     const isTemp    = params.get('type') === 'temporary';
+    const rawAmount = params.get('amount') || params.get('price') || '0';
     const compPrice = isTemp
-      ? parseInt(params.get('amount') || '20')
-      : parseInt(params.get('price')  || '0');
+      ? (parseInt(params.get('amount')) || 20)
+      : (parseInt(params.get('price'))  || 0);
 
     // ── Populate order summary ─────────────────
     document.getElementById('comp-name-display').textContent  = compName;
@@ -613,6 +640,28 @@
 
     function closeQR() {
       document.getElementById('qr-overlay').classList.remove('show');
+      // reset UTR field on close
+      const inp = document.getElementById('utr-input');
+      if (inp) inp.value = '';
+      const btn = document.getElementById('confirm-btn');
+      if (btn) { btn.disabled = true; btn.style.opacity = '0.38'; btn.style.cursor = 'not-allowed'; }
+    }
+
+    function onUTRInput(el) {
+      // Allow only digits
+      el.value = el.value.replace(/\D/g, '').substring(0, 12);
+      const valid = el.value.length === 12;
+      el.style.borderColor = valid ? '#16a34a' : '#e2e8f0';
+      const btn = document.getElementById('confirm-btn');
+      if (valid) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.38';
+        btn.style.cursor = 'not-allowed';
+      }
     }
 
     function confirmPayment() {
