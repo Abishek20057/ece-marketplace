@@ -30,14 +30,14 @@ ece-marketplace/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. Open `index.html` in a browser — no build step needed.
 2. All pages are plain HTML/CSS/JS (no framework, no dependencies except Google Fonts).
 
 ---
 
-## ✏️ How to Add Components
+## How to Add Components
 
 Edit `js/data.js`. Each component object looks like:
 
