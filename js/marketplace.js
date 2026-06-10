@@ -146,9 +146,13 @@ function buildCard(c) {
     : `<span class="card-price price-free">Free</span>`;
   const imgSrc = c.image || COMPONENT_IMAGES[c.id] || '';
   const fallback = CAT_EMOJI[c.category] || c.icon || '📦';
+  const tempBadge = hasTemp
+  ? `<div class="temp-fee-badge">₹${c.tempPrice} Temporary Access Fee</div>`
+  : '';
 
   return `
     <div class="component-card">
+       ${tempBadge}
       <div class="card-img-wrap">
         ${imgSrc
           ? `<img src="${imgSrc}" alt="${c.name}"
