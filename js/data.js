@@ -61,7 +61,7 @@ const COMPONENTS = [
     category: "display",
     categoryLabel: "Display",
     icon: "🖥️",
-    image: "https://upload.wikimedia.org/wikipedia/commons/a/a7/LiquidCrystal_I2C_Backpack.jpg",
+    image: "https://www.google.com/imgres?q=LCD%20Display%20(16x2%20%2F%2020x4)&imgurl=https%3A%2F%2Fm.media-amazon.com%2Fimages%2FI%2F51swvRjWK0L.jpg&imgrefurl=https%3A%2F%2Fwww.amazon.in%2Fmodule-Display-4-Pin-Connection-Indicator%2Fdp%2FB0DVSPDFK3&docid=vHlUb6T47eOgDM&tbnid=LqMO4NtXOnDAZM&vet=12ahUKEwid9snPtfyUAxWP1TgGHa9vEKAQnPAOegQIGxAB..i&w=713&h=713&hcb=2&ved=2ahUKEwid9snPtfyUAxWP1TgGHa9vEKAQnPAOegQIGxAB",
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,

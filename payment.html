@@ -35,6 +35,19 @@
       font-size: 0.95rem;
       margin-bottom: 2rem;
     }
+    /* Type badge at top */
+    .type-badge {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 0.35rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+    .type-badge.temp  { background: rgba(245,158,8,0.15); color: #b45309; border: 1px solid #f59e0b; }
+    .type-badge.perm  { background: rgba(56,130,246,0.12); color: #1d4ed8; border: 1px solid #3b82f6; }
+
     .order-summary {
       background: #f8fafc;
       border-radius: 12px;
@@ -66,9 +79,7 @@
       color: var(--navy);
     }
     .order-row.total .price { color: var(--electric); }
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
+    .form-group { margin-bottom: 1.2rem; }
     .form-group label {
       display: block;
       font-size: 0.85rem;
@@ -98,31 +109,6 @@
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
-    .payment-methods {
-      display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .pay-method {
-      flex: 1;
-      min-width: 80px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 0.75rem 0.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--slate);
-    }
-    .pay-method.active {
-      border-color: var(--electric);
-      background: rgba(56,130,246,0.08);
-      color: var(--electric);
-    }
-    .pay-method .pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
     .section-label {
       font-family: var(--font-display);
       font-size: 0.8rem;
@@ -155,12 +141,133 @@
       color: var(--slate-dk);
       margin-top: 1rem;
     }
-    /* Success overlay */
+
+    /* ── Payment method tabs (permanent only) ── */
+    .payment-methods {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .pay-method {
+      flex: 1;
+      min-width: 80px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--slate);
+    }
+    .pay-method.active {
+      border-color: var(--electric);
+      background: rgba(56,130,246,0.08);
+      color: var(--electric);
+    }
+    .pay-method .pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+
+    /* ── QR Modal overlay ── */
+    .qr-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,22,40,0.88);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-overlay.show { display: flex; }
+    .qr-box {
+      background: white;
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 380px;
+      width: 92%;
+      text-align: center;
+      animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .qr-box h2 {
+      font-family: var(--font-display);
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+      font-size: 1.4rem;
+    }
+    .qr-box .qr-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--electric);
+      margin: 0.5rem 0 1.2rem;
+      font-family: var(--font-display);
+    }
+    .qr-img-wrap {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 1rem;
+      margin: 0 auto 1.2rem;
+      display: inline-block;
+      border: 2px solid #e2e8f0;
+    }
+    .qr-img-wrap img { display: block; width: 200px; height: 200px; }
+    .upi-id-display {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: monospace;
+      font-size: 1rem;
+      color: #166534;
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .qr-note {
+      font-size: 0.82rem;
+      color: var(--slate-dk);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .qr-confirm-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.6rem;
+    }
+    .qr-confirm-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(22,163,74,0.35); }
+    .qr-cancel-btn {
+      width: 100%;
+      padding: 0.7rem;
+      background: transparent;
+      color: var(--slate-dk);
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .qr-cancel-btn:hover { border-color: var(--electric); }
+
+    /* ── Success overlay ── */
     .success-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(10,22,40,0.85);
+      background: rgba(10,22,40,0.88);
       z-index: 1000;
       align-items: center;
       justify-content: center;
@@ -175,13 +282,9 @@
       width: 90%;
       animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
     }
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
     .success-icon { font-size: 4rem; margin-bottom: 1rem; }
     .success-box h2 { font-family: var(--font-display); color: var(--navy); margin-bottom: 0.5rem; }
-    .success-box p { color: var(--slate); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .success-box p  { color: var(--slate); font-size: 0.95rem; margin-bottom: 1.5rem; }
     .order-id {
       background: #f0fdf4;
       border: 1px solid #86efac;
@@ -195,6 +298,7 @@
   </style>
 </head>
 <body>
+
   <!-- Navbar -->
   <nav class="navbar">
     <a href="index.html" class="logo">ECE<span>Hub</span></a>
@@ -208,8 +312,12 @@
 
   <div class="payment-page">
     <div class="payment-card">
+
+      <!-- Dynamic badge: Temporary / Permanent -->
+      <div id="type-badge" class="type-badge"></div>
+
       <h1>💳 Payment Details</h1>
-      <p class="subtitle">Complete your purchase securely</p>
+      <p class="subtitle" id="page-subtitle">Complete your purchase securely</p>
 
       <!-- Order Summary -->
       <div class="order-summary">
@@ -218,9 +326,9 @@
           <span id="comp-name-display">Component</span>
           <span id="comp-price-display">₹0</span>
         </div>
-        <div class="order-row">
-          <span>♾️ Permanent License</span>
-          <span style="color:#16a34a;">Included</span>
+        <div class="order-row" id="license-row">
+          <span id="license-label"></span>
+          <span id="license-val" style="color:#16a34a;"></span>
         </div>
         <div class="order-row total">
           <span>Total</span>
@@ -228,156 +336,255 @@
         </div>
       </div>
 
-      <!-- Payment Method -->
-      <div class="section-label">💳 Payment Method</div>
-      <div class="payment-methods">
-        <div class="pay-method active" onclick="selectMethod(this, 'upi')">
-          <span class="pay-icon">📱</span>UPI
-        </div>
-        <div class="pay-method" onclick="selectMethod(this, 'card')">
-          <span class="pay-icon">💳</span>Card
-        </div>
-        <div class="pay-method" onclick="selectMethod(this, 'netbanking')">
-          <span class="pay-icon">🏦</span>Net Banking
-        </div>
-        <div class="pay-method" onclick="selectMethod(this, 'cash')">
-          <span class="pay-icon">💵</span>Cash
-        </div>
-      </div>
-
-      <!-- UPI Panel (default) -->
-      <div id="panel-upi">
+      <!-- ══════════════════════════════════════
+           TEMPORARY SECTION — UPI only
+           ══════════════════════════════════════ -->
+      <div id="temp-section" style="display:none;">
+        <div class="section-label">👤 Your Details</div>
         <div class="form-group">
-          <label>UPI ID</label>
-          <input type="text" id="upi-id" placeholder="yourname@upi or phone@paytm" />
-        </div>
-        <p style="font-size:0.82rem;color:var(--slate-dk);margin-top:-0.5rem;">
-          📲 You will receive a payment request on your UPI app after clicking Pay.
-        </p>
-      </div>
-
-      <!-- Card Panel (hidden) -->
-      <div id="panel-card" style="display:none;">
-        <div class="form-group">
-          <label>Cardholder Name</label>
-          <input type="text" placeholder="As printed on card" />
-        </div>
-        <div class="form-group">
-          <label>Card Number</label>
-          <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" id="card-num" />
+          <label>Full Name</label>
+          <input type="text" id="t-name" placeholder="Your full name" />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Expiry</label>
-            <input type="text" placeholder="MM/YY" maxlength="5" />
+            <label>Roll Number</label>
+            <input type="text" id="t-roll" placeholder="e.g. 21ECE001" />
           </div>
           <div class="form-group">
-            <label>CVV</label>
-            <input type="password" placeholder="•••" maxlength="3" />
+            <label>Year</label>
+            <select id="t-year">
+              <option value="">Select Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
           </div>
         </div>
-      </div>
-
-      <!-- Net Banking Panel (hidden) -->
-      <div id="panel-netbanking" style="display:none;">
         <div class="form-group">
-          <label>Select Bank</label>
-          <select>
-            <option value="">— Choose your bank —</option>
-            <option>State Bank of India</option>
-            <option>HDFC Bank</option>
-            <option>ICICI Bank</option>
-            <option>Axis Bank</option>
-            <option>Bank of Baroda</option>
-            <option>Punjab National Bank</option>
-            <option>Canara Bank</option>
-            <option>Union Bank of India</option>
-            <option>Indian Bank</option>
-            <option>Other</option>
-          </select>
+          <label>Phone Number</label>
+          <input type="tel" id="t-phone" placeholder="10-digit mobile number" maxlength="10" />
         </div>
+
+        <button class="pay-btn" onclick="showQR()">
+          📱 Make UPI Payment &nbsp;— ₹<span id="t-pay-label">20</span>
+        </button>
+        <div class="secure-note">🔐 Pay via UPI · Amount goes directly to ECE Department</div>
       </div>
 
-      <!-- Cash Panel (hidden) -->
-      <div id="panel-cash" style="display:none;">
-        <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;font-size:0.9rem;color:#92400e;">
-          <strong>💵 Pay at HOD Cabin</strong><br><br>
-          Visit the <strong>HOD Cabin, ECE Department</strong> with the exact amount: <strong id="cash-amount">₹0</strong>.<br>
-          Office hours: <strong>9 AM – 5 PM</strong> (Mon–Sat).<br>
-          Bring your <strong>College ID Card</strong>.
-        </div>
-      </div>
+      <!-- ══════════════════════════════════════
+           PERMANENT SECTION — multiple methods
+           ══════════════════════════════════════ -->
+      <div id="perm-section" style="display:none;">
 
-      <!-- Personal Details -->
-      <div class="section-label">👤 Your Details</div>
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="buyer-name" placeholder="Your full name" />
-      </div>
-      <div class="form-row">
+        <div class="section-label">💳 Payment Method</div>
+        <div class="payment-methods">
+          <div class="pay-method active" onclick="selectMethod(this,'upi')">
+            <span class="pay-icon">📱</span>UPI
+          </div>
+          <div class="pay-method" onclick="selectMethod(this,'card')">
+            <span class="pay-icon">💳</span>Card
+          </div>
+          <div class="pay-method" onclick="selectMethod(this,'netbanking')">
+            <span class="pay-icon">🏦</span>Net Banking
+          </div>
+          <div class="pay-method" onclick="selectMethod(this,'cash')">
+            <span class="pay-icon">💵</span>Cash
+          </div>
+        </div>
+
+        <!-- UPI panel -->
+        <div id="panel-upi">
+          <div class="form-group">
+            <label>Your UPI ID</label>
+            <input type="text" id="p-upi-id" placeholder="yourname@upi or phone@paytm" />
+          </div>
+          <p style="font-size:0.82rem;color:var(--slate-dk);margin-top:-0.5rem;">
+            📲 Scan our QR code and complete the payment on the next screen.
+          </p>
+        </div>
+
+        <!-- Card panel -->
+        <div id="panel-card" style="display:none;">
+          <div class="form-group">
+            <label>Cardholder Name</label>
+            <input type="text" placeholder="As printed on card" />
+          </div>
+          <div class="form-group">
+            <label>Card Number</label>
+            <input type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Expiry</label>
+              <input type="text" placeholder="MM/YY" maxlength="5" />
+            </div>
+            <div class="form-group">
+              <label>CVV</label>
+              <input type="password" placeholder="•••" maxlength="3" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Banking panel -->
+        <div id="panel-netbanking" style="display:none;">
+          <div class="form-group">
+            <label>Select Bank</label>
+            <select>
+              <option value="">— Choose your bank —</option>
+              <option>State Bank of India</option>
+              <option>HDFC Bank</option>
+              <option>ICICI Bank</option>
+              <option>Axis Bank</option>
+              <option>Bank of Baroda</option>
+              <option>Punjab National Bank</option>
+              <option>Canara Bank</option>
+              <option>Union Bank of India</option>
+              <option>Indian Bank</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cash panel -->
+        <div id="panel-cash" style="display:none;">
+          <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;font-size:0.9rem;color:#92400e;">
+            <strong>💵 Pay at HOD Cabin</strong><br><br>
+            Visit the <strong>HOD Cabin, ECE Department</strong> with the exact amount: <strong id="cash-amount">₹0</strong>.<br>
+            Office hours: <strong>9 AM – 5 PM</strong> (Mon–Sat).<br>
+            Bring your <strong>College ID Card</strong>.
+          </div>
+        </div>
+
+        <div class="section-label">👤 Your Details</div>
         <div class="form-group">
-          <label>Roll Number</label>
-          <input type="text" id="buyer-roll" placeholder="e.g. 21ECE001" />
+          <label>Full Name</label>
+          <input type="text" id="p-name" placeholder="Your full name" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Roll Number</label>
+            <input type="text" id="p-roll" placeholder="e.g. 21ECE001" />
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <select id="p-year">
+              <option value="">Select Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
-          <label>Year</label>
-          <select id="buyer-year">
-            <option value="">Select Year</option>
-            <option>1st Year</option>
-            <option>2nd Year</option>
-            <option>3rd Year</option>
-            <option>4th Year</option>
-          </select>
+          <label>Phone Number</label>
+          <input type="tel" id="p-phone" placeholder="10-digit mobile number" maxlength="10" />
         </div>
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="buyer-phone" placeholder="10-digit mobile number" maxlength="10" />
+
+        <button class="pay-btn" onclick="processPermanent()">
+          🔒 Pay &nbsp;₹<span id="p-pay-label">0</span>
+        </button>
+        <div class="secure-note">🔐 Secure payment · All data stays within ECE Department</div>
       </div>
 
-      <button class="pay-btn" onclick="processPayment()">
-        🔒 Pay &nbsp;<span id="pay-amount">₹0</span>
-      </button>
-
-      <div class="secure-note">
-        🔐 Secure payment · All data stays within ECE Department
-      </div>
     </div>
   </div>
 
-  <!-- Success Overlay -->
+  <!-- ══ QR Code Modal (Temporary UPI) ══ -->
+  <div class="qr-overlay" id="qr-overlay">
+    <div class="qr-box">
+      <h2>📱 Scan &amp; Pay</h2>
+      <div class="qr-amount">₹<span id="qr-amount-label">20</span></div>
+
+      <div class="qr-img-wrap">
+        <!-- QR generated via Google Charts API for ecehub@oksbi -->
+        <img id="qr-img" src="" alt="UPI QR Code" />
+      </div>
+
+      <div class="upi-id-display" id="upi-display">ecehub@oksbi</div>
+
+      <p class="qr-note">
+        Open any UPI app (GPay, PhonePe, Paytm, etc.),<br>
+        scan this QR and pay <strong>₹<span id="qr-note-amount">20</span></strong>.<br>
+        Click <strong>"I've Paid"</strong> only after payment is done.
+      </p>
+
+      <button class="qr-confirm-btn" onclick="confirmPayment()">✅ I've Paid — Confirm</button>
+      <button class="qr-cancel-btn" onclick="closeQR()">✕ Cancel</button>
+    </div>
+  </div>
+
+  <!-- ══ Success Overlay ══ -->
   <div class="success-overlay" id="success-overlay">
     <div class="success-box">
-      <div class="success-icon">✅</div>
-      <h2>Payment Successful!</h2>
-      <p>Your component purchase is confirmed. Collect it from the HOD Cabin, ECE Department.</p>
+      <div class="success-icon" id="success-icon">✅</div>
+      <h2 id="success-title">Payment Successful!</h2>
+      <p id="success-msg">Your component is confirmed.</p>
       <div class="order-id" id="order-id">Order #ECE-000000</div>
-      <p style="font-size:0.82rem;color:#64748b;margin-bottom:1.5rem;">Show this order ID at the HOD Cabin to collect your component.</p>
-      <a href="marketplace.html" class="btn btn-primary" style="display:block;">← Back to Marketplace</a>
+      <p style="font-size:0.82rem;color:#64748b;margin-bottom:1.5rem;" id="success-sub"></p>
+      <a href="marketplace.html" class="btn btn-primary" style="display:block;" id="success-btn">← Back to Marketplace</a>
     </div>
   </div>
 
   <script>
-    let selectedMethod = 'upi';
-    const panels = ['upi','card','netbanking','cash'];
+    // ── Constants ──────────────────────────────
+    const OUR_UPI   = 'ecehub@oksbi';
+    const OUR_NAME  = 'ECE Hub';
 
-    // Load URL params
-    const params = new URLSearchParams(window.location.search);
-    const compName = decodeURIComponent(params.get('name') || 'Component');
-    const compPrice = parseInt(params.get('price') || '0');
+    // ── Read URL params ────────────────────────
+    const params    = new URLSearchParams(window.location.search);
+    const compName  = decodeURIComponent(params.get('name')  || 'Component');
+    const isTemp    = params.get('type') === 'temporary';
+    const compPrice = isTemp
+      ? parseInt(params.get('amount') || '20')
+      : parseInt(params.get('price')  || '0');
 
-    document.getElementById('comp-name-display').textContent = compName;
+    // ── Populate order summary ─────────────────
+    document.getElementById('comp-name-display').textContent  = compName;
     document.getElementById('comp-price-display').textContent = `₹${compPrice}`;
-    document.getElementById('comp-total').textContent = `₹${compPrice}`;
-    document.getElementById('pay-amount').textContent = `₹${compPrice}`;
-    document.getElementById('cash-amount').textContent = `₹${compPrice}`;
+    document.getElementById('comp-total').textContent         = `₹${compPrice}`;
+    document.getElementById('cash-amount').textContent        = `₹${compPrice}`;
+
+    if (isTemp) {
+      // Temporary section
+      document.getElementById('type-badge').textContent      = '⏱ Temporary Borrow';
+      document.getElementById('type-badge').classList.add('temp');
+      document.getElementById('page-subtitle').textContent   = 'Pay ₹20 to borrow this component';
+      document.getElementById('license-label').textContent   = '⏱ Borrow Period';
+      document.getElementById('license-val').textContent     = '7 Days';
+      document.getElementById('temp-section').style.display  = 'block';
+      document.getElementById('t-pay-label').textContent     = compPrice;
+
+      // Build QR URL
+      const upiString = `upi://pay?pa=${OUR_UPI}&pn=${encodeURIComponent(OUR_NAME)}&am=${compPrice}&cu=INR&tn=${encodeURIComponent('ECE Hub - Temporary: ' + compName)}`;
+      const qrURL     = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+      document.getElementById('qr-img').src              = qrURL;
+      document.getElementById('qr-amount-label').textContent  = compPrice;
+      document.getElementById('qr-note-amount').textContent   = compPrice;
+      document.getElementById('upi-display').textContent      = OUR_UPI;
+
+    } else {
+      // Permanent section
+      document.getElementById('type-badge').textContent      = '♾️ Permanent Purchase';
+      document.getElementById('type-badge').classList.add('perm');
+      document.getElementById('page-subtitle').textContent   = 'Complete your purchase securely';
+      document.getElementById('license-label').textContent   = '♾️ Permanent License';
+      document.getElementById('license-val').textContent     = 'Included';
+      document.getElementById('perm-section').style.display  = 'block';
+      document.getElementById('p-pay-label').textContent     = compPrice;
+    }
+
+    // ── Payment method toggle (permanent) ─────
+    let selectedMethod = 'upi';
+    const permPanels   = ['upi','card','netbanking','cash'];
 
     function selectMethod(el, method) {
       document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
       el.classList.add('active');
       selectedMethod = method;
-      panels.forEach(p => document.getElementById('panel-'+p).style.display = 'none');
-      document.getElementById('panel-'+method).style.display = 'block';
+      permPanels.forEach(p => document.getElementById('panel-' + p).style.display = 'none');
+      document.getElementById('panel-' + method).style.display = 'block';
     }
 
     // Card number formatting
@@ -389,51 +596,92 @@
       });
     }
 
-   function processPayment() {
-    const name = document.getElementById('buyer-name').value.trim();
-    const roll = document.getElementById('buyer-roll').value.trim();
-    const phone = document.getElementById('buyer-phone').value.trim();
+    // ── TEMPORARY FLOW ─────────────────────────
+    function showQR() {
+      const name  = document.getElementById('t-name').value.trim();
+      const roll  = document.getElementById('t-roll').value.trim();
+      const phone = document.getElementById('t-phone').value.trim();
 
-  if (!name) {
-    alert('Please enter your Full Name.');
-    return;
-  }
+      if (!name)  { alert('Please enter your Full Name.'); return; }
+      if (!roll)  { alert('Please enter your Roll Number.'); return; }
+      if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+        alert('Please enter a valid 10-digit Phone Number.'); return;
+      }
 
-  if (!roll) {
-    alert('Please enter your Roll Number.');
-    return;
-  }
-
-  if (!phone || phone.length !== 10) {
-    alert('Please enter a valid 10-digit Phone Number.');
-    return;
-  }
-
-  if (selectedMethod === 'upi') {
-    const upi = document.getElementById('upi-id').value.trim();
-
-    if (!upi) {
-      alert('Please enter your UPI ID.');
-      return;
+      document.getElementById('qr-overlay').classList.add('show');
     }
 
-    const paymentDone = confirm(
-      `Amount: ₹${compPrice}\n\nScan QR and complete payment.\n\nClick OK only after payment is completed.`
-    );
-
-    if (!paymentDone) {
-      alert('Payment not completed.');
-      return;
+    function closeQR() {
+      document.getElementById('qr-overlay').classList.remove('show');
     }
-  }
 
-  const orderId = 'ECE-' + Date.now().toString().slice(-6);
+    function confirmPayment() {
+      closeQR();
+      const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      document.getElementById('success-icon').textContent     = '✅';
+      document.getElementById('success-title').textContent    = 'Payment Confirmed!';
+      document.getElementById('success-msg').textContent      = `You can now collect "${compName}" from the HOD Cabin.`;
+      document.getElementById('order-id').textContent         = `Order #${orderId}`;
+      document.getElementById('success-sub').textContent      = 'Show this order ID at the HOD Cabin. Return within 7 days.';
+      document.getElementById('success-btn').href             = `collect.html?name=${encodeURIComponent(compName)}&order=${orderId}`;
+      document.getElementById('success-btn').textContent      = '🏢 View Collection Steps →';
+      document.getElementById('success-overlay').classList.add('show');
+    }
 
-  document.getElementById('order-id').textContent =
-    `Order #${orderId}`;
+    // ── PERMANENT FLOW ─────────────────────────
+    function processPermanent() {
+      const name  = document.getElementById('p-name').value.trim();
+      const roll  = document.getElementById('p-roll').value.trim();
+      const phone = document.getElementById('p-phone').value.trim();
 
-  document.getElementById('success-overlay').classList.add('show');
-}
+      if (!name)  { alert('Please enter your Full Name.'); return; }
+      if (!roll)  { alert('Please enter your Roll Number.'); return; }
+      if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+        alert('Please enter a valid 10-digit Phone Number.'); return;
+      }
+
+      if (selectedMethod === 'upi') {
+        const upi = document.getElementById('p-upi-id').value.trim();
+        if (!upi) { alert('Please enter your UPI ID.'); return; }
+
+        // Show QR for permanent too
+        const upiString = `upi://pay?pa=${OUR_UPI}&pn=${encodeURIComponent(OUR_NAME)}&am=${compPrice}&cu=INR&tn=${encodeURIComponent('ECE Hub - Buy: ' + compName)}`;
+        const qrURL     = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+        document.getElementById('qr-img').src                  = qrURL;
+        document.getElementById('qr-amount-label').textContent = compPrice;
+        document.getElementById('qr-note-amount').textContent  = compPrice;
+        document.getElementById('qr-overlay').classList.add('show');
+
+      } else if (selectedMethod === 'cash') {
+        showSuccessPerm();
+      } else {
+        // Card / Net banking — simulate
+        showSuccessPerm();
+      }
+    }
+
+    function showSuccessPerm() {
+      const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      document.getElementById('success-icon').textContent   = '✅';
+      document.getElementById('success-title').textContent  = 'Order Placed!';
+      document.getElementById('success-msg').textContent    = `Your purchase of "${compName}" is confirmed. Collect it from the HOD Cabin.`;
+      document.getElementById('order-id').textContent       = `Order #${orderId}`;
+      document.getElementById('success-sub').textContent    = 'Show this Order ID at the HOD Cabin, ECE Department to collect your component.';
+      document.getElementById('success-btn').href           = 'marketplace.html';
+      document.getElementById('success-btn').textContent    = '← Back to Marketplace';
+      document.getElementById('success-overlay').classList.add('show');
+    }
+
+    // Override confirmPayment for permanent UPI
+    const _origConfirm = confirmPayment;
+    window.confirmPayment = function() {
+      closeQR();
+      if (isTemp) {
+        _origConfirm();
+      } else {
+        showSuccessPerm();
+      }
+    };
   </script>
 </body>
 </html>
