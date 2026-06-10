@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace — ECE Component Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">ECE<span class="logo-accent">Hub</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="marketplace.html" class="active">Marketplace</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost">Login</a>
+        <a href="register.html" class="btn btn-primary">Sign Up</a>
+      </div>
+      <button class="hamburger" id="hamburger">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Component Marketplace</h1>
+      <p>Browse reusable modules, circuits, and project components from ECE senior projects.</p>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE BODY -->
+  <section class="marketplace-section">
+    <div class="container">
+      <div class="marketplace-layout">
+
+        <!-- SIDEBAR FILTERS -->
+        <aside class="filter-sidebar">
+          <div class="filter-block">
+            <h4>Search</h4>
+            <input type="text" id="search-input" class="filter-input" placeholder="Search components..." />
+          </div>
+
+          <div class="filter-block">
+            <h4>Access Type</h4>
+            <label class="filter-check">
+              <input type="checkbox" value="temporary" checked /> Temporary (Free)
+            </label>
+            <label class="filter-check">
+              <input type="checkbox" value="permanent" checked /> Permanent (Paid)
+            </label>
+          </div>
+
+          <div class="filter-block">
+            <h4>Category</h4>
+            <label class="filter-check"><input type="checkbox" value="microcontroller" checked /> 🟦 Dev Boards</label>
+            <label class="filter-check"><input type="checkbox" value="sensor" checked /> 🌡️ Sensors</label>
+            <label class="filter-check"><input type="checkbox" value="display" checked /> 🖥️ Displays</label>
+            <label class="filter-check"><input type="checkbox" value="relay" checked /> 🔌 Relay & Switching</label>
+            <label class="filter-check"><input type="checkbox" value="motor" checked /> ⚙️ Motors</label>
+            <label class="filter-check"><input type="checkbox" value="communication" checked /> 📡 Communication</label>
+            <label class="filter-check"><input type="checkbox" value="power" checked /> 🔋 Power</label>
+            <label class="filter-check"><input type="checkbox" value="audio" checked /> 🔔 Audio & Alert</label>
+            <label class="filter-check"><input type="checkbox" value="common" checked /> 🔗 Prototyping</label>
+          </div>
+
+          <div class="filter-block">
+            <h4>Price Range</h4>
+            <input type="range" id="price-range" min="0" max="500" value="500" class="price-slider" />
+            <div class="price-labels">
+              <span>₹0</span>
+              <span id="price-max-label">₹500</span>
+            </div>
+          </div>
+
+          <button class="btn btn-outline btn-full" id="reset-filters">Reset Filters</button>
+        </aside>
+
+        <!-- COMPONENT GRID -->
+        <main class="marketplace-main">
+          <div class="market-toolbar">
+            <span id="result-count" class="result-count">Showing all components</span>
+            <select class="sort-select" id="sort-select">
+              <option value="default">Sort: Default</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </div>
+
+          <div class="components-grid" id="market-grid">
+            <!-- Injected by JS -->
+          </div>
+
+          <div class="empty-state" id="empty-state" style="display:none;">
+            <span>🔍</span>
+            <h3>No components found</h3>
+            <p>Try adjusting your filters or search term.</p>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENT DETAIL MODAL -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="component-modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="logo-text">ECE<span class="logo-accent">Hub</span></span>
+          <p>A student-driven component marketplace for the ECE Department.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Access</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 ECE Component Hub. Built for the Department.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/marketplace.js"></script>
+</body>
+</html>

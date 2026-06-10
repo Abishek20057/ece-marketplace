@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECE Component Hub — Department Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">ECE<span class="logo-accent">Hub</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-ghost">Login</a>
+        <a href="register.html" class="btn btn-primary">Sign Up</a>
+      </div>
+      <button class="hamburger" id="hamburger">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="circuit-canvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge">ECE Department — Component Exchange</div>
+      <h1 class="hero-title">
+        Build Smarter.<br/>
+        <span class="gradient-text">Share Knowledge.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Access reusable project components, circuits & modules from senior projects. 
+        Borrow to learn, or purchase to build your own.
+      </p>
+      <div class="hero-cta">
+        <a href="marketplace.html" class="btn btn-primary btn-lg">Browse Components</a>
+        <a href="about.html" class="btn btn-outline btn-lg">How It Works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">120+</span><span class="stat-label">Components</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">40+</span><span class="stat-label">Projects</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">300+</span><span class="stat-label">Students Helped</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">How It Works</span>
+        <h2>Two Ways to Access Components</h2>
+      </div>
+      <div class="plans-grid">
+        <div class="plan-card plan-temp">
+          <div class="plan-icon">⏱</div>
+          <h3>Temporary Access</h3>
+          <p class="plan-subtitle">Learn & Explore</p>
+          <ul class="plan-features">
+            <li>✓ Access component documentation</li>
+            <li>✓ View circuit diagrams & schematics</li>
+            <li>✓ Read usage guides</li>
+            <li>✓ Time-limited project preview</li>
+            <li>✗ No source code download</li>
+            <li>✗ No commercial use</li>
+          </ul>
+          <div class="plan-price">
+            <span class="price-value">Free</span>
+            <span class="price-period">/ limited period</span>
+          </div>
+          <a href="marketplace.html?type=temporary" class="btn btn-outline btn-full">Browse Free</a>
+        </div>
+
+        <div class="plan-card plan-perm featured">
+          <div class="featured-badge">Most Popular</div>
+          <div class="plan-icon">♾️</div>
+          <h3>Permanent License</h3>
+          <p class="plan-subtitle">Build Your Project</p>
+          <ul class="plan-features">
+            <li>✓ Full source code access</li>
+            <li>✓ All circuit files & PCB layouts</li>
+            <li>✓ Lifetime updates</li>
+            <li>✓ Use in your own projects</li>
+            <li>✓ Priority support</li>
+            <li>✓ Funds the ECE Department</li>
+          </ul>
+          <div class="plan-price">
+            <span class="price-value">₹ Varies</span>
+            <span class="price-period">per component</span>
+          </div>
+          <a href="marketplace.html?type=permanent" class="btn btn-primary btn-full">Buy Components</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED COMPONENTS -->
+  <section class="section featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Featured</span>
+        <h2>Popular Components</h2>
+        <a href="marketplace.html" class="see-all">See All →</a>
+      </div>
+      <div class="components-grid" id="featured-grid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPARTMENT BANNER -->
+  <section class="dept-banner">
+    <div class="container">
+      <div class="banner-content">
+        <div class="banner-text">
+          <h3>Supporting ECE Department Growth</h3>
+          <p>Every purchase directly contributes to department funds — enabling better labs, equipment, and student projects.</p>
+        </div>
+        <a href="about.html" class="btn btn-primary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="logo-text">ECE<span class="logo-accent">Hub</span></span>
+          <p>A student-driven component marketplace for the ECE Department.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="marketplace.html">Marketplace</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Access</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 ECE Component Hub. Built for the Department.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/circuit.js"></script>
+</body>
+</html>
