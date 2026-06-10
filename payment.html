@@ -576,55 +576,44 @@
   </div>
 
   <script>
-    // ── Constants ──────────────────────────────
-    const OUR_UPI   = 'ecehub@oksbi';
-    const OUR_NAME  = 'ECE Hub';
+    // ── CONFIG ─────────────────────────────────────────────
+    const OUR_UPI          = 'ecehub@oksbi';
+    const OUR_NAME         = 'ECE Hub';
+    const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwiQ8AhNe9bUJinoe6p94o6t5isIrlDM_CT401nVOjToAKEvIfxv8tb9Q1PVhrL580ymQ/exec';
 
-    // ── Read URL params ────────────────────────
+    // ── URL PARAMS ─────────────────────────────────────────
     const params    = new URLSearchParams(window.location.search);
-    const compName  = decodeURIComponent(params.get('name')  || 'Component');
+    const compName  = decodeURIComponent(params.get('name') || 'Component');
     const isTemp    = params.get('type') === 'temporary';
-    const rawAmount = params.get('amount') || params.get('price') || '0';
     const compPrice = isTemp
       ? (parseInt(params.get('amount')) || 20)
       : (parseInt(params.get('price'))  || 0);
 
-    // ── Populate order summary ─────────────────
+    // ── POPULATE ORDER SUMMARY ─────────────────────────────
     document.getElementById('comp-name-display').textContent  = compName;
-    document.getElementById('comp-price-display').textContent = `₹${compPrice}`;
-    document.getElementById('comp-total').textContent         = `₹${compPrice}`;
-    document.getElementById('cash-amount').textContent        = `₹${compPrice}`;
+    document.getElementById('comp-price-display').textContent = '₹' + compPrice;
+    document.getElementById('comp-total').textContent         = '₹' + compPrice;
+    document.getElementById('cash-amount').textContent        = '₹' + compPrice;
 
     if (isTemp) {
-      // Temporary section
-      document.getElementById('type-badge').textContent      = '⏱ Temporary Borrow';
+      document.getElementById('type-badge').textContent     = '⏱ Temporary Borrow';
       document.getElementById('type-badge').classList.add('temp');
-      document.getElementById('page-subtitle').textContent   = 'Pay ₹20 to borrow this component';
-      document.getElementById('license-label').textContent   = '⏱ Borrow Period';
-      document.getElementById('license-val').textContent     = '7 Days';
-      document.getElementById('temp-section').style.display  = 'block';
-      document.getElementById('t-pay-label').textContent     = compPrice;
-
-      // Build QR URL
-      const upiString = `upi://pay?pa=${OUR_UPI}&pn=${encodeURIComponent(OUR_NAME)}&am=${compPrice}&cu=INR&tn=${encodeURIComponent('ECE Hub - Temporary: ' + compName)}`;
-      const qrURL     = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-      document.getElementById('qr-img').src              = qrURL;
-      document.getElementById('qr-amount-label').textContent  = compPrice;
-      document.getElementById('qr-note-amount').textContent   = compPrice;
-      document.getElementById('upi-display').textContent      = OUR_UPI;
-
+      document.getElementById('page-subtitle').textContent  = 'Pay ₹20 to borrow this component';
+      document.getElementById('license-label').textContent  = '⏱ Borrow Period';
+      document.getElementById('license-val').textContent    = '7 Days';
+      document.getElementById('temp-section').style.display = 'block';
+      document.getElementById('t-pay-label').textContent    = compPrice;
     } else {
-      // Permanent section
-      document.getElementById('type-badge').textContent      = '♾️ Permanent Purchase';
+      document.getElementById('type-badge').textContent     = '♾️ Permanent Purchase';
       document.getElementById('type-badge').classList.add('perm');
-      document.getElementById('page-subtitle').textContent   = 'Complete your purchase securely';
-      document.getElementById('license-label').textContent   = '♾️ Permanent License';
-      document.getElementById('license-val').textContent     = 'Included';
-      document.getElementById('perm-section').style.display  = 'block';
-      document.getElementById('p-pay-label').textContent     = compPrice;
+      document.getElementById('page-subtitle').textContent  = 'Complete your purchase securely';
+      document.getElementById('license-label').textContent  = '♾️ Permanent License';
+      document.getElementById('license-val').textContent    = 'Included';
+      document.getElementById('perm-section').style.display = 'block';
+      document.getElementById('p-pay-label').textContent    = compPrice;
     }
 
-    // ── Payment method toggle (permanent) ─────
+    // ── PAYMENT METHOD TABS (permanent) ───────────────────
     let selectedMethod = 'upi';
     const permPanels   = ['upi','card','netbanking','cash'];
 
@@ -645,49 +634,19 @@
       });
     }
 
-    // ── TEMPORARY FLOW ─────────────────────────
-    function showQR() {
-      const name  = document.getElementById('t-name').value.trim();
-      const roll  = document.getElementById('t-roll').value.trim();
-      const phone = document.getElementById('t-phone').value.trim();
-
-      if (!name)  { alert('Please enter your Full Name.'); return; }
-      if (!roll)  { alert('Please enter your Roll Number.'); return; }
-      if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
-        alert('Please enter a valid 10-digit Phone Number.'); return;
-      }
-
-      document.getElementById('qr-overlay').classList.add('show');
-    }
-
-    function closeQR() {
-      document.getElementById('qr-overlay').classList.remove('show');
-      // reset UTR field on close
-      screenshotFile = null; screenshotB64 = null;
-      const inp = document.getElementById('utr-input');
-      if (inp) { inp.value = ''; inp.style.borderColor = '#e2e8f0'; }
-      const btn = document.getElementById('confirm-btn');
-      if (btn) { btn.disabled = true; btn.style.opacity = '0.38'; btn.style.cursor = 'not-allowed'; btn.textContent = '✅ Confirm Payment'; }
-      const zone = document.getElementById('upload-zone');
-      if (zone) { zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f8fafc'; }
-      const ph = document.getElementById('upload-placeholder');
-      if (ph) ph.style.display = 'block';
-      const pv = document.getElementById('upload-preview');
-      if (pv) pv.style.display = 'none';
-      const si = document.getElementById('screenshot-input');
-      if (si) si.value = '';
-    }
-
+    // ── SCREENSHOT & UTR STATE ─────────────────────────────
     let screenshotFile = null;
     let screenshotB64  = null;
 
     function checkConfirmReady() {
-      const utr   = document.getElementById('utr-input').value;
-      const ready = utr.length === 12 && screenshotFile !== null;
+      const utrEl = document.getElementById('utr-input');
+      const utr   = utrEl ? utrEl.value : '';
+      const ready = (utr.length === 12) && (screenshotFile !== null);
       const btn   = document.getElementById('confirm-btn');
+      if (!btn) return;
       btn.disabled      = !ready;
-      btn.style.opacity = ready ? '1' : '0.38';
-      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+      btn.style.opacity = ready ? '1'            : '0.38';
+      btn.style.cursor  = ready ? 'pointer'      : 'not-allowed';
     }
 
     function onUTRInput(el) {
@@ -707,93 +666,146 @@
       screenshotFile = file;
       const reader = new FileReader();
       reader.onload = (e) => {
-        screenshotB64 = e.target.result; // base64 data URL
+        screenshotB64 = e.target.result;
         document.getElementById('upload-placeholder').style.display = 'none';
-        document.getElementById('upload-preview').style.display = 'block';
-        document.getElementById('preview-img').src = screenshotB64;
-        document.getElementById('preview-name').textContent = '✓ ' + file.name;
-        document.getElementById('upload-zone').style.borderColor = '#16a34a';
-        document.getElementById('upload-zone').style.background  = '#f0fdf4';
+        document.getElementById('upload-preview').style.display     = 'block';
+        document.getElementById('preview-img').src                  = screenshotB64;
+        document.getElementById('preview-name').textContent         = '✓ ' + file.name;
+        document.getElementById('upload-zone').style.borderColor    = '#16a34a';
+        document.getElementById('upload-zone').style.background     = '#f0fdf4';
         checkConfirmReady();
       };
       reader.readAsDataURL(file);
     }
 
-    // ── GOOGLE APPS SCRIPT WEB APP URL ──────────
-    // After deploying Code.gs, paste the URL here:
-    const SHEET_WEBAPP_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+    // ── QR HELPERS ─────────────────────────────────────────
+    function buildQR(amount, label) {
+      const upiStr = 'upi://pay?pa=' + OUR_UPI
+                   + '&pn=' + encodeURIComponent(OUR_NAME)
+                   + '&am=' + amount
+                   + '&cu=INR'
+                   + '&tn=' + encodeURIComponent('ECE Hub - ' + label + ': ' + compName);
+      return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(upiStr);
+    }
 
-    function confirmPayment() {
-      const utr  = document.getElementById('utr-input').value.trim();
-      const name = isTemp
-        ? document.getElementById('t-name').value.trim()
-        : document.getElementById('p-name').value.trim();
-      const roll = isTemp
-        ? document.getElementById('t-roll').value.trim()
-        : document.getElementById('p-roll').value.trim();
-      const year = isTemp
-        ? document.getElementById('t-year').value
-        : document.getElementById('p-year').value;
-      const phone = isTemp
-        ? document.getElementById('t-phone').value.trim()
-        : document.getElementById('p-phone').value.trim();
+    function openQRModal(amount, label) {
+      document.getElementById('qr-img').src              = buildQR(amount, label);
+      document.getElementById('qr-amount-label').textContent = amount;
+      document.getElementById('qr-note-amount').textContent  = amount;
+      document.getElementById('upi-display').textContent     = OUR_UPI;
+      document.getElementById('qr-overlay').classList.add('show');
+    }
 
-      const orderId = 'ECE-' + Date.now().toString().slice(-6);
-
-      // Show loading state
+    function closeQR() {
+      document.getElementById('qr-overlay').classList.remove('show');
+      // Reset all modal state
+      screenshotFile = null;
+      screenshotB64  = null;
+      const utrEl = document.getElementById('utr-input');
+      if (utrEl) { utrEl.value = ''; utrEl.style.borderColor = '#e2e8f0'; }
       const btn = document.getElementById('confirm-btn');
-      btn.textContent  = '⏳ Submitting…';
-      btn.disabled     = true;
-      btn.style.opacity = '0.7';
+      if (btn) {
+        btn.disabled      = true;
+        btn.style.opacity = '0.38';
+        btn.style.cursor  = 'not-allowed';
+        btn.textContent   = '✅ Confirm Payment';
+      }
+      const zone = document.getElementById('upload-zone');
+      if (zone) { zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f8fafc'; }
+      const ph = document.getElementById('upload-placeholder');
+      if (ph) ph.style.display = 'block';
+      const pv = document.getElementById('upload-preview');
+      if (pv) pv.style.display = 'none';
+      const si = document.getElementById('screenshot-input');
+      if (si) si.value = '';
+    }
 
-      const payload = {
-        timestamp  : new Date().toLocaleString('en-IN'),
-        name       : name,
-        roll       : roll,
-        year       : year,
-        phone      : phone,
-        component  : compName,
-        amount     : compPrice,
-        type       : isTemp ? 'Temporary' : 'Permanent',
-        utr        : utr,
-        orderId    : orderId,
-        screenshot : screenshotB64   // base64 image sent to Apps Script
-      };
-
+    // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
+    function submitToSheet(payload, onDone) {
       fetch(SHEET_WEBAPP_URL, {
         method : 'POST',
         mode   : 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify(payload)
-      })
-      .then(() => {
-        closeQR();
-        showSuccessTemp(orderId);
-      })
-      .catch(() => {
-        // Even if fetch fails (no-cors), proceed — sheet may still receive it
-        closeQR();
-        showSuccessTemp(orderId);
-      });
+      }).then(onDone).catch(onDone); // always proceed
     }
 
-    function showSuccessTemp(orderId) {
-      document.getElementById('success-icon').textContent  = '✅';
-      document.getElementById('success-title').textContent = 'Payment Confirmed!';
-      document.getElementById('success-msg').textContent   = `You can now collect "${compName}" from the HOD Cabin.`;
-      document.getElementById('order-id').textContent      = `Order #${orderId}`;
-      document.getElementById('success-sub').textContent   = 'Show this order ID at the HOD Cabin. Return within 7 days.';
-      document.getElementById('success-btn').href          = `collect.html?name=${encodeURIComponent(compName)}&order=${orderId}`;
-      document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
+    // ── SUCCESS SCREEN ─────────────────────────────────────
+    function showSuccess(orderId, type) {
+      document.getElementById('success-icon').textContent = '✅';
+      if (type === 'temporary') {
+        document.getElementById('success-title').textContent = 'Payment Confirmed!';
+        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the HOD Cabin.';
+        document.getElementById('success-sub').textContent   = 'Show this order ID at the HOD Cabin. Return within 7 days.';
+        document.getElementById('success-btn').href          = 'collect.html?name=' + encodeURIComponent(compName) + '&order=' + orderId;
+        document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
+      } else {
+        document.getElementById('success-title').textContent = 'Order Placed!';
+        document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the HOD Cabin, ECE Department to collect your component.';
+        document.getElementById('success-btn').href          = 'marketplace.html';
+        document.getElementById('success-btn').textContent   = '← Back to Marketplace';
+      }
+      document.getElementById('order-id').textContent = 'Order #' + orderId;
       document.getElementById('success-overlay').classList.add('show');
     }
 
-    // ── PERMANENT FLOW ─────────────────────────
+    // ── CONFIRM PAYMENT (QR modal submit btn) ──────────────
+    function confirmPayment() {
+      const utr     = document.getElementById('utr-input').value.trim();
+      const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      const type    = isTemp ? 'temporary' : 'permanent';
+
+      // Read correct form fields based on type
+      const nameId  = isTemp ? 't-name'  : 'p-name';
+      const rollId  = isTemp ? 't-roll'  : 'p-roll';
+      const yearId  = isTemp ? 't-year'  : 'p-year';
+      const phoneId = isTemp ? 't-phone' : 'p-phone';
+
+      const payload = {
+        timestamp : new Date().toLocaleString('en-IN'),
+        orderId,
+        name      : document.getElementById(nameId).value.trim(),
+        roll      : document.getElementById(rollId).value.trim(),
+        year      : document.getElementById(yearId).value,
+        phone     : document.getElementById(phoneId).value.trim(),
+        component : compName,
+        amount    : compPrice,
+        type      : isTemp ? 'Temporary' : 'Permanent',
+        utr,
+        screenshot: screenshotB64 || ''
+      };
+
+      // Loading state
+      const btn = document.getElementById('confirm-btn');
+      btn.textContent   = '⏳ Submitting…';
+      btn.disabled      = true;
+      btn.style.opacity = '0.7';
+
+      submitToSheet(payload, () => {
+        closeQR();
+        showSuccess(orderId, type);
+      });
+    }
+
+    // ── TEMPORARY: show QR after form validation ───────────
+    function showQR() {
+      const name  = document.getElementById('t-name').value.trim();
+      const roll  = document.getElementById('t-roll').value.trim();
+      const phone = document.getElementById('t-phone').value.trim();
+      if (!name)  { alert('Please enter your Full Name.'); return; }
+      if (!roll)  { alert('Please enter your Roll Number.'); return; }
+      if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+        alert('Please enter a valid 10-digit Phone Number.'); return;
+      }
+      openQRModal(compPrice, 'Temporary');
+    }
+
+    // ── PERMANENT: validate form → show QR for UPI, or direct submit for cash ──
     function processPermanent() {
       const name  = document.getElementById('p-name').value.trim();
       const roll  = document.getElementById('p-roll').value.trim();
       const phone = document.getElementById('p-phone').value.trim();
-
       if (!name)  { alert('Please enter your Full Name.'); return; }
       if (!roll)  { alert('Please enter your Roll Number.'); return; }
       if (!phone || phone.length !== 10 || !/^\d{10}$/.test(phone)) {
@@ -803,69 +815,31 @@
       if (selectedMethod === 'upi') {
         const upi = document.getElementById('p-upi-id').value.trim();
         if (!upi) { alert('Please enter your UPI ID.'); return; }
-
-        // Show QR for permanent too
-        const upiString = `upi://pay?pa=${OUR_UPI}&pn=${encodeURIComponent(OUR_NAME)}&am=${compPrice}&cu=INR&tn=${encodeURIComponent('ECE Hub - Buy: ' + compName)}`;
-        const qrURL     = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-        document.getElementById('qr-img').src                  = qrURL;
-        document.getElementById('qr-amount-label').textContent = compPrice;
-        document.getElementById('qr-note-amount').textContent  = compPrice;
-        document.getElementById('qr-overlay').classList.add('show');
+        openQRModal(compPrice, 'Buy');
 
       } else if (selectedMethod === 'cash') {
-        showSuccessPerm();
+        // Cash — submit to sheet with "CASH" as UTR, no screenshot needed
+        const orderId = 'ECE-' + Date.now().toString().slice(-6);
+        const payload = {
+          timestamp : new Date().toLocaleString('en-IN'),
+          orderId,
+          name,
+          roll      : document.getElementById('p-roll').value.trim(),
+          year      : document.getElementById('p-year').value,
+          phone,
+          component : compName,
+          amount    : compPrice,
+          type      : 'Permanent',
+          utr       : 'CASH',
+          screenshot: ''
+        };
+        submitToSheet(payload, () => showSuccess(orderId, 'permanent'));
+
       } else {
-        // Card / Net banking — simulate
-        showSuccessPerm();
+        // Card / Net banking — same QR + UTR + screenshot flow
+        openQRModal(compPrice, 'Buy');
       }
     }
-
-    function showSuccessPerm() {
-      const orderId = 'ECE-' + Date.now().toString().slice(-6);
-      const name  = document.getElementById('p-name').value.trim();
-      const roll  = document.getElementById('p-roll').value.trim();
-      const year  = document.getElementById('p-year').value;
-      const phone = document.getElementById('p-phone').value.trim();
-      const utr   = (document.getElementById('utr-input') || {value:''}).value.trim();
-
-      const payload = {
-        timestamp : new Date().toLocaleString('en-IN'),
-        name, roll, year, phone,
-        component : compName,
-        amount    : compPrice,
-        type      : 'Permanent',
-        utr       : utr || selectedMethod.toUpperCase(),
-        orderId,
-        screenshot: screenshotB64 || ''
-      };
-
-      fetch(SHEET_WEBAPP_URL, {
-        method : 'POST',
-        mode   : 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify(payload)
-      }).catch(() => {});
-
-      document.getElementById('success-icon').textContent   = '✅';
-      document.getElementById('success-title').textContent  = 'Order Placed!';
-      document.getElementById('success-msg').textContent    = `Your purchase of "${compName}" is confirmed. Collect it from the HOD Cabin.`;
-      document.getElementById('order-id').textContent       = `Order #${orderId}`;
-      document.getElementById('success-sub').textContent    = 'Show this Order ID at the HOD Cabin, ECE Department to collect your component.';
-      document.getElementById('success-btn').href           = 'marketplace.html';
-      document.getElementById('success-btn').textContent    = '← Back to Marketplace';
-      document.getElementById('success-overlay').classList.add('show');
-    }
-
-    // Override confirmPayment for permanent UPI
-    const _origConfirm = confirmPayment;
-    window.confirmPayment = function() {
-      closeQR();
-      if (isTemp) {
-        _origConfirm();
-      } else {
-        showSuccessPerm();
-      }
-    };
   </script>
 </body>
 </html>
