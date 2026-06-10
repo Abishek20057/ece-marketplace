@@ -178,18 +178,21 @@
       inset: 0;
       background: rgba(10,22,40,0.88);
       z-index: 999;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      overflow-y: auto;
+      padding: 1.5rem 1rem;
     }
     .qr-overlay.show { display: flex; }
     .qr-box {
       background: white;
       border-radius: 20px;
-      padding: 2.5rem 2rem;
-      max-width: 380px;
-      width: 92%;
+      padding: 2rem 1.5rem;
+      max-width: 400px;
+      width: 100%;
       text-align: center;
       animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      margin: auto;
     }
     @keyframes popIn {
       from { transform: scale(0.8); opacity: 0; }
@@ -205,7 +208,7 @@
       font-size: 2rem;
       font-weight: 700;
       color: var(--electric);
-      margin: 0.5rem 0 1.2rem;
+      margin: 0.3rem 0 0.8rem;
       font-family: var(--font-display);
     }
     .qr-img-wrap {
@@ -216,7 +219,7 @@
       display: inline-block;
       border: 2px solid #e2e8f0;
     }
-    .qr-img-wrap img { display: block; width: 200px; height: 200px; }
+    .qr-img-wrap img { display: block; width: 170px; height: 170px; }
     .upi-id-display {
       background: #f0fdf4;
       border: 1px solid #86efac;
@@ -225,7 +228,7 @@
       font-family: monospace;
       font-size: 1rem;
       color: #166534;
-      margin-bottom: 1.2rem;
+      margin-bottom: 0.8rem;
       font-weight: 700;
       letter-spacing: 0.03em;
     }
@@ -552,6 +555,13 @@
         <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="onScreenshot(this)" />
       </div>
 
+      <!-- Progress hint -->
+      <div id="confirm-hint" style="font-size:0.78rem;color:#f59e0b;font-weight:600;
+           margin-bottom:0.6rem;padding:0.5rem 0.8rem;background:#fffbeb;
+           border-radius:8px;border:1px solid #fde68a;text-align:left;">
+        ⚠️ <span id="hint-text">Enter UTR and upload screenshot to confirm</span>
+      </div>
+
       <button
         class="qr-confirm-btn"
         id="confirm-btn"
@@ -639,14 +649,31 @@
     let screenshotB64  = null;
 
     function checkConfirmReady() {
-      const utrEl = document.getElementById('utr-input');
-      const utr   = utrEl ? utrEl.value : '';
-      const ready = (utr.length === 12) && (screenshotFile !== null);
-      const btn   = document.getElementById('confirm-btn');
+      const utrEl   = document.getElementById('utr-input');
+      const utr     = utrEl ? utrEl.value : '';
+      const hasUTR  = utr.length === 12;
+      const hasSS   = screenshotFile !== null;
+      const ready   = hasUTR && hasSS;
+
+      const btn  = document.getElementById('confirm-btn');
+      const hint = document.getElementById('confirm-hint');
+      const hintTxt = document.getElementById('hint-text');
       if (!btn) return;
+
       btn.disabled      = !ready;
-      btn.style.opacity = ready ? '1'            : '0.38';
-      btn.style.cursor  = ready ? 'pointer'      : 'not-allowed';
+      btn.style.opacity = ready ? '1'       : '0.38';
+      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+
+      if (hint && hintTxt) {
+        if (ready) {
+          hint.style.display = 'none';
+        } else {
+          hint.style.display = 'block';
+          if (!hasUTR && !hasSS) hintTxt.textContent = 'Enter UTR and upload screenshot to confirm';
+          else if (!hasUTR)      hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID';
+          else                   hintTxt.textContent = 'Upload your payment screenshot';
+        }
+      }
     }
 
     function onUTRInput(el) {
@@ -718,6 +745,10 @@
       if (pv) pv.style.display = 'none';
       const si = document.getElementById('screenshot-input');
       if (si) si.value = '';
+      const hint = document.getElementById('confirm-hint');
+      if (hint) hint.style.display = 'block';
+      const hintTxt = document.getElementById('hint-text');
+      if (hintTxt) hintTxt.textContent = 'Enter UTR and upload screenshot to confirm';
     }
 
     // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
