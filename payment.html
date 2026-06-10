@@ -525,9 +525,31 @@
                  font-size:1rem;font-family:monospace;color:#1e293b;box-sizing:border-box;
                  transition:border-color 0.2s;letter-spacing:0.05em;"
         />
-        <p id="utr-hint" style="font-size:0.78rem;color:#94a3b8;margin-top:0.35rem;margin-bottom:0;">
+        <p style="font-size:0.78rem;color:#94a3b8;margin-top:0.35rem;margin-bottom:0;">
           Find it in your UPI app → Payment History → Transaction ID
         </p>
+      </div>
+
+      <!-- Screenshot upload -->
+      <div style="margin-bottom:1.2rem;text-align:left;">
+        <label style="font-size:0.82rem;font-weight:700;color:#1e293b;display:block;margin-bottom:0.4rem;">
+          📸 Payment Screenshot
+        </label>
+        <div id="upload-zone"
+          onclick="document.getElementById('screenshot-input').click()"
+          style="border:2px dashed #cbd5e1;border-radius:10px;padding:1.2rem 1rem;text-align:center;
+                 cursor:pointer;transition:all 0.2s;background:#f8fafc;">
+          <div id="upload-placeholder">
+            <div style="font-size:1.8rem;margin-bottom:0.3rem;">📤</div>
+            <div style="font-size:0.85rem;font-weight:600;color:#475569;">Click to upload screenshot</div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.2rem;">JPG / PNG · Max 5MB</div>
+          </div>
+          <div id="upload-preview" style="display:none;">
+            <img id="preview-img" style="max-height:120px;border-radius:8px;margin-bottom:0.4rem;" />
+            <div id="preview-name" style="font-size:0.78rem;color:#16a34a;font-weight:600;"></div>
+          </div>
+        </div>
+        <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="onScreenshot(this)" />
       </div>
 
       <button
@@ -641,39 +663,128 @@
     function closeQR() {
       document.getElementById('qr-overlay').classList.remove('show');
       // reset UTR field on close
+      screenshotFile = null; screenshotB64 = null;
       const inp = document.getElementById('utr-input');
-      if (inp) inp.value = '';
+      if (inp) { inp.value = ''; inp.style.borderColor = '#e2e8f0'; }
       const btn = document.getElementById('confirm-btn');
-      if (btn) { btn.disabled = true; btn.style.opacity = '0.38'; btn.style.cursor = 'not-allowed'; }
+      if (btn) { btn.disabled = true; btn.style.opacity = '0.38'; btn.style.cursor = 'not-allowed'; btn.textContent = '✅ Confirm Payment'; }
+      const zone = document.getElementById('upload-zone');
+      if (zone) { zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f8fafc'; }
+      const ph = document.getElementById('upload-placeholder');
+      if (ph) ph.style.display = 'block';
+      const pv = document.getElementById('upload-preview');
+      if (pv) pv.style.display = 'none';
+      const si = document.getElementById('screenshot-input');
+      if (si) si.value = '';
+    }
+
+    let screenshotFile = null;
+    let screenshotB64  = null;
+
+    function checkConfirmReady() {
+      const utr   = document.getElementById('utr-input').value;
+      const ready = utr.length === 12 && screenshotFile !== null;
+      const btn   = document.getElementById('confirm-btn');
+      btn.disabled      = !ready;
+      btn.style.opacity = ready ? '1' : '0.38';
+      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
     }
 
     function onUTRInput(el) {
-      // Allow only digits
       el.value = el.value.replace(/\D/g, '').substring(0, 12);
-      const valid = el.value.length === 12;
-      el.style.borderColor = valid ? '#16a34a' : '#e2e8f0';
-      const btn = document.getElementById('confirm-btn');
-      if (valid) {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.cursor = 'pointer';
-      } else {
-        btn.disabled = true;
-        btn.style.opacity = '0.38';
-        btn.style.cursor = 'not-allowed';
-      }
+      el.style.borderColor = el.value.length === 12 ? '#16a34a' : '#e2e8f0';
+      checkConfirmReady();
     }
 
+    function onScreenshot(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File too large. Please upload a screenshot under 5MB.');
+        input.value = '';
+        return;
+      }
+      screenshotFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        screenshotB64 = e.target.result; // base64 data URL
+        document.getElementById('upload-placeholder').style.display = 'none';
+        document.getElementById('upload-preview').style.display = 'block';
+        document.getElementById('preview-img').src = screenshotB64;
+        document.getElementById('preview-name').textContent = '✓ ' + file.name;
+        document.getElementById('upload-zone').style.borderColor = '#16a34a';
+        document.getElementById('upload-zone').style.background  = '#f0fdf4';
+        checkConfirmReady();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ── GOOGLE APPS SCRIPT WEB APP URL ──────────
+    // After deploying Code.gs, paste the URL here:
+    const SHEET_WEBAPP_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
     function confirmPayment() {
-      closeQR();
+      const utr  = document.getElementById('utr-input').value.trim();
+      const name = isTemp
+        ? document.getElementById('t-name').value.trim()
+        : document.getElementById('p-name').value.trim();
+      const roll = isTemp
+        ? document.getElementById('t-roll').value.trim()
+        : document.getElementById('p-roll').value.trim();
+      const year = isTemp
+        ? document.getElementById('t-year').value
+        : document.getElementById('p-year').value;
+      const phone = isTemp
+        ? document.getElementById('t-phone').value.trim()
+        : document.getElementById('p-phone').value.trim();
+
       const orderId = 'ECE-' + Date.now().toString().slice(-6);
-      document.getElementById('success-icon').textContent     = '✅';
-      document.getElementById('success-title').textContent    = 'Payment Confirmed!';
-      document.getElementById('success-msg').textContent      = `You can now collect "${compName}" from the HOD Cabin.`;
-      document.getElementById('order-id').textContent         = `Order #${orderId}`;
-      document.getElementById('success-sub').textContent      = 'Show this order ID at the HOD Cabin. Return within 7 days.';
-      document.getElementById('success-btn').href             = `collect.html?name=${encodeURIComponent(compName)}&order=${orderId}`;
-      document.getElementById('success-btn').textContent      = '🏢 View Collection Steps →';
+
+      // Show loading state
+      const btn = document.getElementById('confirm-btn');
+      btn.textContent  = '⏳ Submitting…';
+      btn.disabled     = true;
+      btn.style.opacity = '0.7';
+
+      const payload = {
+        timestamp  : new Date().toLocaleString('en-IN'),
+        name       : name,
+        roll       : roll,
+        year       : year,
+        phone      : phone,
+        component  : compName,
+        amount     : compPrice,
+        type       : isTemp ? 'Temporary' : 'Permanent',
+        utr        : utr,
+        orderId    : orderId,
+        screenshot : screenshotB64   // base64 image sent to Apps Script
+      };
+
+      fetch(SHEET_WEBAPP_URL, {
+        method : 'POST',
+        mode   : 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(payload)
+      })
+      .then(() => {
+        closeQR();
+        showSuccessTemp(orderId);
+      })
+      .catch(() => {
+        // Even if fetch fails (no-cors), proceed — sheet may still receive it
+        closeQR();
+        showSuccessTemp(orderId);
+      });
+    }
+
+    function showSuccessTemp(orderId) {
+      document.getElementById('success-icon').textContent  = '✅';
+      document.getElementById('success-title').textContent = 'Payment Confirmed!';
+      document.getElementById('success-msg').textContent   = `You can now collect "${compName}" from the HOD Cabin.`;
+      document.getElementById('order-id').textContent      = `Order #${orderId}`;
+      document.getElementById('success-sub').textContent   = 'Show this order ID at the HOD Cabin. Return within 7 days.';
+      document.getElementById('success-btn').href          = `collect.html?name=${encodeURIComponent(compName)}&order=${orderId}`;
+      document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
       document.getElementById('success-overlay').classList.add('show');
     }
 
@@ -711,6 +822,30 @@
 
     function showSuccessPerm() {
       const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      const name  = document.getElementById('p-name').value.trim();
+      const roll  = document.getElementById('p-roll').value.trim();
+      const year  = document.getElementById('p-year').value;
+      const phone = document.getElementById('p-phone').value.trim();
+      const utr   = (document.getElementById('utr-input') || {value:''}).value.trim();
+
+      const payload = {
+        timestamp : new Date().toLocaleString('en-IN'),
+        name, roll, year, phone,
+        component : compName,
+        amount    : compPrice,
+        type      : 'Permanent',
+        utr       : utr || selectedMethod.toUpperCase(),
+        orderId,
+        screenshot: screenshotB64 || ''
+      };
+
+      fetch(SHEET_WEBAPP_URL, {
+        method : 'POST',
+        mode   : 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(payload)
+      }).catch(() => {});
+
       document.getElementById('success-icon').textContent   = '✅';
       document.getElementById('success-title').textContent  = 'Order Placed!';
       document.getElementById('success-msg').textContent    = `Your purchase of "${compName}" is confirmed. Collect it from the HOD Cabin.`;
