@@ -613,9 +613,7 @@ input, textarea, select {
 .badge-cat[data-cat="power"]    { background: rgba(245,158,11,0.15); color: #fbbf24; }
 .badge-cat[data-cat="audio"]    { background: rgba(236,72,153,0.15); color: #f472b6; }
 .badge-cat[data-cat="common"]   { background: rgba(100,116,139,0.15); color: #94a3b8; }
-.badge-cat[data-cat="common"] {
-   /* existing code */
-}
+
 
 .temp-fee-badge{
     background:#fff7ed;
