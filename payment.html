@@ -389,30 +389,51 @@
       });
     }
 
-    function processPayment() {
-      const name = document.getElementById('buyer-name').value.trim();
-      const roll = document.getElementById('buyer-roll').value.trim();
-      const phone = document.getElementById('buyer-phone').value.trim();
+   function processPayment() {
+    const name = document.getElementById('buyer-name').value.trim();
+    const roll = document.getElementById('buyer-roll').value.trim();
+    const phone = document.getElementById('buyer-phone').value.trim();
 
-      if (!name || !roll) {
-        alert('Please fill in your Name and Roll Number.');
-        return;
-      }
-      if (phone && phone.length !== 10) {
-        alert('Please enter a valid 10-digit phone number.');
-        return;
-      }
+  if (!name) {
+    alert('Please enter your Full Name.');
+    return;
+  }
 
-      if (selectedMethod === 'upi') {
-        const upi = document.getElementById('upi-id').value.trim();
-        if (!upi) { alert('Please enter your UPI ID.'); return; }
-      }
+  if (!roll) {
+    alert('Please enter your Roll Number.');
+    return;
+  }
 
-      // Show success
-      const orderId = 'ECE-' + Date.now().toString().slice(-6);
-      document.getElementById('order-id').textContent = `Order #${orderId}`;
-      document.getElementById('success-overlay').classList.add('show');
+  if (!phone || phone.length !== 10) {
+    alert('Please enter a valid 10-digit Phone Number.');
+    return;
+  }
+
+  if (selectedMethod === 'upi') {
+    const upi = document.getElementById('upi-id').value.trim();
+
+    if (!upi) {
+      alert('Please enter your UPI ID.');
+      return;
     }
+
+    const paymentDone = confirm(
+      `Amount: ₹${compPrice}\n\nScan QR and complete payment.\n\nClick OK only after payment is completed.`
+    );
+
+    if (!paymentDone) {
+      alert('Payment not completed.');
+      return;
+    }
+  }
+
+  const orderId = 'ECE-' + Date.now().toString().slice(-6);
+
+  document.getElementById('order-id').textContent =
+    `Order #${orderId}`;
+
+  document.getElementById('success-overlay').classList.add('show');
+}
   </script>
 </body>
 </html>

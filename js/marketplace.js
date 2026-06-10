@@ -144,7 +144,7 @@ function buildCard(c) {
   const priceLabel = hasPerm
     ? `<span class="card-price price-paid">₹${c.permPrice}</span>`
     : `<span class="card-price price-free">Free</span>`;
-  const imgSrc = COMPONENT_IMAGES[c.id] || '';
+  const imgSrc = c.image || COMPONENT_IMAGES[c.id] || '';
   const fallback = CAT_EMOJI[c.category] || c.icon || '📦';
 
   return `
