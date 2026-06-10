@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collect Component — ECE Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .collect-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: var(--navy);
+    }
+    .collect-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .collect-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .collect-card h1 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+    .collect-card .component-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--electric);
+      margin-bottom: 1.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(56,130,246,0.1);
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .collect-steps {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    .collect-steps h3 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-dk);
+      margin-bottom: 1rem;
+    }
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .step-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--amber);
+      color: var(--navy);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-text {
+      color: var(--slate);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .step-text strong {
+      color: var(--navy);
+    }
+    .cabin-info {
+      background: linear-gradient(135deg, var(--navy), #1a3a5c);
+      color: white;
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .cabin-info .cabin-icon { font-size: 2rem; flex-shrink: 0; }
+    .cabin-info .cabin-details { text-align: left; }
+    .cabin-info .cabin-details strong {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+    .cabin-info .cabin-details span {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+    .collect-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .badge-temp-large {
+      display: inline-block;
+      background: rgba(245,158,8,0.15);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      border-radius: 20px;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">ECE<span>Hub</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="marketplace.html" class="active">Marketplace</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="collect-page">
+    <div class="collect-card">
+      <div class="collect-icon">🏢</div>
+      <div class="badge-temp-large">⏱ Temporary Access</div>
+      <h1>Collect Your Component</h1>
+      <div class="component-name" id="comp-name">Loading…</div>
+
+      <div class="cabin-info">
+        <div class="cabin-icon">📍</div>
+        <div class="cabin-details">
+          <strong>HOD Cabin — ECE Department</strong>
+          <span>2nd Floor, Main Block · Bring your ID Card</span>
+        </div>
+      </div>
+
+      <div class="collect-steps">
+        <h3>📋 Steps to Collect</h3>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">Visit the <strong>HOD Cabin, ECE Department</strong> during working hours (9AM – 5PM).</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">Show your <strong>College ID Card</strong> and mention the component name shown above.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">Sign the <strong>Component Register</strong> with your name, roll number, and date.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text">Return the component within <strong>7 days</strong> in working condition. No fee charged.</div>
+        </div>
+      </div>
+
+      <div class="collect-actions">
+        <a href="marketplace.html" class="btn btn-outline">← Back to Marketplace</a>
+        <a href="index.html" class="btn btn-primary">Go to Home</a>
+      </div>
+
+      <p style="font-size:0.78rem;color:#94a3b8;margin-top:1.5rem;">
+        Temporary borrowing is free. Components must be returned within 7 days.<br>
+        For queries, contact ECE Department office.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Show component name from URL params
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    if (name) {
+      document.getElementById('comp-name').textContent = decodeURIComponent(name);
+    }
+  </script>
+</body>
+</html>

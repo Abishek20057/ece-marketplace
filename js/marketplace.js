@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('reset-filters').addEventListener('click', resetFilters);
 
-  // Modal
+  // Modal close
   const overlay = document.getElementById('modal-overlay');
   document.getElementById('modal-close').addEventListener('click', () => overlay.classList.remove('active'));
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
@@ -62,23 +62,14 @@ function renderGrid() {
   const count = document.getElementById('result-count');
 
   let filtered = COMPONENTS.filter(c => {
-    // Type filter
     const hasMatchType = c.type.some(t => types.includes(t));
     if (!hasMatchType) return false;
-
-    // Category
-    if (!categories.includes(c.category)) return false;
-
-    // Search
+    if (categories.length && !categories.includes(c.category)) return false;
     if (search && !c.name.toLowerCase().includes(search) && !c.description.toLowerCase().includes(search)) return false;
-
-    // Price filter (against permanent price only)
     if (c.permPrice !== null && c.permPrice > maxPrice) return false;
-
     return true;
   });
 
-  // Sort
   if (sortVal === 'price-asc') {
     filtered.sort((a, b) => (a.permPrice ?? 0) - (b.permPrice ?? 0));
   } else if (sortVal === 'price-desc') {
@@ -100,7 +91,6 @@ function renderGrid() {
       card.addEventListener('click', () => openModal(filtered[i]));
     });
 
-    // Animate in
     requestAnimationFrame(() => {
       grid.querySelectorAll('.component-card').forEach((card, i) => {
         card.style.opacity = '0';
@@ -131,9 +121,17 @@ function buildCard(c) {
     ? `<span class="card-price price-paid">₹${c.permPrice}</span>`
     : `<span class="card-price price-free">Free</span>`;
 
+  // Image or icon fallback
+  const imgHtml = c.image
+    ? `<img src="${c.image}" alt="${c.name}" class="card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="card-thumb" style="display:none">${c.icon}</div>`
+    : `<div class="card-thumb">${c.icon}</div>`;
+
   return `
     <div class="component-card">
-      <div class="card-thumb">${c.icon}</div>
+      <div class="card-img-wrap">
+        ${imgHtml}
+      </div>
       <div class="card-body">
         <div class="card-badges">
           ${hasTemp ? '<span class="badge badge-temp">Temporary</span>' : ''}
@@ -157,8 +155,15 @@ function openModal(c) {
   const hasPerm = c.type.includes('permanent');
   const hasTemp = c.type.includes('temporary');
 
+  // Save selected component for post-login redirect
+  // These are used by auth.js after login
+
+  const imgSection = c.image
+    ? `<img src="${c.image}" alt="${c.name}" class="modal-img" onerror="this.style.display='none'">`
+    : `<div class="modal-thumb">${c.icon}</div>`;
+
   body.innerHTML = `
-    <div class="modal-thumb">${c.icon}</div>
+    ${imgSection}
     <h2>${c.name}</h2>
     <p class="modal-meta">${c.categoryLabel} · ${c.project}</p>
     <p class="modal-desc">${c.description}</p>
@@ -177,23 +182,49 @@ function openModal(c) {
     ${hasTemp ? `
     <div class="modal-price-row">
       <div>
-        <div class="modal-price-label">⏱ Temporary Access — Learn & Explore</div>
+        <div class="modal-price-label">⏱ Temporary Access — Borrow from Department</div>
         <div class="modal-price-val">Free</div>
       </div>
-      <a href="login.html" class="btn btn-outline">Get Temporary Access</a>
+      <button class="btn btn-outline" onclick="handleBorrow(${c.id}, '${encodeURIComponent(c.name)}')">Get Temporary Access</button>
     </div>` : ''}
     ${hasPerm ? `
     <div class="modal-price-row">
       <div>
-        <div class="modal-price-label">♾️ Permanent License — Full Files</div>
+        <div class="modal-price-label">♾️ Permanent — Buy & Keep</div>
         <div class="modal-price-val">₹${c.permPrice}</div>
       </div>
-      <a href="login.html" class="btn btn-primary">Buy Permanent License</a>
+      <button class="btn btn-primary" onclick="handleBuy(${c.id}, '${encodeURIComponent(c.name)}', ${c.permPrice})">Buy Now</button>
     </div>` : ''}
     <p style="font-size:0.78rem;color:var(--slate-dk);margin-top:0.75rem;text-align:center;">
-      Permanent license purchases support the ECE Department directly.
+      Permanent purchases support the ECE Department directly.
     </p>
   `;
 
   overlay.classList.add('active');
+}
+
+// ── TEMPORARY: Login → Collect page ──────────────────
+function handleBorrow(id, name) {
+  const isLoggedIn = sessionStorage.getItem('ece_logged_in');
+  if (isLoggedIn) {
+    // Already logged in → go directly to collect page
+    window.location.href = `collect.html?id=${id}&name=${name}&type=temporary`;
+  } else {
+    // Save intent → login → collect
+    sessionStorage.setItem('ece_redirect', `collect.html?id=${id}&name=${name}&type=temporary`);
+    window.location.href = 'login.html';
+  }
+}
+
+// ── PERMANENT: Login → Payment page ──────────────────
+function handleBuy(id, name, price) {
+  const isLoggedIn = sessionStorage.getItem('ece_logged_in');
+  if (isLoggedIn) {
+    // Already logged in → go directly to payment
+    window.location.href = `payment.html?id=${id}&name=${name}&price=${price}`;
+  } else {
+    // Save intent → login → payment
+    sessionStorage.setItem('ece_redirect', `payment.html?id=${id}&name=${name}&price=${price}`);
+    window.location.href = 'login.html';
+  }
 }

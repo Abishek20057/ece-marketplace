@@ -1,0 +1,524 @@
+// ============================================
+// ECE HUB — COMPONENT DATA (Real Inventory)
+// ============================================
+
+const COMPONENTS = [
+
+  // ─── DEVELOPMENT BOARDS ───────────────────
+
+  {
+    id: 1,
+    name: "Arduino UNO",
+    description: "The classic microcontroller board based on ATmega328P. Ideal for beginners and embedded projects. Features 14 digital I/O pins, 6 analog inputs, and USB connectivity.",
+    category: "microcontroller",
+    categoryLabel: "Development Board",
+    icon: "🟦",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 149,
+    project: "ECE Department Inventory",
+    tech: ["ATmega328P", "Arduino IDE", "5V Logic"],
+    features: ["14 digital I/O pins", "6 analog input pins", "16 MHz clock speed", "USB programming", "5V operating voltage"]
+  },
+  {
+    id: 2,
+    name: "ESP32 Development Board",
+    description: "Powerful dual-core microcontroller with built-in Wi-Fi and Bluetooth. Perfect for IoT applications. Supports Arduino IDE and MicroPython.",
+    category: "microcontroller",
+    categoryLabel: "Development Board",
+    icon: "🟩",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 199,
+    project: "ECE Department Inventory",
+    tech: ["Xtensa LX6", "Wi-Fi 802.11", "Bluetooth 4.2", "Arduino IDE"],
+    features: ["Dual-core 240 MHz CPU", "Built-in Wi-Fi & Bluetooth", "34 GPIO pins", "4MB Flash memory", "Deep sleep support"]
+  },
+  {
+    id: 3,
+    name: "NodeMCU (ESP8266)",
+    description: "Wi-Fi enabled microcontroller module based on ESP8266. Popular for IoT projects with built-in TCP/IP stack and easy Arduino IDE support.",
+    category: "microcontroller",
+    categoryLabel: "Development Board",
+    icon: "🟧",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 129,
+    project: "ECE Department Inventory",
+    tech: ["ESP8266", "Wi-Fi 802.11 b/g/n", "Lua / Arduino IDE"],
+    features: ["Built-in Wi-Fi module", "11 digital I/O pins", "1 analog input pin", "USB-to-Serial (CH340)", "3.3V logic level"]
+  },
+
+  // ─── DISPLAY MODULES ──────────────────────
+
+  {
+    id: 4,
+    name: "LCD Display (16x2 / 20x4)",
+    description: "Character LCD display module. Available in 16x2 and 20x4 configurations. Connects via I2C backpack for minimal pin usage.",
+    category: "display",
+    categoryLabel: "Display",
+    icon: "🖥️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 99,
+    project: "ECE Department Inventory",
+    tech: ["HD44780 Controller", "I2C Backpack", "Arduino Library"],
+    features: ["16x2 or 20x4 character variants", "I2C interface (only 2 wires)", "Adjustable contrast", "Backlight control", "3.3V / 5V compatible"]
+  },
+  {
+    id: 5,
+    name: "OLED Display",
+    description: "0.96-inch SSD1306 OLED display module with 128x64 pixel resolution. Ultra-low power, high contrast display via I2C or SPI.",
+    category: "display",
+    categoryLabel: "Display",
+    icon: "📺",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 129,
+    project: "ECE Department Inventory",
+    tech: ["SSD1306", "I2C / SPI", "Adafruit Library"],
+    features: ["128x64 pixel resolution", "0.96 inch screen", "I2C & SPI interface", "Ultra-low power consumption", "No backlight needed"]
+  },
+
+  // ─── SENSORS ──────────────────────────────
+
+  {
+    id: 6,
+    name: "Smoke Sensor (MQ Series)",
+    description: "MQ-2 / MQ-135 smoke and gas detection sensor. Detects smoke, LPG, CO, and other gases. Analog and digital output available.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "💨",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 99,
+    project: "ECE Department Inventory",
+    tech: ["MQ-2 / MQ-135", "Analog + Digital Out", "5V Supply"],
+    features: ["Smoke & gas detection", "Analog and digital output", "Sensitivity adjustment via pot", "Fast response time", "Wide detection range"]
+  },
+  {
+    id: 7,
+    name: "Soil Moisture Sensor",
+    description: "Capacitive or resistive soil moisture sensor for monitoring water content in soil. Used in smart irrigation and agriculture projects.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "🌱",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["Resistive / Capacitive", "Analog + Digital Out", "3.3V–5V"],
+    features: ["Real-time soil moisture reading", "Analog and digital output", "Adjustable threshold", "Compact design", "Direct Arduino compatible"]
+  },
+  {
+    id: 8,
+    name: "Fire Detection Sensor (Flame Sensor)",
+    description: "Infrared flame sensor detects fire or flame presence within 1 meter. Used in fire alarm and safety automation systems.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "🔥",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["IR Photodiode", "LM393 Comparator", "Digital Output"],
+    features: ["Detects flame up to 1m", "60° detection angle", "Digital output pin", "Sensitivity adjustable", "5V operating voltage"]
+  },
+  {
+    id: 9,
+    name: "IR Sensor (Infrared Obstacle Sensor)",
+    description: "Infrared obstacle detection sensor for robotics and automation. Detects objects in proximity and outputs digital signal.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "📡",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 69,
+    project: "ECE Department Inventory",
+    tech: ["IR LED + Photodiode", "LM393", "Digital Output"],
+    features: ["2cm–30cm detection range", "Digital output", "Sensitivity pot adjustment", "Works in ambient light", "3-pin connection (VCC, GND, OUT)"]
+  },
+  {
+    id: 10,
+    name: "Ultrasonic Sensor (HC-SR04)",
+    description: "Distance measurement sensor using ultrasonic pulses. Accurate range detection from 2cm to 400cm. Widely used in obstacle avoidance robots.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "📏",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 89,
+    project: "ECE Department Inventory",
+    tech: ["HC-SR04", "40kHz Ultrasonic", "Trig/Echo Pins"],
+    features: ["Range: 2cm to 400cm", "±3mm accuracy", "Trig & Echo interface", "5V supply", "Non-contact measurement"]
+  },
+  {
+    id: 11,
+    name: "LDR Sensor (Light Sensor)",
+    description: "Light Dependent Resistor module for detecting ambient light levels. Used in automatic lighting and solar tracking systems.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "💡",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 59,
+    project: "ECE Department Inventory",
+    tech: ["GL5528 LDR", "Analog + Digital Out", "5V"],
+    features: ["Analog light level output", "Digital threshold output", "Sensitivity adjustable", "Low cost", "Wide light range detection"]
+  },
+  {
+    id: 12,
+    name: "DHT11 / DHT22 Temperature & Humidity Sensor",
+    description: "Digital temperature and humidity sensor. DHT11 for basic use; DHT22 for higher accuracy. Single-wire protocol.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "🌡️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 99,
+    project: "ECE Department Inventory",
+    tech: ["DHT11 / DHT22", "Single-Wire Protocol", "Arduino / ESP32"],
+    features: ["Temperature: 0–50°C (DHT11)", "Humidity: 20–90% RH", "DHT22: higher accuracy ±0.5°C", "Single digital pin", "Built-in calibration"]
+  },
+  {
+    id: 13,
+    name: "Rain Sensor Module",
+    description: "Detects rain or water presence using a conductive sensor pad. Used in weather stations and automatic wiper systems.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "🌧️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["Conductive Pad", "LM393 Comparator", "Analog + Digital Out"],
+    features: ["Rain/water detection", "Analog sensitivity output", "Digital threshold trigger", "Sensitivity adjustable", "3.3V–5V compatible"]
+  },
+  {
+    id: 14,
+    name: "Vibration Sensor",
+    description: "SW-420 vibration sensor module detects vibration, shock, and movement. Used in anti-theft alarms and impact detection systems.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "📳",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 69,
+    project: "ECE Department Inventory",
+    tech: ["SW-420", "LM393", "Digital Output"],
+    features: ["Vibration & shock detection", "Digital output", "Sensitivity pot", "Non-directional detection", "3.3V–5V supply"]
+  },
+  {
+    id: 15,
+    name: "Tilt Sensor",
+    description: "Simple ball-tilt switch sensor that detects tilt or inclination. Used in orientation detection and safety switches.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "↗️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 59,
+    project: "ECE Department Inventory",
+    tech: ["Ball Switch", "Digital Output", "3V–5V"],
+    features: ["Tilt/angle detection", "Digital output", "Simple 2-state output", "Compact size", "No calibration needed"]
+  },
+  {
+    id: 16,
+    name: "MPU6050 Accelerometer & Gyroscope",
+    description: "6-axis IMU sensor combining 3-axis accelerometer and 3-axis gyroscope over I2C. Used in drones, robots, and motion tracking.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "🎯",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 149,
+    project: "ECE Department Inventory",
+    tech: ["MPU6050", "I2C Interface", "DMP Processor"],
+    features: ["3-axis accelerometer", "3-axis gyroscope", "I2C interface", "Digital Motion Processor", "16-bit ADC resolution"]
+  },
+
+  // ─── RELAY MODULES ────────────────────────
+
+  {
+    id: 17,
+    name: "Single Channel Relay Module",
+    description: "5V relay module for controlling high-voltage AC/DC loads from a microcontroller. Includes optocoupler isolation for protection.",
+    category: "relay",
+    categoryLabel: "Relay & Switching",
+    icon: "🔌",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["SRD-05VDC", "Optocoupler", "5V Trigger"],
+    features: ["Controls 250V AC / 30V DC", "Optocoupler isolated", "Active LOW / HIGH configurable", "Status LED", "Screw terminal output"]
+  },
+  {
+    id: 18,
+    name: "Two Channel Relay Module",
+    description: "Dual relay module for controlling two independent high-voltage loads. Commonly used in home automation projects.",
+    category: "relay",
+    categoryLabel: "Relay & Switching",
+    icon: "🔌🔌",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 109,
+    project: "ECE Department Inventory",
+    tech: ["SRD-05VDC x2", "Optocoupler", "5V Trigger"],
+    features: ["2 independent channels", "Controls 250V AC loads", "Optocoupler isolation", "Individual status LEDs", "Active LOW trigger"]
+  },
+  {
+    id: 19,
+    name: "Four Channel Relay Module",
+    description: "4-channel relay board for controlling four devices independently. Used in industrial automation, smart home, and multi-device control.",
+    category: "relay",
+    categoryLabel: "Relay & Switching",
+    icon: "🔋",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 149,
+    project: "ECE Department Inventory",
+    tech: ["SRD-05VDC x4", "Optocoupler", "5V Trigger"],
+    features: ["4 independent relay channels", "Controls 250V AC / 10A", "Full optocoupler isolation", "4 status LEDs", "Stackable design"]
+  },
+
+  // ─── MOTORS & DRIVERS ─────────────────────
+
+  {
+    id: 20,
+    name: "DC Motor",
+    description: "Standard DC hobby motor used in robotics and automation projects. Operated with PWM for speed control via motor driver.",
+    category: "motor",
+    categoryLabel: "Motor",
+    icon: "⚙️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["Brushed DC", "3V–12V", "PWM Speed Control"],
+    features: ["3V to 12V operating range", "PWM speed control compatible", "High torque variant available", "Compact size", "Used with L293D / L298N"]
+  },
+  {
+    id: 21,
+    name: "Servo Motor",
+    description: "Positional servo motor for precise angle control (0°–180°). Controlled by PWM signal. Used in robotic arms, pan-tilt, and steering.",
+    category: "motor",
+    categoryLabel: "Motor",
+    icon: "🔧",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 129,
+    project: "ECE Department Inventory",
+    tech: ["SG90 / MG996R", "PWM Control", "5V Supply"],
+    features: ["0° to 180° rotation", "PWM controlled (50Hz)", "SG90: 1.8 kg·cm torque", "MG996R: metal gear variant", "3-wire connection (VCC, GND, Signal)"]
+  },
+  {
+    id: 22,
+    name: "Motor Driver Module (L293D / L298N)",
+    description: "H-bridge motor driver for controlling direction and speed of DC motors. L293D for small motors; L298N for higher current loads.",
+    category: "motor",
+    categoryLabel: "Motor",
+    icon: "🚗",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 119,
+    project: "ECE Department Inventory",
+    tech: ["L293D / L298N", "H-Bridge", "PWM Input"],
+    features: ["Controls 2 DC motors", "Forward / Reverse / Speed control", "L298N: up to 2A per channel", "Built-in flyback diodes", "Enable pin for PWM"]
+  },
+
+  // ─── COMMUNICATION MODULES ────────────────
+
+  {
+    id: 23,
+    name: "Bluetooth Module (HC-05 / HC-06)",
+    description: "Serial Bluetooth module for wireless communication between microcontrollers and smartphones. HC-05 supports master/slave; HC-06 is slave-only.",
+    category: "communication",
+    categoryLabel: "Communication",
+    icon: "📶",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 149,
+    project: "ECE Department Inventory",
+    tech: ["HC-05 / HC-06", "UART Serial", "Bluetooth 2.0"],
+    features: ["Bluetooth 2.0 SPP", "UART interface (TX/RX)", "HC-05: Master & Slave mode", "10m range", "AT command configuration"]
+  },
+  {
+    id: 24,
+    name: "RFID Module (RC522)",
+    description: "13.56 MHz RFID reader/writer module. Used in attendance systems, access control, and card-based identification projects.",
+    category: "communication",
+    categoryLabel: "Communication",
+    icon: "💳",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 149,
+    project: "ECE Department Inventory",
+    tech: ["MFRC522", "SPI Interface", "13.56 MHz"],
+    features: ["Read & write RFID cards", "SPI interface", "Includes RFID card + key fob", "Range: up to 5cm", "Works with Arduino MFRC522 library"]
+  },
+  {
+    id: 25,
+    name: "GSM Module (SIM800L / SIM900A)",
+    description: "GSM/GPRS module for SMS, calling, and internet connectivity over mobile networks. Used in remote monitoring and alert systems.",
+    category: "communication",
+    categoryLabel: "Communication",
+    icon: "📱",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 299,
+    project: "ECE Department Inventory",
+    tech: ["SIM800L / SIM900A", "UART AT Commands", "GSM / GPRS"],
+    features: ["Send/receive SMS", "Voice calls support", "GPRS data connection", "AT command interface", "Requires SIM card (2G)"]
+  },
+  {
+    id: 26,
+    name: "GPS Module (NEO-6M)",
+    description: "GPS receiver module for real-time location tracking. Outputs NMEA data over UART. Used in vehicle tracking and navigation systems.",
+    category: "communication",
+    categoryLabel: "Communication",
+    icon: "🛰️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 249,
+    project: "ECE Department Inventory",
+    tech: ["u-blox NEO-6M", "UART NMEA Output", "3.3V–5V"],
+    features: ["Real-time GPS coordinates", "UART NMEA data output", "Integrated antenna", "Cold start: <27s", "Hot start: <1s"]
+  },
+  {
+    id: 27,
+    name: "ESP8266 Wi-Fi Module",
+    description: "Standalone Wi-Fi module for adding internet connectivity to any microcontroller via AT commands or as standalone MCU.",
+    category: "communication",
+    categoryLabel: "Communication",
+    icon: "📡",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 99,
+    project: "ECE Department Inventory",
+    tech: ["ESP8266", "802.11 b/g/n", "AT Commands / SDK"],
+    features: ["Wi-Fi 802.11 b/g/n", "AT command mode", "TCP/IP stack built-in", "Station + AP modes", "UART interface"]
+  },
+
+  // ─── POWER COMPONENTS ─────────────────────
+
+  {
+    id: 28,
+    name: "Batteries",
+    description: "Rechargeable and non-rechargeable battery options including 18650 Li-ion, 9V, and AA cells for embedded projects.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔋",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 99,
+    project: "ECE Department Inventory",
+    tech: ["18650 Li-ion", "9V Alkaline", "AA / AAA Cells"],
+    features: ["18650: 3.7V 2600mAh", "9V block batteries", "Rechargeable variants", "Battery holder included", "Multiple capacities available"]
+  },
+  {
+    id: 29,
+    name: "Solar Panels",
+    description: "Small solar panel modules (5V–12V) for renewable energy project demonstrations and IoT low-power applications.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "☀️",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 199,
+    project: "ECE Department Inventory",
+    tech: ["Polycrystalline / Monocrystalline", "5V–12V Output", "0.5W–5W"],
+    features: ["5V / 6V / 12V variants", "0.5W to 5W power", "Compact size", "Suitable for outdoor demos", "For charging & direct supply"]
+  },
+  {
+    id: 30,
+    name: "Power Adapters",
+    description: "DC power adapters (5V, 9V, 12V) with barrel jack connectors for powering development boards and circuits on the workbench.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔌",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 79,
+    project: "ECE Department Inventory",
+    tech: ["5V 2A / 9V 1A / 12V 1A", "Barrel Jack (5.5mm)", "AC-DC"],
+    features: ["5V, 9V, 12V available", "1A to 2A current rating", "Regulated DC output", "LED power indicator", "Barrel jack connector"]
+  },
+
+  // ─── AUDIO & ALERT ────────────────────────
+
+  {
+    id: 31,
+    name: "Buzzer",
+    description: "Active and passive buzzer modules for generating alert tones and audio feedback in embedded systems.",
+    category: "audio",
+    categoryLabel: "Audio & Alert",
+    icon: "🔔",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 49,
+    project: "ECE Department Inventory",
+    tech: ["Active / Passive Buzzer", "3V–5V", "Digital Control"],
+    features: ["Active: beeps on HIGH signal", "Passive: tone via PWM frequency", "Loud 85dB output", "Small and compact", "Works with any GPIO pin"]
+  },
+
+  // ─── COMMON COMPONENTS ────────────────────
+
+  {
+    id: 32,
+    name: "Breadboard",
+    description: "Solderless breadboard for prototyping circuits. Available in half-size (400 tie points) and full-size (830 tie points).",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🟫",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 69,
+    project: "ECE Department Inventory",
+    tech: ["400 / 830 Tie Points", "Solderless", "ABS Plastic"],
+    features: ["400 or 830 tie-point options", "Power rail strips", "Reusable", "No soldering needed", "Universal component fit"]
+  },
+  {
+    id: 33,
+    name: "Jumper Wires",
+    description: "Male-to-male, male-to-female, and female-to-female jumper wire sets for breadboard and module connections.",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🔗",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 49,
+    project: "ECE Department Inventory",
+    tech: ["20cm / 30cm Lengths", "M-M / M-F / F-F", "Flexible PVC"],
+    features: ["M-M, M-F, F-F variants", "40-wire sets", "20cm standard length", "Color coded", "Fits breadboard headers"]
+  },
+  {
+    id: 34,
+    name: "LEDs (Various Colors)",
+    description: "Standard 5mm LEDs in red, green, blue, yellow, and white. Used as indicators and display elements in all types of circuits.",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🔴",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 29,
+    project: "ECE Department Inventory",
+    tech: ["5mm Through-Hole", "2V–3.3V Forward Voltage", "20mA"],
+    features: ["Red, Green, Blue, Yellow, White", "5mm standard size", "2V–3.3V forward voltage", "20mA rated current", "Use with 220Ω–330Ω resistor"]
+  },
+  {
+    id: 35,
+    name: "Push Buttons",
+    description: "Tactile momentary push buttons for user input, reset switches, and digital input in circuit prototyping.",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🔘",
+    type: ["temporary", "permanent"],
+    tempPrice: 0,
+    permPrice: 29,
+    project: "ECE Department Inventory",
+    tech: ["SPST Momentary", "Through-Hole", "12mm / 6mm"],
+    features: ["Momentary action", "12mm and 6mm sizes", "Breadboard compatible", "50mA / 12V rated", "Satisfying tactile click"]
+  }
+
+];

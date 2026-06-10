@@ -18,11 +18,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Simulate login — replace with real backend call
       showLoading(loginForm.querySelector('button'), 'Signing in…');
       setTimeout(() => {
-        // On success, redirect
-        window.location.href = 'marketplace.html';
+        // Mark as logged in
+        sessionStorage.setItem('ece_logged_in', 'true');
+        sessionStorage.setItem('ece_user_email', email);
+
+        // Check if there's a saved redirect (from Borrow / Buy click)
+        const redirect = sessionStorage.getItem('ece_redirect');
+        if (redirect) {
+          sessionStorage.removeItem('ece_redirect');
+          window.location.href = redirect;
+        } else {
+          window.location.href = 'marketplace.html';
+        }
       }, 1200);
     });
   }
@@ -50,7 +59,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showLoading(registerForm.querySelector('button'), 'Creating account…');
       setTimeout(() => {
-        window.location.href = 'marketplace.html';
+        sessionStorage.setItem('ece_logged_in', 'true');
+        sessionStorage.setItem('ece_user_email', email);
+
+        const redirect = sessionStorage.getItem('ece_redirect');
+        if (redirect) {
+          sessionStorage.removeItem('ece_redirect');
+          window.location.href = redirect;
+        } else {
+          window.location.href = 'marketplace.html';
+        }
       }, 1500);
     });
   }

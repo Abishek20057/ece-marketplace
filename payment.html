@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment — ECE Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .payment-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background: var(--navy);
+    }
+    .payment-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .payment-card h1 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--navy);
+      margin-bottom: 0.3rem;
+    }
+    .payment-card .subtitle {
+      color: var(--slate-dk);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+    .order-summary {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #e2e8f0;
+    }
+    .order-summary h3 {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-dk);
+      margin-bottom: 0.75rem;
+    }
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0;
+      font-size: 0.92rem;
+    }
+    .order-row.total {
+      border-top: 2px solid var(--electric);
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--navy);
+    }
+    .order-row.total .price { color: var(--electric); }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 0.4rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--navy);
+      background: white;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--electric);
+      box-shadow: 0 0 0 3px rgba(56,130,246,0.12);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .payment-methods {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .pay-method {
+      flex: 1;
+      min-width: 80px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--slate);
+    }
+    .pay-method.active {
+      border-color: var(--electric);
+      background: rgba(56,130,246,0.08);
+      color: var(--electric);
+    }
+    .pay-method .pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .section-label {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-dk);
+      margin: 1.5rem 0 0.75rem;
+    }
+    .pay-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--electric), #2563eb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+    .pay-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(56,130,246,0.35); }
+    .secure-note {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      font-size: 0.78rem;
+      color: var(--slate-dk);
+      margin-top: 1rem;
+    }
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,22,40,0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .success-overlay.show { display: flex; }
+    .success-box {
+      background: white;
+      border-radius: 20px;
+      padding: 3rem;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .success-box h2 { font-family: var(--font-display); color: var(--navy); margin-bottom: 0.5rem; }
+    .success-box p { color: var(--slate); font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .order-id {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #166534;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">ECE<span>Hub</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="marketplace.html" class="active">Marketplace</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="payment-page">
+    <div class="payment-card">
+      <h1>💳 Payment Details</h1>
+      <p class="subtitle">Complete your purchase securely</p>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3>🛒 Order Summary</h3>
+        <div class="order-row">
+          <span id="comp-name-display">Component</span>
+          <span id="comp-price-display">₹0</span>
+        </div>
+        <div class="order-row">
+          <span>♾️ Permanent License</span>
+          <span style="color:#16a34a;">Included</span>
+        </div>
+        <div class="order-row total">
+          <span>Total</span>
+          <span class="price" id="comp-total">₹0</span>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="section-label">💳 Payment Method</div>
+      <div class="payment-methods">
+        <div class="pay-method active" onclick="selectMethod(this, 'upi')">
+          <span class="pay-icon">📱</span>UPI
+        </div>
+        <div class="pay-method" onclick="selectMethod(this, 'card')">
+          <span class="pay-icon">💳</span>Card
+        </div>
+        <div class="pay-method" onclick="selectMethod(this, 'netbanking')">
+          <span class="pay-icon">🏦</span>Net Banking
+        </div>
+        <div class="pay-method" onclick="selectMethod(this, 'cash')">
+          <span class="pay-icon">💵</span>Cash
+        </div>
+      </div>
+
+      <!-- UPI Panel (default) -->
+      <div id="panel-upi">
+        <div class="form-group">
+          <label>UPI ID</label>
+          <input type="text" id="upi-id" placeholder="yourname@upi or phone@paytm" />
+        </div>
+        <p style="font-size:0.82rem;color:var(--slate-dk);margin-top:-0.5rem;">
+          📲 You will receive a payment request on your UPI app after clicking Pay.
+        </p>
+      </div>
+
+      <!-- Card Panel (hidden) -->
+      <div id="panel-card" style="display:none;">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" placeholder="As printed on card" />
+        </div>
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" id="card-num" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry</label>
+            <input type="text" placeholder="MM/YY" maxlength="5" />
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="password" placeholder="•••" maxlength="3" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Banking Panel (hidden) -->
+      <div id="panel-netbanking" style="display:none;">
+        <div class="form-group">
+          <label>Select Bank</label>
+          <select>
+            <option value="">— Choose your bank —</option>
+            <option>State Bank of India</option>
+            <option>HDFC Bank</option>
+            <option>ICICI Bank</option>
+            <option>Axis Bank</option>
+            <option>Bank of Baroda</option>
+            <option>Punjab National Bank</option>
+            <option>Canara Bank</option>
+            <option>Union Bank of India</option>
+            <option>Indian Bank</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cash Panel (hidden) -->
+      <div id="panel-cash" style="display:none;">
+        <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;font-size:0.9rem;color:#92400e;">
+          <strong>💵 Pay at HOD Cabin</strong><br><br>
+          Visit the <strong>HOD Cabin, ECE Department</strong> with the exact amount: <strong id="cash-amount">₹0</strong>.<br>
+          Office hours: <strong>9 AM – 5 PM</strong> (Mon–Sat).<br>
+          Bring your <strong>College ID Card</strong>.
+        </div>
+      </div>
+
+      <!-- Personal Details -->
+      <div class="section-label">👤 Your Details</div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="buyer-name" placeholder="Your full name" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Roll Number</label>
+          <input type="text" id="buyer-roll" placeholder="e.g. 21ECE001" />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="buyer-year">
+            <option value="">Select Year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="buyer-phone" placeholder="10-digit mobile number" maxlength="10" />
+      </div>
+
+      <button class="pay-btn" onclick="processPayment()">
+        🔒 Pay &nbsp;<span id="pay-amount">₹0</span>
+      </button>
+
+      <div class="secure-note">
+        🔐 Secure payment · All data stays within ECE Department
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Overlay -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-box">
+      <div class="success-icon">✅</div>
+      <h2>Payment Successful!</h2>
+      <p>Your component purchase is confirmed. Collect it from the HOD Cabin, ECE Department.</p>
+      <div class="order-id" id="order-id">Order #ECE-000000</div>
+      <p style="font-size:0.82rem;color:#64748b;margin-bottom:1.5rem;">Show this order ID at the HOD Cabin to collect your component.</p>
+      <a href="marketplace.html" class="btn btn-primary" style="display:block;">← Back to Marketplace</a>
+    </div>
+  </div>
+
+  <script>
+    let selectedMethod = 'upi';
+    const panels = ['upi','card','netbanking','cash'];
+
+    // Load URL params
+    const params = new URLSearchParams(window.location.search);
+    const compName = decodeURIComponent(params.get('name') || 'Component');
+    const compPrice = parseInt(params.get('price') || '0');
+
+    document.getElementById('comp-name-display').textContent = compName;
+    document.getElementById('comp-price-display').textContent = `₹${compPrice}`;
+    document.getElementById('comp-total').textContent = `₹${compPrice}`;
+    document.getElementById('pay-amount').textContent = `₹${compPrice}`;
+    document.getElementById('cash-amount').textContent = `₹${compPrice}`;
+
+    function selectMethod(el, method) {
+      document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
+      el.classList.add('active');
+      selectedMethod = method;
+      panels.forEach(p => document.getElementById('panel-'+p).style.display = 'none');
+      document.getElementById('panel-'+method).style.display = 'block';
+    }
+
+    // Card number formatting
+    const cardInput = document.getElementById('card-num');
+    if (cardInput) {
+      cardInput.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g,'').substring(0,16);
+        e.target.value = v.replace(/(.{4})/g,'$1 ').trim();
+      });
+    }
+
+    function processPayment() {
+      const name = document.getElementById('buyer-name').value.trim();
+      const roll = document.getElementById('buyer-roll').value.trim();
+      const phone = document.getElementById('buyer-phone').value.trim();
+
+      if (!name || !roll) {
+        alert('Please fill in your Name and Roll Number.');
+        return;
+      }
+      if (phone && phone.length !== 10) {
+        alert('Please enter a valid 10-digit phone number.');
+        return;
+      }
+
+      if (selectedMethod === 'upi') {
+        const upi = document.getElementById('upi-id').value.trim();
+        if (!upi) { alert('Please enter your UPI ID.'); return; }
+      }
+
+      // Show success
+      const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      document.getElementById('order-id').textContent = `Order #${orderId}`;
+      document.getElementById('success-overlay').classList.add('show');
+    }
+  </script>
+</body>
+</html>
