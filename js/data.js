@@ -157,10 +157,7 @@ const COMPONENTS = [
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrRu2Upmh_TQP5Ysf78qyJWFxTf6kYR8yssA&s",
     type: ["temporary", "permanent"],
     tempPrice: 20,
-   project: "ECE Department Inventory",
-  },
-  {
- permPrice: 40,
+    permPrice: 40,
     project: "ECE Department Inventory",
     tech: ["HC-SR04", "40kHz Ultrasonic", "5V Logic"],
     features: ["2cm–400cm range", "3mm accuracy", "Trigger + Echo pins", "Non-contact measurement", "Low power consumption"]
@@ -178,8 +175,9 @@ const COMPONENTS = [
     permPrice: 15,
     project: "ECE Department Inventory",
     tech: ["LDR / Photoresistor", "Analog Out", "Comparator Module"],
-    features: ["Detects light intensity", "Analog output"],
-    
+    features: ["Detects light intensity", "Analog output", "Digital threshold output", "Adjustable sensitivity", "Used in light-dark detection"]
+  },
+  {
     id: 12,
     name: "DHT11 / DHT22 Temperature & Humidity Sensor",
     description: "Digital temperature and humidity sensor. DHT11 for basic use, DHT22 for higher accuracy. Widely used in weather stations and HVAC projects.",
