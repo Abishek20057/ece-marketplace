@@ -13,7 +13,7 @@ const COMPONENTS = [
     category: "microcontroller",
     categoryLabel: "Development Board",
     icon: "🟦",
-    image: "https://upload.wikimedia.org/wikipedia/commons/3/38/Arduino_Uno_-_R3.jpg",
+    image: "https://www.flyrobo.in/image/cache/wp/gj/arduino-uno-r3-smd-board-cable-for-arduino-uno-1/arduino-uno-r3-smd-board-cable-for-arduino-uno-14-550x550h.webp",
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,

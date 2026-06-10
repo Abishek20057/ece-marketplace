@@ -214,10 +214,18 @@ function openModal(c) {
     ${hasTemp ? `
     <div class="modal-price-row">
       <div>
-        <div class="modal-price-label">⏱ Temporary — Borrow Free</div>
-        <div class="modal-price-val">Free</div>
-      </div>
-      <button class="btn btn-outline" onclick="handleBorrow(${c.id},'${encodeURIComponent(c.name)}')">Get Temporary Access</button>
+        <div class="modal-price-label">
+  ⏱ Temporary — Borrow for ₹${c.tempPrice}
+</div>
+
+<div class="modal-price-val">
+  ₹${c.tempPrice}
+</div>
+
+<button class="btn btn-outline"
+onclick="handleBorrow(${c.id},'${encodeURIComponent(c.name)}')">
+Get Temporary Access ₹${c.tempPrice}
+</button>
     </div>` : ''}
     ${hasPerm ? `
     <div class="modal-price-row">
@@ -238,7 +246,8 @@ function openModal(c) {
 function handleBorrow(id, name) {
   const loggedIn = localStorage.getItem('ece_logged_in');
   if (loggedIn === 'true') {
-    window.location.href = `collect.html?id=${id}&name=${name}&type=temporary`;
+    window.location.href =
+`payment.html?id=${id}&name=${name}&type=temporary&amount=${component.tempPrice}`;
   } else {
     localStorage.setItem('ece_after_login', `collect.html?id=${id}&name=${name}&type=temporary`);
     window.location.href = 'login.html';
