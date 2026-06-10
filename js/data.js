@@ -177,7 +177,7 @@ const COMPONENTS = [
     features: ["Detects light intensity", "Analog output", "Wide light range sensing", "Adjustable threshold", "Auto light control projects"]
   },
   {
-    image: "
+
     id: 12,
     name: "DHT11 / DHT22 Temperature & Humidity Sensor",
     description: "Digital temperature and humidity sensor. DHT11 for basic use, DHT22 for higher accuracy. Widely used in weather stations and HVAC projects.",
@@ -561,7 +561,7 @@ const COMPONENTS = [
     project: "ECE Department Inventory",
     tech: ["SPST Tactile", "6x6mm / 12x12mm", "Active Low / High"],
     features: ["Momentary contact", "6x6 and 12x12mm sizes", "4-pin DIP package", "Low actuation force", "Breadboard compatible"]
-  }
+  },
   {
     id: 36,
     name: "Lithium-Ion Battery (18650)",
