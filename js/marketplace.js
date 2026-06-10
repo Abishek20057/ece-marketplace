@@ -243,17 +243,21 @@ Get Temporary Access ₹${c.tempPrice}
 }
 
 // ── TEMPORARY: check login → collect page ──
-function handleBorrow(id, name) {
+function handleBorrow(id, name, tempPrice) {
   const loggedIn = localStorage.getItem('ece_logged_in');
+
   if (loggedIn === 'true') {
     window.location.href =
-`payment.html?id=${id}&name=${name}&type=temporary&amount=${component.tempPrice}`;
+      `payment.html?id=${id}&name=${name}&type=temporary&amount=${tempPrice}`;
   } else {
-    localStorage.setItem('ece_after_login', `collect.html?id=${id}&name=${name}&type=temporary`);
+    localStorage.setItem(
+      'ece_after_login',
+      `payment.html?id=${id}&name=${name}&type=temporary&amount=${tempPrice}`
+    );
+
     window.location.href = 'login.html';
   }
 }
-
 // ── PERMANENT: check login → payment page ──
 function handleBuy(id, name, price) {
   const loggedIn = localStorage.getItem('ece_logged_in');
