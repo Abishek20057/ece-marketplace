@@ -252,9 +252,9 @@ function openModal(c) {
 // ── Borrow (Temporary) ─────────────────────────────────────
 function handleBorrow(id, name, amount) {
   const loggedIn = localStorage.getItem('ece_logged_in') === 'true';
-  const dest = `collect.html?id=${id}&name=${name}&type=temporary&amount=${amount}`;
+  // Must go through payment first — same as Buy flow
+  const dest = `payment.html?id=${id}&name=${name}&price=${amount}&type=temporary`;
   if (loggedIn) {
-    decrementStock(id);
     window.location.href = dest;
   } else {
     localStorage.setItem('ece_after_login', dest);
