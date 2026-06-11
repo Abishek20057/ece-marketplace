@@ -902,3 +902,38 @@ input, textarea, select {
   .schedule-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
   .schedule-time { text-align: left; }
 }
+
+/* ══════════════════════════════════════
+   STOCK BADGES
+══════════════════════════════════════ */
+.stock-badge {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.stock-ok  { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+.stock-low { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+.stock-out { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+/* Sold-out card dim */
+.card-sold-out { opacity: 0.65; }
+.card-sold-out:hover { transform: none !important; box-shadow: none !important; }
+
+/* Sold-out image overlay */
+.card-img-wrap { position: relative; }
+.sold-out-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem; font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #f87171;
+  text-transform: uppercase;
+  backdrop-filter: blur(2px);
+}
