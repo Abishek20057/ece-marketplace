@@ -126,8 +126,8 @@ const COMPONENT_IMAGES = {
   20: 'https://in.element14.com/productimages/large/en_GB/599104-40.jpg',
   21: 'https://www.electronicwings.com/storage/PlatformSection/TopicContent/134/icon/Servo%20Motor.jpg',
   22: 'https://majestronicz.in/cdn/shop/files/CM-104.jpg?v=1721379183',
-  23: '"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa_fBHpwfzMP25ceWlNBHO8NMz39gXLkIsnA&s"',
-  24: '"https://ielectrony.com/wp-content/uploads/2024/05/NA1441.jpg"',
+  23: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSa_fBHpwfzMP25ceWlNBHO8NMz39gXLkIsnA&s',
+  24: 'https://ielectrony.com/wp-content/uploads/2024/05/NA1441.jpg',
   25: 'https://robocomp.in/wp-content/uploads/2022/03/SIM800L-V2.0-5V-Wireless-GSM-GPRS-MODULE-Quad-Band-with-Antenna-3.webp',
   26: 'https://www.flyrobo.in/image/cache/catalog/neo-m8n-gps-module-with-ceramic-active-antenna/neo-m8n-gps-module-with-ceramic-active-antenna1-1024x1024.JPG',
   27: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUO1QefsKrrAZq3lZZBUpFtS59YpPqt0d2TQ&s',
@@ -144,7 +144,7 @@ const COMPONENT_IMAGES = {
   38: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTix5Nsyw4Cf5VCxhrUeuEXYdflybQBqDHkFw&s',
   39: 'https://components101.com/sites/default/files/component_pin/DC-Fan-Motor-Pinout.jpg',
   40: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFspFqSJsrCUbQjcH40qy2iqREGOj2EWHKA&s',
-  41:' https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIGA5D0z_cDfMCxYi_oAx48BPSIz6tSCftbQ&s',
+  41: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIGA5D0z_cDfMCxYi_oAx48BPSIz6tSCftbQ&s',
   42: 'https://components101.com/sites/default/files/component_pin/18650-Battery-Holder-Pinout.jpg',
   43: 'https://components101.com/sites/default/files/component_pin/LM2596-Buck-Converter-Pinout.jpg',
   44: 'https://upload.wikimedia.org/wikipedia/commons/3/38/Arduino_Uno_-_R3.jpg',
@@ -162,7 +162,7 @@ function buildCard(c) {
   const outOfStock = qty <= 0;
   const hasPerm    = c.type.includes('permanent');
   const hasTemp    = c.type.includes('temporary');
-  const imgSrc     = COMPONENT_IMAGES[c.id] || c.image || '';
+  const imgSrc = c.image || COMPONENT_IMAGES[c.id] || '';
   const fallback   = CAT_EMOJI[c.category] || c.icon || '📦';
 
   // Stock badge
@@ -215,7 +215,7 @@ function openModal(c) {
   const body       = document.getElementById('modal-body');
   const hasPerm    = c.type.includes('permanent');
   const hasTemp    = c.type.includes('temporary');
-  const imgSrc     = COMPONENT_IMAGES[c.id] || c.image || '';
+  const imgSrc = c.image || COMPONENT_IMAGES[c.id] || '';
   const fallback   = CAT_EMOJI[c.category] || c.icon || '📦';
   const qty        = getStock(c.id);
   const outOfStock = qty <= 0;
