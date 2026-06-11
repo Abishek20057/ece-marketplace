@@ -607,7 +607,7 @@ const COMPONENTS = [
     ]
   },
   {
-    id: 27,
+    id: 39,
     name: "Mini DC Fan",
     description: "Compact DC fan used for cooling electronic circuits, robotics projects, embedded systems, and ventilation applications.",
     category: "motor",
@@ -628,4 +628,136 @@ const COMPONENTS = [
         "Suitable for cooling circuits and projects"
     ]
   },
+  {
+    id: 38,
+    name: "Mini Breadboard",
+    description: "Compact solderless mini breadboard used for prototyping and testing electronic circuits. Ideal for Arduino, ESP32, and sensor interfacing projects.",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🔗",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTix5Nsyw4Cf5VCxhrUeuEXYdflybQBqDHkFw&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 10,
+    permPrice: 20,
+
+    project: "ECE Department Inventory",
+    tech: ["Solderless Design", "Tie Point Connections", "Reusable Board"],
+    features: [
+        "170 tie points",
+        "No soldering required",
+        "Reusable for multiple projects",
+        "Compatible with jumper wires",
+        "Ideal for circuit prototyping"
+    ]
+},
+{
+    id: 40,
+    name: "18650 Lithium-Ion Battery Holder",
+    description: "Battery holder designed for 18650 lithium-ion cells. Provides secure mounting and easy power connections for portable electronics and IoT projects.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔋",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFspFqSJsrCUbQjcH40qy2iqREGOj2EWHKA&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 10,
+    permPrice: 25,
+
+    project: "ECE Department Inventory",
+    tech: ["18650 Cell Support", "Wire Leads", "Plastic Housing"],
+    features: [
+        "Supports one 18650 battery",
+        "Easy battery replacement",
+        "Durable plastic construction",
+        "Pre-attached connection wires",
+        "Suitable for portable projects"
+    ]
+},
+{
+    id: 41,
+    name: "Fingerprint Sensor Module",
+    description: "Biometric fingerprint sensor module used for user authentication and access control systems. Commonly used in smart locks, attendance systems, and security projects.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "👆",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIGA5D0z_cDfMCxYi_oAx48BPSIz6tSCftbQ&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 80,
+    permPrice: 550,
+
+    project: "ECE Department Inventory",
+    tech: ["Optical Fingerprint Sensor", "UART Serial Interface", "3.3V–5V"],
+    features: [
+        "Stores multiple fingerprints",
+        "Fast fingerprint matching",
+        "UART communication",
+        "High recognition accuracy",
+        "Suitable for access control projects"
+    ]
+},
+{
+    id: 42,
+    name: "HW-131 18650 Battery Holder",
+    description: "18650 lithium-ion battery holder module with integrated switch and DC output terminals. Suitable for portable electronics, IoT, and embedded system projects.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔋",
+    image: "https://easyspares.in/image/cache/catalog/esw-product/9V-Battery-Cap-Connector-600x600.jpg",
+    type: ["temporary", "permanent"],
+    tempPrice: 2,
+    permPrice: 5,
+
+    project: "ECE Department Inventory",
+    tech: ["18650 Battery Support", "On/Off Switch", "DC Output"],
+    features: [
+        "Supports one 18650 Li-ion cell",
+        "Built-in power switch",
+        "Easy wire connection",
+        "Portable power solution",
+        "Reusable module design"
+    ]
+},
+{
+    id: 43,
+    name: "Step-Down Transformer",
+    description: "Electrical transformer used to reduce AC mains voltage to a lower AC voltage. Commonly used in power supply circuits, rectifier projects, and electronics laboratory experiments.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "⚡",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO8n2sXo7l3qj5m1u9e7v6Zt3a2h8kJzQ&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 30,
+    permPrice: 90,
+
+    project: "ECE Department Inventory",
+    tech: ["230V AC Input", "12V AC Output", "Step-Down Transformer"],
+    features: [
+        "230V AC to 12V AC conversion",
+        "Electrical isolation",
+        "Suitable for power supply projects",
+        "Reliable voltage transformation",
+        "Widely used in electronics labs"
+    ]
+},
+{
+    id: 44,
+    name: "Arduino UNO SMD",
+    description: "Arduino UNO SMD version based on the ATmega328P microcontroller. Functionally similar to the standard UNO but uses an SMD-mounted microcontroller, making it compact and reliable for embedded projects.",
+    category: "microcontroller",
+    categoryLabel: "Development Board",
+    icon: "🤖",
+    image: "",
+    type: ["temporary", "permanent"],
+    tempPrice: 50,
+    permPrice: 125,
+
+    project: "ECE Department Inventory",
+    tech: ["ATmega328P SMD", "USB Interface", "5V Logic"],
+    features: [
+        "ATmega328P SMD microcontroller",
+        "14 Digital I/O Pins",
+        "6 Analog Input Pins",
+        "USB programming support",
+        "Compatible with Arduino IDE"
+    ]
+},
 ];
