@@ -607,7 +607,7 @@ const COMPONENTS = [
     ]
   },
   {
-    id: 38,
+    id: 27,
     name: "Mini DC Fan",
     description: "Compact DC fan used for cooling electronic circuits, robotics projects, embedded systems, and ventilation applications.",
     category: "motor",

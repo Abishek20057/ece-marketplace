@@ -31,6 +31,34 @@
     </div>
   </nav>
 
+  <!-- ══════════════════════════════════════════
+       ANNOUNCEMENT TICKER — right below navbar,
+       visible without any scrolling
+  ══════════════════════════════════════════ -->
+  <div class="announce-bar">
+    <div class="announce-inner">
+      <span class="announce-dot"></span>
+      <span class="announce-label">OPEN NOW</span>
+      <div class="announce-ticker">
+        <span>
+          🏫 ECE Dept Lab &nbsp;·&nbsp;
+          📅 Mon – Fri &nbsp; 9:30 AM – 5:00 PM &nbsp;·&nbsp;
+          🗓️ Saturday — Full Day &nbsp;·&nbsp;
+          🛠️ Free Hands-On Training &nbsp;·&nbsp;
+          🤝 Mentorship from Seniors &amp; Faculty &nbsp;·&nbsp;
+          ⚡ Arduino · ESP32 · IoT · Sensors &nbsp;·&nbsp;&nbsp;
+          🏫 ECE Dept Lab &nbsp;·&nbsp;
+          📅 Mon – Fri &nbsp; 9:30 AM – 5:00 PM &nbsp;·&nbsp;
+          🗓️ Saturday — Full Day &nbsp;·&nbsp;
+          🛠️ Free Hands-On Training &nbsp;·&nbsp;
+          🤝 Mentorship from Seniors &amp; Faculty &nbsp;·&nbsp;
+          ⚡ Arduino · ESP32 · IoT · Sensors &nbsp;&nbsp;
+        </span>
+      </div>
+      <a href="contact.html" class="announce-cta">Join Now →</a>
+    </div>
+  </div>
+
   <!-- HERO -->
   <section class="hero">
     <canvas id="circuit-canvas"></canvas>
@@ -41,7 +69,7 @@
         <span class="gradient-text">Share Knowledge.</span>
       </h1>
       <p class="hero-subtitle">
-        Access reusable project components, circuits & modules from the ECE Department inventory.
+        Access reusable project components, circuits &amp; modules from the ECE Department inventory.
         Borrow to learn, or purchase to build your own.
       </p>
       <div class="hero-cta">
@@ -49,11 +77,115 @@
         <a href="about.html" class="btn btn-outline btn-lg">How It Works</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><span class="stat-num">120+</span><span class="stat-label">Components</span></div>
+        <div class="stat"><span class="stat-num">35+</span><span class="stat-label">Components</span></div>
         <div class="stat-divider"></div>
-        <div class="stat"><span class="stat-num">40+</span><span class="stat-label">Projects</span></div>
+        <div class="stat"><span class="stat-num">Mon–Sat</span><span class="stat-label">Lab Open</span></div>
         <div class="stat-divider"></div>
-        <div class="stat"><span class="stat-num">300+</span><span class="stat-label">Students Helped</span></div>
+        <div class="stat"><span class="stat-num">Free</span><span class="stat-label">Training</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       TRAINING HIGHLIGHT — immediately after hero
+       First thing seen after scroll begins
+  ══════════════════════════════════════════ -->
+  <section class="training-highlight">
+    <div class="container">
+      <div class="th-grid">
+
+        <!-- LEFT: Schedule card -->
+        <div class="th-schedule">
+          <div class="th-schedule-head">
+            <span class="th-live-dot"></span>
+            <span>Lab Schedule</span>
+          </div>
+          <div class="schedule-rows">
+            <div class="schedule-row">
+              <div class="schedule-day">
+                <span class="day-icon">📅</span>
+                <div>
+                  <strong>Monday – Friday</strong>
+                  <span class="day-sub">Weekdays</span>
+                </div>
+              </div>
+              <div class="schedule-time">9:30 AM – 5:00 PM</div>
+            </div>
+            <div class="schedule-divider"></div>
+            <div class="schedule-row">
+              <div class="schedule-day">
+                <span class="day-icon">🗓️</span>
+                <div>
+                  <strong>Saturday</strong>
+                  <span class="day-sub">Full Day Open</span>
+                </div>
+              </div>
+              <div class="schedule-time schedule-sat">All Day ✓</div>
+            </div>
+            <div class="schedule-divider"></div>
+            <div class="schedule-row">
+              <div class="schedule-day">
+                <span class="day-icon">📍</span>
+                <div>
+                  <strong>Location</strong>
+                  <span class="day-sub">ECE Department Lab</span>
+                </div>
+              </div>
+              <div class="schedule-time" style="color:var(--slate);font-size:0.85rem;">On Campus</div>
+            </div>
+          </div>
+          <a href="contact.html" class="btn btn-primary btn-full" style="margin-top:1.5rem;">Reserve a Slot →</a>
+        </div>
+
+        <!-- RIGHT: Training features -->
+        <div class="th-info">
+          <span class="eyebrow">🎓 Free Initiative</span>
+          <h2 class="th-title">Hands-On Training &amp; Workshops</h2>
+          <p class="th-desc">
+            Don't just borrow components — <strong>learn to build with them.</strong>
+            Our lab is open with seniors and faculty ready to guide you through
+            Arduino, ESP32, IoT, and sensor projects from scratch.
+          </p>
+          <div class="th-features">
+            <div class="th-feat">
+              <span class="feat-icon">🔌</span>
+              <div>
+                <strong>Live Circuit Building</strong>
+                <p>Wire, solder, and test circuits with real guidance.</p>
+              </div>
+            </div>
+            <div class="th-feat">
+              <span class="feat-icon">💻</span>
+              <div>
+                <strong>Code &amp; Debug Together</strong>
+                <p>Write Arduino/ESP32 code with mentors by your side.</p>
+              </div>
+            </div>
+            <div class="th-feat">
+              <span class="feat-icon">🎓</span>
+              <div>
+                <strong>Senior &amp; Faculty Mentors</strong>
+                <p>Direct help from people who've built the same projects.</p>
+              </div>
+            </div>
+            <div class="th-feat">
+              <span class="feat-icon">🆓</span>
+              <div>
+                <strong>Completely Free</strong>
+                <p>No fee. Just show up during lab hours and start building.</p>
+              </div>
+            </div>
+          </div>
+          <div class="th-tags">
+            <span class="th-tag">Arduino</span>
+            <span class="th-tag">ESP32</span>
+            <span class="th-tag">IoT</span>
+            <span class="th-tag">Sensors</span>
+            <span class="th-tag">Robotics</span>
+            <span class="th-tag">PCB Design</span>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -69,18 +201,18 @@
         <div class="plan-card plan-temp">
           <div class="plan-icon">⏱</div>
           <h3>Temporary Access</h3>
-          <p class="plan-subtitle">Learn & Explore</p>
+          <p class="plan-subtitle">Learn &amp; Explore</p>
           <ul class="plan-features">
-            <li>✓ Access component documentation</li>
-            <li>✓ View circuit diagrams & schematics</li>
+            <li>✓ Borrow component from HOD cabin</li>
+            <li>✓ View circuit diagrams &amp; schematics</li>
             <li>✓ Read usage guides</li>
-            <li>✓ Time-limited project preview</li>
-            <li>✗ No source code download</li>
+            <li>✓ Return after use</li>
+            <li>✗ No permanent ownership</li>
             <li>✗ No commercial use</li>
           </ul>
           <div class="plan-price">
-            <span class="price-value">Free</span>
-            <span class="price-period">/ limited period</span>
+            <span class="price-value">₹20</span>
+            <span class="price-period">/ temporary fee</span>
           </div>
           <a href="marketplace.html?type=temporary" class="btn btn-outline btn-full">Browse Free</a>
         </div>
@@ -91,9 +223,9 @@
           <h3>Permanent License</h3>
           <p class="plan-subtitle">Build Your Project</p>
           <ul class="plan-features">
-            <li>✓ Full source code access</li>
-            <li>✓ All circuit files & PCB layouts</li>
-            <li>✓ Lifetime updates</li>
+            <li>✓ Keep the component</li>
+            <li>✓ All circuit files &amp; PCB layouts</li>
+            <li>✓ Lifetime ownership</li>
             <li>✓ Use in your own projects</li>
             <li>✓ Priority support</li>
             <li>✓ Funds the ECE Department</li>
@@ -108,35 +240,7 @@
     </div>
   </section>
 
-  <!-- HANDS-ON TRAINING -->
-  <section class="section training-section">
-    <div class="container">
-      <div class="training-card">
-        <div class="training-content">
-          <span class="eyebrow" style="color:var(--electric);">🎓 New Initiative</span>
-          <h2 style="margin:0.5rem 0 1rem;">Free Hands-On Training &amp; Workshops</h2>
-          <p style="color:var(--slate);font-size:1.05rem;line-height:1.7;margin-bottom:1.5rem;">
-            Beyond just borrowing components — ECE Hub now offers <strong>hands-on training sessions</strong>
-            for Arduino, ESP32, IoT, and sensor-based projects. Learn to wire circuits, write code,
-            and debug your own modules with guidance from seniors and faculty.
-          </p>
-          <ul class="plan-features" style="margin-bottom:1.5rem;">
-            <li>✓ Live circuit-building sessions</li>
-            <li>✓ Beginner-friendly project walkthroughs</li>
-            <li>✓ Direct mentorship from seniors &amp; faculty</li>
-            <li>✓ Open lab access during sessions</li>
-          </ul>
-          <a href="contact.html" class="btn btn-primary btn-lg">Join a Training Session</a>
-        </div>
-        <div class="training-visual">
-          <div class="training-glow"></div>
-          <div class="training-icon">🛠️</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
+  <!-- FEATURED COMPONENTS -->
   <section class="section featured-section">
     <div class="container">
       <div class="section-header">
@@ -144,9 +248,7 @@
         <h2>Popular Components</h2>
         <a href="marketplace.html" class="see-all">See All →</a>
       </div>
-      <div class="components-grid" id="featured-grid">
-        <!-- Injected by JS -->
-      </div>
+      <div class="components-grid" id="featured-grid"></div>
     </div>
   </section>
 
@@ -196,6 +298,6 @@
   <script src="js/data.js"></script>
   <script src="js/main.js"></script>
   <script src="js/circuit.js"></script>
-<script src="js/nav.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>
