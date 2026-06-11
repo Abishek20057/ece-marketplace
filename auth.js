@@ -1,6 +1,9 @@
 // ============================================
-// ECE HUB — AUTH JS
+// ECE HUB — AUTH JS — v2 (Login/Signup separation)
+// If you see this comment in DevTools Sources tab,
+// the correct file is loaded.
 // ============================================
+console.log('[ECE Hub] auth.js v2 loaded — login/signup validation active');
 
 // ── Registered users storage ──────────────────────────────
 function getUsers() {
