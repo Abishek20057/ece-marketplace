@@ -348,16 +348,16 @@
         <div class="section-label">👤 Your Details</div>
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="t-name" placeholder="Your full name" />
+          <input type="text" id="t-name" placeholder="Your full name" oninput="validateTempForm()" />
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Roll Number</label>
-            <input type="text" id="t-roll" placeholder="e.g. 21ECE001" />
+            <input type="text" id="t-roll" placeholder="e.g. 21ECE001" oninput="validateTempForm()" />
           </div>
           <div class="form-group">
             <label>Year</label>
-            <select id="t-year">
+            <select id="t-year" onchange="validateTempForm()">
               <option value="">Select Year</option>
               <option>1st Year</option>
               <option>2nd Year</option>
@@ -368,10 +368,14 @@
         </div>
         <div class="form-group">
           <label>Phone Number</label>
-          <input type="tel" id="t-phone" placeholder="10-digit mobile number" maxlength="10" />
+          <input type="tel" id="t-phone" placeholder="10-digit mobile number" maxlength="10" oninput="validateTempForm()" />
+        </div>
+        <div class="form-group">
+          <label>Email (for return reminders &amp; fine notices)</label>
+          <input type="email" id="t-email" placeholder="you@example.com" oninput="validateTempForm()" />
         </div>
 
-        <button class="pay-btn" onclick="showQR()">
+        <button class="pay-btn" id="t-pay-btn" onclick="showQR()" disabled style="opacity:0.4;cursor:not-allowed;">
           📱 Make UPI Payment &nbsp;— ₹<span id="t-pay-label">20</span>
         </button>
         <div class="secure-note">🔐 Pay via UPI · Amount goes directly to ECE Department</div>
@@ -402,7 +406,7 @@
         <div id="panel-upi">
           <div class="form-group">
             <label>Your UPI ID</label>
-            <input type="text" id="p-upi-id" placeholder="yourname@upi or phone@paytm" />
+            <input type="text" id="p-upi-id" placeholder="yourname@upi or phone@paytm" oninput="validatePermForm()" />
           </div>
           <p style="font-size:0.82rem;color:var(--slate-dk);margin-top:-0.5rem;">
             📲 Scan our QR code and complete the payment on the next screen.
@@ -464,16 +468,16 @@
         <div class="section-label">👤 Your Details</div>
         <div class="form-group">
           <label>Full Name</label>
-          <input type="text" id="p-name" placeholder="Your full name" />
+          <input type="text" id="p-name" placeholder="Your full name" oninput="validatePermForm()" />
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Roll Number</label>
-            <input type="text" id="p-roll" placeholder="e.g. 21ECE001" />
+            <input type="text" id="p-roll" placeholder="e.g. 21ECE001" oninput="validatePermForm()" />
           </div>
           <div class="form-group">
             <label>Year</label>
-            <select id="p-year">
+            <select id="p-year" onchange="validatePermForm()">
               <option value="">Select Year</option>
               <option>1st Year</option>
               <option>2nd Year</option>
@@ -484,10 +488,10 @@
         </div>
         <div class="form-group">
           <label>Phone Number</label>
-          <input type="tel" id="p-phone" placeholder="10-digit mobile number" maxlength="10" />
+          <input type="tel" id="p-phone" placeholder="10-digit mobile number" maxlength="10" oninput="validatePermForm()" />
         </div>
 
-        <button class="pay-btn" onclick="processPermanent()">
+        <button class="pay-btn" id="p-pay-btn" onclick="processPermanent()" disabled style="opacity:0.4;cursor:not-allowed;">
           🔒 Pay &nbsp;₹<span id="p-pay-label">0</span>
         </button>
         <div class="secure-note">🔐 Secure payment · All data stays within ECE Department</div>
@@ -585,6 +589,7 @@
     </div>
   </div>
 
+  <script src="js/data.js"></script>
   <script>
     // ── CONFIG ─────────────────────────────────────────────
     const OUR_UPI          = 'ecehub@oksbi';
@@ -593,11 +598,26 @@
 
     // ── URL PARAMS ─────────────────────────────────────────
     const params    = new URLSearchParams(window.location.search);
+    const compId    = parseInt(params.get('id')) || null;
     const compName  = decodeURIComponent(params.get('name') || 'Component');
     const isTemp    = params.get('type') === 'temporary';
     const compPrice = isTemp
       ? (parseInt(params.get('amount')) || 20)
       : (parseInt(params.get('price'))  || 0);
+
+    // ── Decrement stock by 1 (persisted via localStorage) ──
+    function decrementStock() {
+      if (compId === null) return;
+      try {
+        const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
+        const current = (typeof COMPONENTS !== 'undefined')
+          ? (overrides[compId] !== undefined ? overrides[compId] : (COMPONENTS.find(c => c.id === compId) || {}).stock)
+          : overrides[compId];
+        const newStock = Math.max(0, (current !== undefined ? current : 1) - 1);
+        overrides[compId] = newStock;
+        localStorage.setItem('ece_stock_overrides', JSON.stringify(overrides));
+      } catch (e) { /* ignore */ }
+    }
 
     // ── POPULATE ORDER SUMMARY ─────────────────────────────
     document.getElementById('comp-name-display').textContent  = compName;
@@ -633,6 +653,7 @@
       selectedMethod = method;
       permPanels.forEach(p => document.getElementById('panel-' + p).style.display = 'none');
       document.getElementById('panel-' + method).style.display = 'block';
+      validatePermForm();
     }
 
     // Card number formatting
@@ -705,6 +726,39 @@
       reader.readAsDataURL(file);
     }
 
+    // ── FORM VALIDATION (enable/disable Pay buttons) ──────
+    function isValidPhone(v) { return /^\d{10}$/.test(v); }
+
+    function validateTempForm() {
+      const name  = document.getElementById('t-name').value.trim();
+      const roll  = document.getElementById('t-roll').value.trim();
+      const year  = document.getElementById('t-year').value;
+      const phone = document.getElementById('t-phone').value.trim();
+      const email = document.getElementById('t-email').value.trim();
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const ready = name && roll && year && isValidPhone(phone) && validEmail;
+      const btn = document.getElementById('t-pay-btn');
+      btn.disabled      = !ready;
+      btn.style.opacity = ready ? '1' : '0.4';
+      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+    }
+
+    function validatePermForm() {
+      const name  = document.getElementById('p-name').value.trim();
+      const roll  = document.getElementById('p-roll').value.trim();
+      const year  = document.getElementById('p-year').value;
+      const phone = document.getElementById('p-phone').value.trim();
+      let methodOk = true;
+      if (selectedMethod === 'upi') {
+        methodOk = document.getElementById('p-upi-id').value.trim().length > 0;
+      }
+      const ready = name && roll && year && isValidPhone(phone) && methodOk;
+      const btn = document.getElementById('p-pay-btn');
+      btn.disabled      = !ready;
+      btn.style.opacity = ready ? '1' : '0.4';
+      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+    }
+
     // ── QR HELPERS ─────────────────────────────────────────
     function buildQR(amount, label) {
       const upiStr = 'upi://pay?pa=' + OUR_UPI
@@ -763,6 +817,7 @@
 
     // ── SUCCESS SCREEN ─────────────────────────────────────
     function showSuccess(orderId, type) {
+      decrementStock();
       document.getElementById('success-icon').textContent = '✅';
       if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
@@ -793,6 +848,13 @@
       const yearId  = isTemp ? 't-year'  : 'p-year';
       const phoneId = isTemp ? 't-phone' : 'p-phone';
 
+      let dueDate = '';
+      if (isTemp) {
+        const d = new Date();
+        d.setDate(d.getDate() + 7);
+        dueDate = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
       const payload = {
         timestamp : new Date().toLocaleString('en-IN'),
         orderId,
@@ -800,10 +862,12 @@
         roll      : document.getElementById(rollId).value.trim(),
         year      : document.getElementById(yearId).value,
         phone     : document.getElementById(phoneId).value.trim(),
+        email     : isTemp ? document.getElementById('t-email').value.trim() : '',
         component : compName,
         amount    : compPrice,
         type      : isTemp ? 'Temporary' : 'Permanent',
         utr,
+        dueDate,
         screenshot: screenshotB64 || ''
       };
 

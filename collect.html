@@ -123,6 +123,32 @@
       flex-wrap: wrap;
       margin-top: 1.5rem;
     }
+    .due-banner {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1px solid #fcd34d;
+      border-radius: 12px;
+      padding: 0.9rem 1.2rem;
+      margin: 1.2rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #92400e;
+      font-weight: 600;
+    }
+    .due-banner strong { font-family: var(--font-display); font-size: 1.05rem; color: #b45309; }
+    .order-id-box {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: #166534;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
     .badge-temp-large {
       display: inline-block;
       background: rgba(245,158,8,0.15);
@@ -156,30 +182,35 @@
       <div class="component-name" id="comp-name">Loading…</div>
 
       <div class="cabin-info">
-        <div class="cabin-icon">📍</div>
+        <div class="cabin-icon">🧰</div>
         <div class="cabin-details">
-          <strong>HOD Cabin — ECE Department</strong>
-          <span>HOD SIR CABIN · Bring your ID Card</span>
+          <strong>ECE Component Lab Desk</strong>
+          <span>Ground Floor · ECE Block · Bring your College ID Card</span>
         </div>
+      </div>
+
+      <div class="due-banner" id="due-banner">
+        <span>📅 Return Due Date</span>
+        <strong id="due-date">—</strong>
       </div>
 
       <div class="collect-steps">
         <h3>📋 Steps to Collect</h3>
         <div class="step-item">
           <div class="step-num">1</div>
-          <div class="step-text">Visit the <strong>HOD Sir Cabin, ECE Department</strong> during working hours (9AM – 5PM).</div>
+          <div class="step-text">Walk in to the <strong>ECE Component Lab Desk</strong> during lab hours (9AM – 5PM, Mon–Sat).</div>
         </div>
         <div class="step-item">
           <div class="step-num">2</div>
-          <div class="step-text">Show your <strong>College ID Card</strong> and mention the component name shown above.</div>
+          <div class="step-text">Show this <strong>Order ID</strong> and your <strong>College ID Card</strong> to the lab assistant on duty.</div>
         </div>
         <div class="step-item">
           <div class="step-num">3</div>
-          <div class="step-text">Sign the <strong>Component Register</strong> with your name, roll number, and date.</div>
+          <div class="step-text">Sign the <strong>Issue Register</strong> with your name, roll number, and issue date.</div>
         </div>
         <div class="step-item">
           <div class="step-num">4</div>
-          <div class="step-text">Return the component within <strong>7 days</strong> in working condition. No fee charged.</div>
+          <div class="step-text">Return the component on or before the due date above. <strong>Late returns incur a ₹50/day fine</strong>, emailed to you automatically.</div>
         </div>
       </div>
 
@@ -189,19 +220,34 @@
       </div>
 
       <p style="font-size:0.78rem;color:#94a3b8;margin-top:1.5rem;">
-        Temporary borrowing is free. Components must be returned within 7 days.<br>
-        For queries, contact ECE Department office.
+        ⏱ Borrowing fee: ₹20 · Return within 7 days to avoid fines.<br>
+        Late fine: <strong>₹50/day</strong>, increasing daily, emailed automatically until returned.
       </p>
     </div>
   </div>
 
   <script>
-    // Show component name from URL params
-    const params = new URLSearchParams(window.location.search);
-    const name = params.get('name');
+    // Show component name + order ID + due date from URL params
+    const params  = new URLSearchParams(window.location.search);
+    const name    = params.get('name');
+    const orderId = params.get('order');
+
     if (name) {
       document.getElementById('comp-name').textContent = decodeURIComponent(name);
     }
+
+    if (orderId) {
+      const orderBox = document.createElement('div');
+      orderBox.className = 'order-id-box';
+      orderBox.textContent = '🎫 Order #' + orderId;
+      document.getElementById('comp-name').insertAdjacentElement('afterend', orderBox);
+    }
+
+    // Due date = today + 7 days
+    const due = new Date();
+    due.setDate(due.getDate() + 7);
+    const dueStr = due.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('due-date').textContent = dueStr;
   </script>
 </body>
 </html>
