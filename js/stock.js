@@ -7,40 +7,40 @@ const DEFAULT_STOCK = {
    1: 30,  // Arduino UNO
    2:  3,  // ESP32
    3: 11,  // NodeMCU ESP8266
-   4:  5,  // LCD Display
-   5:  5,  // OLED Display
-   6:  5,  // Smoke Sensor
-   7:  5,  // Soil Moisture
-   8:  5,  // Flame Sensor
-   9:  5,  // IR Sensor
-  10:  5,  // Ultrasonic HC-SR04
-  11:  5,  // LDR Sensor
-  12:  5,  // DHT11/DHT22
-  13:  5,  // Rain Sensor
-  14:  5,  // Vibration Sensor
-  15:  5,  // Tilt Sensor
-  16:  5,  // MPU6050
-  17:  5,  // Single Relay
-  18:  5,  // 2-Ch Relay
-  19:  5,  // 4-Ch Relay
-  20:  5,  // DC Motor
+   4:  20,  // LCD Display
+   5:  1,  // OLED Display
+   6:  7,  // Smoke Sensor
+   7:  7,  // Soil Moisture
+   8:  4,  // Flame Sensor
+   9:  6,  // IR Sensor
+  10:  8,  // Ultrasonic HC-SR04
+  11:  1,  // LDR Sensor
+  12:  11,  // DHT11/DHT22
+  13:  3,  // Rain Sensor
+  14:  1,  // Vibration Sensor
+  15:  2,  // Tilt Sensor
+  16:  1,  // MPU6050
+  17:  8,  // Single Relay
+  18:  2,  // 2-Ch Relay
+  19:  2,  // 4-Ch Relay
+  20:  4,  // DC Motor
   21:  5,  // Servo Motor
-  22:  5,  // Motor Driver
-  23:  5,  // Bluetooth HC-05
-  24:  5,  // RFID RC522
-  25:  5,  // GSM Module
-  26:  5,  // GPS Module
+  22:  6,  // Motor Driver
+  23:  2,  // Bluetooth HC-05
+  24:  1,  // RFID RC522
+  25:  3,  // GSM Module
+  26:  3,  // GPS Module
   27:  5,  // DC-DC Booster
-  28: 10,  // Batteries
-  29:  5,  // Solar Panels
-  30:  5,  // Power Adapters
-  31: 10,  // Buzzer
-  32: 10,  // Breadboard
-  33: 20,  // Jumper Wires
-  34: 50,  // LEDs
-  35: 20,  // Push Buttons
-  36:  5,  // Li-Ion 18650
-  37:  5,  // Water Pump
+  28: 11,  // Batteries
+  29:  3,  // Solar Panels
+  30:  8,  // Power Adapters
+  31: 5,  // Buzzer
+  32: 5,  // Breadboard
+  33: 50,  // Jumper Wires
+  34: 5,  // LEDs
+  35: 7,  // Push Buttons
+  36:  9,  // Li-Ion 18650
+  37:  9,  // Water Pump
 };
 
 const STOCK_KEY = 'ece_stock';
