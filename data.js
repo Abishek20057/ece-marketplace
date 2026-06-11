@@ -8,7 +8,6 @@ const COMPONENTS = [
 
   {
     id: 1,
-    stock: 30,
     name: "Arduino UNO",
     description: "The classic microcontroller board based on ATmega328P. Ideal for beginners and embedded projects. Features 14 digital I/O pins, 6 analog inputs, and USB connectivity.",
     category: "microcontroller",
@@ -24,7 +23,6 @@ const COMPONENTS = [
   },
   {
     id: 2,
-    stock: 2,
     name: "ESP32 Development Board",
     description: "Powerful dual-core microcontroller with built-in Wi-Fi and Bluetooth. Perfect for IoT applications. Supports Arduino IDE and MicroPython.",
     category: "microcontroller",
@@ -40,7 +38,6 @@ const COMPONENTS = [
   },
   {
     id: 3,
-    stock: 11,
     name: "NodeMCU (ESP8266)",
     description: "Wi-Fi enabled microcontroller module based on ESP8266. Popular for IoT projects with built-in TCP/IP stack and easy Arduino IDE support.",
     category: "microcontroller",
@@ -59,7 +56,6 @@ const COMPONENTS = [
 
   {
     id: 4,
-    stock: 8,
     name: "LCD Display (16x2 / 20x4)",
     description: "Character LCD display module. Available in 16x2 and 20x4 configurations. Connects via I2C backpack for minimal pin usage.",
     category: "display",
@@ -75,7 +71,6 @@ const COMPONENTS = [
   },
   {
     id: 5,
-    stock: 8,
     name: "OLED Display",
     description: "0.96-inch SSD1306 OLED display module with 128x64 pixel resolution. Ultra-low power, high contrast display via I2C or SPI.",
     category: "display",
@@ -94,7 +89,6 @@ const COMPONENTS = [
 
   {
     id: 6,
-    stock: 5,
     name: "Smoke Sensor (MQ Series)",
     description: "MQ-2/MQ-135 gas and smoke detection sensor. Detects LPG, smoke, alcohol, propane, hydrogen, methane. Analog and digital output.",
     category: "sensor",
@@ -110,7 +104,6 @@ const COMPONENTS = [
   },
   {
     id: 7,
-    stock: 5,
     name: "Soil Moisture Sensor",
     description: "Capacitive or resistive soil moisture sensor. Measures water content in soil for smart irrigation and agriculture projects.",
     category: "sensor",
@@ -126,7 +119,6 @@ const COMPONENTS = [
   },
   {
     id: 8,
-    stock: 5,
     name: "Fire Detection Sensor (Flame Sensor)",
     description: "Infrared flame sensor that detects fire and flame sources. Sensitive to wavelengths between 760nm and 1100nm. Ideal for fire alarm systems.",
     category: "sensor",
@@ -142,7 +134,6 @@ const COMPONENTS = [
   },
   {
     id: 9,
-    stock: 5,
     name: "IR Sensor (Infrared Obstacle Sensor)",
     description: "Infrared obstacle detection sensor for short-range object detection. Widely used in robotics, line followers, and proximity sensing.",
     category: "sensor",
@@ -158,7 +149,6 @@ const COMPONENTS = [
   },
   {
     id: 10,
-    stock: 5,
     name: "Ultrasonic Sensor (HC-SR04)",
     description: "HC-SR04 ultrasonic ranging module. Measures distance from 2cm to 400cm using sonar. Non-contact, high accuracy.",
     category: "sensor",
@@ -174,7 +164,6 @@ const COMPONENTS = [
   },
   {
     id: 11,
-    stock: 5,
     name: "LDR Sensor (Light Sensor)",
     description: "Light Dependent Resistor module for ambient light sensing. Resistance decreases as light intensity increases.",
     category: "sensor",
@@ -190,7 +179,6 @@ const COMPONENTS = [
   },
   {
     id: 12,
-    stock: 5,
     name: "DHT11 / DHT22 Temperature & Humidity Sensor",
     description: "Digital temperature and humidity sensor. DHT11 for basic use, DHT22 for higher accuracy. Widely used in weather stations and HVAC projects.",
     category: "sensor",
@@ -206,7 +194,6 @@ const COMPONENTS = [
   },
   {
     id: 13,
-    stock: 5,
     name: "Rain Sensor Module",
     description: "Detects rainfall using conductive pads. Outputs analog and digital signals based on rain intensity. Used in smart weather and irrigation systems.",
     category: "sensor",
@@ -222,7 +209,6 @@ const COMPONENTS = [
   },
   {
     id: 14,
-    stock: 5,
     name: "Vibration Sensor",
     description: "Piezoelectric vibration sensor module detects shocks, vibrations, and knocks. Used in tamper detection and vibration measurement.",
     category: "sensor",
@@ -238,7 +224,6 @@ const COMPONENTS = [
   },
   {
     id: 15,
-    stock: 5,
     name: "Tilt Sensor",
     description: "Ball-type tilt sensor that detects orientation change. Simple on/off switch mechanism triggered by tilt angle.",
     category: "sensor",
@@ -254,7 +239,6 @@ const COMPONENTS = [
   },
   {
     id: 16,
-    stock: 4,
     name: "MPU6050 Accelerometer & Gyroscope",
     description: "6-axis IMU sensor combining 3-axis accelerometer and 3-axis gyroscope. Used in drones, robotics, and motion tracking via I2C.",
     category: "sensor",
@@ -273,7 +257,6 @@ const COMPONENTS = [
 
   {
     id: 17,
-    stock: 6,
     name: "Single Channel Relay Module",
     description: "1-channel 5V relay module for switching AC/DC loads. Controlled by microcontroller signal. Includes flyback diode for protection.",
     category: "relay",
@@ -289,7 +272,6 @@ const COMPONENTS = [
   },
   {
     id: 18,
-    stock: 6,
     name: "Two Channel Relay Module",
     description: "2-channel relay module. Control two independent loads from a microcontroller. Ideal for home automation projects.",
     category: "relay",
@@ -305,7 +287,6 @@ const COMPONENTS = [
   },
   {
     id: 19,
-    stock: 4,
     name: "Four Channel Relay Module",
     description: "4-channel relay module for controlling 4 independent electrical loads. Perfect for smart home and industrial automation.",
     category: "relay",
@@ -324,7 +305,6 @@ const COMPONENTS = [
 
   {
     id: 20,
-    stock: 10,
     name: "DC Motor",
     description: "Standard brushed DC motor for general-purpose robotics and projects. Runs on 3–12V DC. Requires motor driver for microcontroller control.",
     category: "motor",
@@ -340,7 +320,6 @@ const COMPONENTS = [
   },
   {
     id: 21,
-    stock: 8,
     name: "Servo Motor",
     description: "SG90 / MG90S servo motor for precise angular position control. Controlled by PWM signal from microcontroller. 0–180° rotation.",
     category: "motor",
@@ -356,7 +335,6 @@ const COMPONENTS = [
   },
   {
     id: 22,
-    stock: 6,
     name: "Motor Driver Module (L293D / L298N)",
     description: "Dual H-bridge motor driver IC for controlling DC and stepper motors. Supports two DC motors or one stepper. Enable/direction pins.",
     category: "motor",
@@ -375,7 +353,6 @@ const COMPONENTS = [
 
   {
     id: 23,
-    stock: 4,
     name: "Bluetooth Module (HC-05 / HC-06)",
     description: "HC-05/HC-06 Bluetooth serial module. Enables wireless serial communication between Arduino and phone/PC. Master-slave configurable.",
     category: "communication",
@@ -391,7 +368,6 @@ const COMPONENTS = [
   },
   {
     id: 24,
-    stock: 3,
     name: "RFID Module (RC522)",
     description: "MFRC522 RFID reader/writer module. Reads Mifare 13.56 MHz RFID cards and tags. Used in access control and attendance systems.",
     category: "communication",
@@ -407,7 +383,6 @@ const COMPONENTS = [
   },
   {
     id: 25,
-    stock: 2,
     name: "GSM Module (SIM800L / SIM900A)",
     description: "GSM/GPRS module for sending SMS, making calls, and internet via UART. SIM800L compact; SIM900A for dev boards.",
     category: "communication",
@@ -423,7 +398,6 @@ const COMPONENTS = [
   },
   {
     id: 26,
-    stock: 2,
     name: "GPS Module (NEO-6M)",
     description: "u-blox NEO-6M GPS module with ceramic antenna. Provides location coordinates via UART. Used in vehicle tracking and navigation.",
     category: "communication",
@@ -439,7 +413,6 @@ const COMPONENTS = [
   },
   {
     id: 27,
-    stock: 5,
     name: "DC-DC Voltage Booster Module",
     description: "Step-up DC-DC voltage booster module used to increase low DC voltages to higher output voltages. Commonly used in battery-powered and embedded electronics projects.",
     category: "power",
@@ -465,7 +438,6 @@ const COMPONENTS = [
 
   {
     id: 28,
-    stock: 6,
     name: "HW Batteries",
     description: "Assorted rechargeable and non-rechargeable batteries. Includes 9V, AA, AAA, 18650 Li-ion, and LiPo packs for project power supply.",
     category: "power",
@@ -481,7 +453,6 @@ const COMPONENTS = [
   },
   {
     id: 29,
-    stock: 3,
     name: "Solar Panels",
     description: "Small photovoltaic solar panels (3V–12V) for solar energy harvesting projects. Used in IoT sensor nodes and off-grid systems.",
     category: "power",
@@ -497,7 +468,6 @@ const COMPONENTS = [
   },
   {
     id: 30,
-    stock: 6,
     name: "Power Adapters",
     description: "5V and 12V DC power adapters/SMPS for project power supply. Regulated output with barrel jack connector.",
     category: "power",
@@ -516,7 +486,6 @@ const COMPONENTS = [
 
   {
     id: 31,
-    stock: 10,
     name: "Buzzer",
     description: "Active and passive piezoelectric buzzers for sound alerts in Arduino projects. Active buzzer needs only DC; passive buzzer needs PWM for tones.",
     category: "audio",
@@ -535,7 +504,6 @@ const COMPONENTS = [
 
   {
     id: 32,
-    stock: 12,
     name: "Breadboard",
     description: "Solderless prototyping breadboard. 830 tie-point full-size or 400 tie-point half-size. Connect components without soldering.",
     category: "prototyping",
@@ -551,7 +519,6 @@ const COMPONENTS = [
   },
   {
     id: 33,
-    stock: 20,
     name: "Jumper Wires",
     description: "Male-to-male, male-to-female, and female-to-female jumper wire kits for prototyping. 10cm–30cm lengths.",
     category: "prototyping",
@@ -567,7 +534,6 @@ const COMPONENTS = [
   },
   {
     id: 34,
-    stock: 25,
     name: "LEDs (Various Colors)",
     description: "Assorted 5mm and 3mm through-hole LEDs in red, green, blue, yellow, white. Standard indicator and display use.",
     category: "prototyping",
@@ -583,7 +549,6 @@ const COMPONENTS = [
   },
   {
     id: 35,
-    stock: 15,
     name: "Push Buttons",
     description: "Tactile push button switches (6x6mm and 12x12mm). Momentary contact, SPST type. Used for user input in all Arduino/MCU projects.",
     category: "prototyping",
@@ -599,7 +564,6 @@ const COMPONENTS = [
   },
   {
     id: 36,
-    stock: 10,
     name: "Lithium-Ion Battery (18650)",
     description: "Rechargeable 18650 Lithium-Ion battery widely used in portable electronics, IoT devices, robotics, and embedded system projects due to its high energy density and long cycle life.",
     category: "power",
@@ -622,7 +586,6 @@ const COMPONENTS = [
   },
   {
     id: 37,
-    stock: 4,
     name: "Mini DC Water Pump",
     description: "Compact DC water pump used for automatic irrigation systems, water level control, smart gardening, and IoT-based water management projects.",
     category: "motor",
@@ -644,8 +607,7 @@ const COMPONENTS = [
     ]
   },
   {
-    id: 27,
-    stock: 5,
+    id: 39,
     name: "Mini DC Fan",
     description: "Compact DC fan used for cooling electronic circuits, robotics projects, embedded systems, and ventilation applications.",
     category: "motor",
@@ -666,4 +628,135 @@ const COMPONENTS = [
         "Suitable for cooling circuits and projects"
     ]
   },
+  {
+    id: 38,
+    name: "Mini Breadboard",
+    description: "Compact solderless mini breadboard used for prototyping and testing electronic circuits. Ideal for Arduino, ESP32, and sensor interfacing projects.",
+    category: "common",
+    categoryLabel: "Prototyping",
+    icon: "🔗",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTix5Nsyw4Cf5VCxhrUeuEXYdflybQBqDHkFw&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 10,
+    permPrice: 20,
+
+    project: "ECE Department Inventory",
+    tech: ["Solderless Design", "Tie Point Connections", "Reusable Board"],
+    features: [
+        "170 tie points",
+        "No soldering required",
+        "Reusable for multiple projects",
+        "Compatible with jumper wires",
+        "Ideal for circuit prototyping"
+    ]
+},
+{
+    id: 40,
+    name: "18650 Lithium-Ion Battery Holder",
+    description: "Battery holder designed for 18650 lithium-ion cells. Provides secure mounting and easy power connections for portable electronics and IoT projects.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔋",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHFspFqSJsrCUbQjcH40qy2iqREGOj2EWHKA&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 10,
+    permPrice: 25,
+
+    project: "ECE Department Inventory",
+    tech: ["18650 Cell Support", "Wire Leads", "Plastic Housing"],
+    features: [
+        "Supports one 18650 battery",
+        "Easy battery replacement",
+        "Durable plastic construction",
+        "Pre-attached connection wires",
+        "Suitable for portable projects"
+    ]
+},
+{
+    id: 41,
+    name: "Fingerprint Sensor Module",
+    description: "Biometric fingerprint sensor module used for user authentication and access control systems. Commonly used in smart locks, attendance systems, and security projects.",
+    category: "sensor",
+    categoryLabel: "Sensor",
+    icon: "👆",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIGA5D0z_cDfMCxYi_oAx48BPSIz6tSCftbQ&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 80,
+    permPrice: 550,
+
+    project: "ECE Department Inventory",
+    tech: ["Optical Fingerprint Sensor", "UART Serial Interface", "3.3V–5V"],
+    features: [
+        "Stores multiple fingerprints",
+        "Fast fingerprint matching",
+        "UART communication",
+        "High recognition accuracy",
+        "Suitable for access control projects"
+    ]
+},
+{
+    id: 42,
+    name: "HW-131 18650 Battery Holder",
+    description: "18650 lithium-ion battery holder module with integrated switch and DC output terminals. Suitable for portable electronics, IoT, and embedded system projects.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "🔋",
+    image: "https://easyspares.in/image/cache/catalog/esw-product/9V-Battery-Cap-Connector-600x600.jpg",
+    type: ["temporary", "permanent"],
+    tempPrice: 2,
+    permPrice: 5,
+
+    project: "ECE Department Inventory",
+    tech: ["18650 Battery Support", "On/Off Switch", "DC Output"],
+    features: [
+        "Supports one 18650 Li-ion cell",
+        "Built-in power switch",
+        "Easy wire connection",
+        "Portable power solution",
+        "Reusable module design"
+    ]
+},
+{
+    id: 43,
+    name: "Step-Down Transformer",
+    description: "Electrical transformer used to reduce AC mains voltage to a lower AC voltage. Commonly used in power supply circuits, rectifier projects, and electronics laboratory experiments.",
+    category: "power",
+    categoryLabel: "Power",
+    icon: "⚡",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO8n2sXo7l3qj5m1u9e7v6Zt3a2h8kJzQ&s",
+    type: ["temporary", "permanent"],
+    tempPrice: 30,
+    permPrice: 90,
+
+    project: "ECE Department Inventory",
+    tech: ["230V AC Input", "12V AC Output", "Step-Down Transformer"],
+    features: [
+        "230V AC to 12V AC conversion",
+        "Electrical isolation",
+        "Suitable for power supply projects",
+        "Reliable voltage transformation",
+        "Widely used in electronics labs"
+    ]
+},
+{
+    id: 44,
+    name: "Arduino UNO SMD",
+    description: "Arduino UNO SMD version based on the ATmega328P microcontroller. Functionally similar to the standard UNO but uses an SMD-mounted microcontroller, making it compact and reliable for embedded projects.",
+    category: "microcontroller",
+    categoryLabel: "Development Board",
+    icon: "🤖",
+    image: "https://store.arduino.cc/cdn/shop/products/A000066_03.front_1000x750.jpg",
+    type: ["temporary", "permanent"],
+    tempPrice: 50,
+    permPrice: 125,
+    project: "ECE Department Inventory",
+    tech: ["ATmega328P SMD", "USB Interface", "5V Logic"],
+    features: [
+        "ATmega328P SMD microcontroller",
+        "14 Digital I/O Pins",
+        "6 Analog Input Pins",
+        "USB programming support",
+        "Compatible with Arduino IDE"
+    ]
+},
 ];
