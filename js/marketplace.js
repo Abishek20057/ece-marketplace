@@ -62,6 +62,9 @@ function renderGrid() {
   if (sortVal === 'price-asc')  filtered.sort((a,b) => (a.permPrice??0)-(b.permPrice??0));
   else if (sortVal === 'price-desc') filtered.sort((a,b) => (b.permPrice??0)-(a.permPrice??0));
   else if (sortVal === 'name')  filtered.sort((a,b) => a.name.localeCompare(b.name));
+  console.log("Total Components:", COMPONENTS.length);  
+  console.log("Filtered Components:", filtered.length);
+  console.log(filtered.map(c => c.id));
 
   if (filtered.length === 0) {
     grid.innerHTML = '';
