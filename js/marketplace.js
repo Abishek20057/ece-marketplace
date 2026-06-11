@@ -2,6 +2,18 @@
 // ECE HUB — MARKETPLACE JS (Fixed)
 // ============================================
 
+// ── Apply persisted stock overrides (sales reduce stock) ──
+(function applyStockOverrides() {
+  try {
+    const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
+    COMPONENTS.forEach(c => {
+      if (overrides[c.id] !== undefined) {
+        c.stock = overrides[c.id];
+      }
+    });
+  } catch (e) { /* ignore */ }
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   const hamburger = document.getElementById('hamburger');
   if (hamburger) hamburger.addEventListener('click', () => {
@@ -144,11 +156,15 @@ function buildCard(c) {
   const priceLabel = hasPerm
     ? `<span class="card-price price-paid">₹${c.permPrice}</span>`
     : `<span class="card-price price-free">Free</span>`;
-  const imgSrc = c.image || COMPONENT_IMAGES[c.id] || '';
+  const imgSrc = COMPONENT_IMAGES[c.id] || c.image || '';
   const fallback = CAT_EMOJI[c.category] || c.icon || '📦';
   const tempBadge = hasTemp
   ? `<div class="temp-fee-badge">₹${c.tempPrice} Temporary Access Fee</div>`
   : '';
+  const stock = (c.stock !== undefined) ? c.stock : 5;
+  const stockBadge = stock <= 0
+    ? `<span class="badge" style="background:#7f1d1d;color:#fecaca;">Out of Stock</span>`
+    : `<span class="badge" style="background:#14532d;color:#bbf7d0;">${stock} in stock</span>`;
 
   return `
     <div class="component-card">
@@ -168,6 +184,7 @@ function buildCard(c) {
           ${hasTemp ? '<span class="badge badge-temp">Temporary</span>' : ''}
           ${hasPerm ? '<span class="badge badge-perm">Permanent</span>' : ''}
           <span class="badge badge-cat">${c.categoryLabel}</span>
+          ${stockBadge}
         </div>
         <h3>${c.name}</h3>
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
@@ -184,8 +201,10 @@ function openModal(c) {
   const body = document.getElementById('modal-body');
   const hasPerm = c.type.includes('permanent');
   const hasTemp = c.type.includes('temporary');
-  const imgSrc = COMPONENT_IMAGES[c.id] || '';
+  const imgSrc = COMPONENT_IMAGES[c.id] || c.image || '';
   const fallback = CAT_EMOJI[c.category] || c.icon || '📦';
+  const stock = (c.stock !== undefined) ? c.stock : 5;
+  const outOfStock = stock <= 0;
 
   body.innerHTML = `
     ${imgSrc
@@ -222,9 +241,9 @@ function openModal(c) {
   ₹${c.tempPrice}
 </div>
 
-<button class="btn btn-outline"
-onclick="handleBorrow(${c.id},'${encodeURIComponent(c.name)}')">
-Get Temporary Access ₹${c.tempPrice}
+<button class="btn btn-primary modal-action-btn"
+onclick="handleBorrow(${c.id},'${encodeURIComponent(c.name)}',${c.tempPrice})" ${outOfStock ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+${outOfStock ? 'Out of Stock' : 'Get Temporary Access ₹' + c.tempPrice}
 </button>
     </div>` : ''}
     ${hasPerm ? `
@@ -233,7 +252,7 @@ Get Temporary Access ₹${c.tempPrice}
         <div class="modal-price-label">♾️ Permanent — Buy & Keep</div>
         <div class="modal-price-val">₹${c.permPrice}</div>
       </div>
-      <button class="btn btn-primary" onclick="handleBuy(${c.id},'${encodeURIComponent(c.name)}',${c.permPrice})">Buy Now ₹${c.permPrice}</button>
+      <button class="btn btn-primary modal-action-btn" onclick="handleBuy(${c.id},'${encodeURIComponent(c.name)}',${c.permPrice})" ${outOfStock ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>${outOfStock ? "Out of Stock" : "Buy Now ₹" + c.permPrice}</button>
     </div>` : ''}
     <p style="font-size:0.78rem;color:var(--slate-dk);margin-top:0.75rem;text-align:center;">
       Purchases support the ECE Department directly.
