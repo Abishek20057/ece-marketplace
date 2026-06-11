@@ -723,7 +723,7 @@ const COMPONENTS = [
     category: "power",
     categoryLabel: "Power",
     icon: "⚡",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO8n2sXo7l3qj5m1u9e7v6Zt3a2h8kJzQ&s",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxbEBfnMxFnlLTIaxGC5LbVsQj3MrSSFIE-w&s",
     type: ["temporary", "permanent"],
     tempPrice: 30,
     permPrice: 90,
@@ -745,11 +745,10 @@ const COMPONENTS = [
     category: "microcontroller",
     categoryLabel: "Development Board",
     icon: "🤖",
-    image: "",
+    image: "https://static.wixstatic.com/media/a5ba95_aa68b83915e04794912fd8aaeed4f147~mv2.jpg/v1/fit/w_500,h_500,q_90/file.jpg",
     type: ["temporary", "permanent"],
     tempPrice: 50,
     permPrice: 125,
-
     project: "ECE Department Inventory",
     tech: ["ATmega328P SMD", "USB Interface", "5V Logic"],
     features: [
