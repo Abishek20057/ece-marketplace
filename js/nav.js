@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — NAV SESSION JS
+// Kalam Hub — NAV SESSION JS
 // Shows user name + logout when logged in
 // ============================================
 

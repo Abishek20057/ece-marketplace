@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — CONTACT JS
+// Kalam Hub — CONTACT JS
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {

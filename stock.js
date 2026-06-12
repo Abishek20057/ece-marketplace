@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — STOCK MANAGEMENT
+// Kalam Hub — STOCK MANAGEMENT
 // localStorage-based stock tracking
 // ============================================
 

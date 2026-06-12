@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — CIRCUIT BOARD CANVAS ANIMATION
+// Kalam Hub — CIRCUIT BOARD CANVAS ANIMATION
 // ============================================
 
 (function () {

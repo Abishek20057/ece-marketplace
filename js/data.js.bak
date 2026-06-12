@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — COMPONENT DATA (Real Inventory)
+// Kalam Hub — COMPONENT DATA (Real Inventory)
 // ============================================
 
 const COMPONENTS = [
@@ -16,7 +16,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["ATmega328P", "Arduino IDE", "5V Logic"],
     features: ["14 digital I/O pins", "6 analog input pins", "16 MHz clock speed", "USB programming", "5V operating voltage"]
   },
@@ -30,7 +30,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 199,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Xtensa LX6", "Wi-Fi 802.11", "Bluetooth 4.2", "Arduino IDE"],
     features: ["Dual-core 240 MHz CPU", "Built-in Wi-Fi & Bluetooth", "34 GPIO pins", "4MB Flash memory", "Deep sleep support"]
   },
@@ -44,7 +44,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 129,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["ESP8266", "Wi-Fi 802.11 b/g/n", "Lua / Arduino IDE"],
     features: ["Built-in Wi-Fi module", "11 digital I/O pins", "1 analog input pin", "USB-to-Serial (CH340)", "3.3V logic level"]
   },
@@ -61,7 +61,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["HD44780 Controller", "I2C Backpack", "Arduino Library"],
     features: ["16x2 or 20x4 character variants", "I2C interface (only 2 wires)", "Adjustable contrast", "Backlight control", "3.3V / 5V compatible"]
   },
@@ -75,7 +75,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 129,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SSD1306", "I2C / SPI", "Adafruit Library"],
     features: ["128x64 pixel resolution", "0.96 inch screen", "I2C & SPI interface", "Ultra-low power consumption", "No backlight needed"]
   },
@@ -92,7 +92,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["MQ-2 / MQ-135", "Analog + Digital Out", "5V Supply"],
     features: ["Smoke & gas detection", "Analog and digital output", "Sensitivity adjustment via pot", "Fast response time", "Wide detection range"]
   },
@@ -106,7 +106,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Resistive / Capacitive", "Analog + Digital Out", "3.3V–5V"],
     features: ["Real-time soil moisture reading", "Analog and digital output", "Adjustable threshold", "Compact design", "Direct Arduino compatible"]
   },
@@ -120,7 +120,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["IR Photodiode", "LM393 Comparator", "Digital Output"],
     features: ["Detects flame up to 1m", "60° detection angle", "Digital output pin", "Sensitivity adjustable", "5V operating voltage"]
   },
@@ -134,7 +134,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 69,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["IR LED + Photodiode", "LM393", "Digital Output"],
     features: ["2cm–30cm detection range", "Digital output", "Sensitivity pot adjustment", "Works in ambient light", "3-pin connection (VCC, GND, OUT)"]
   },
@@ -148,7 +148,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 89,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["HC-SR04", "40kHz Ultrasonic", "Trig/Echo Pins"],
     features: ["Range: 2cm to 400cm", "±3mm accuracy", "Trig & Echo interface", "5V supply", "Non-contact measurement"]
   },
@@ -162,7 +162,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 59,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["GL5528 LDR", "Analog + Digital Out", "5V"],
     features: ["Analog light level output", "Digital threshold output", "Sensitivity adjustable", "Low cost", "Wide light range detection"]
   },
@@ -176,7 +176,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["DHT11 / DHT22", "Single-Wire Protocol", "Arduino / ESP32"],
     features: ["Temperature: 0–50°C (DHT11)", "Humidity: 20–90% RH", "DHT22: higher accuracy ±0.5°C", "Single digital pin", "Built-in calibration"]
   },
@@ -190,7 +190,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Conductive Pad", "LM393 Comparator", "Analog + Digital Out"],
     features: ["Rain/water detection", "Analog sensitivity output", "Digital threshold trigger", "Sensitivity adjustable", "3.3V–5V compatible"]
   },
@@ -204,7 +204,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 69,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SW-420", "LM393", "Digital Output"],
     features: ["Vibration & shock detection", "Digital output", "Sensitivity pot", "Non-directional detection", "3.3V–5V supply"]
   },
@@ -218,7 +218,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 59,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Ball Switch", "Digital Output", "3V–5V"],
     features: ["Tilt/angle detection", "Digital output", "Simple 2-state output", "Compact size", "No calibration needed"]
   },
@@ -232,7 +232,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["MPU6050", "I2C Interface", "DMP Processor"],
     features: ["3-axis accelerometer", "3-axis gyroscope", "I2C interface", "Digital Motion Processor", "16-bit ADC resolution"]
   },
@@ -249,7 +249,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SRD-05VDC", "Optocoupler", "5V Trigger"],
     features: ["Controls 250V AC / 30V DC", "Optocoupler isolated", "Active LOW / HIGH configurable", "Status LED", "Screw terminal output"]
   },
@@ -263,7 +263,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 109,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SRD-05VDC x2", "Optocoupler", "5V Trigger"],
     features: ["2 independent channels", "Controls 250V AC loads", "Optocoupler isolation", "Individual status LEDs", "Active LOW trigger"]
   },
@@ -277,7 +277,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SRD-05VDC x4", "Optocoupler", "5V Trigger"],
     features: ["4 independent relay channels", "Controls 250V AC / 10A", "Full optocoupler isolation", "4 status LEDs", "Stackable design"]
   },
@@ -294,7 +294,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Brushed DC", "3V–12V", "PWM Speed Control"],
     features: ["3V to 12V operating range", "PWM speed control compatible", "High torque variant available", "Compact size", "Used with L293D / L298N"]
   },
@@ -308,7 +308,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 129,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SG90 / MG996R", "PWM Control", "5V Supply"],
     features: ["0° to 180° rotation", "PWM controlled (50Hz)", "SG90: 1.8 kg·cm torque", "MG996R: metal gear variant", "3-wire connection (VCC, GND, Signal)"]
   },
@@ -322,7 +322,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 119,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["L293D / L298N", "H-Bridge", "PWM Input"],
     features: ["Controls 2 DC motors", "Forward / Reverse / Speed control", "L298N: up to 2A per channel", "Built-in flyback diodes", "Enable pin for PWM"]
   },
@@ -339,7 +339,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["HC-05 / HC-06", "UART Serial", "Bluetooth 2.0"],
     features: ["Bluetooth 2.0 SPP", "UART interface (TX/RX)", "HC-05: Master & Slave mode", "10m range", "AT command configuration"]
   },
@@ -353,7 +353,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 149,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["MFRC522", "SPI Interface", "13.56 MHz"],
     features: ["Read & write RFID cards", "SPI interface", "Includes RFID card + key fob", "Range: up to 5cm", "Works with Arduino MFRC522 library"]
   },
@@ -367,7 +367,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 299,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SIM800L / SIM900A", "UART AT Commands", "GSM / GPRS"],
     features: ["Send/receive SMS", "Voice calls support", "GPRS data connection", "AT command interface", "Requires SIM card (2G)"]
   },
@@ -381,7 +381,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 249,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["u-blox NEO-6M", "UART NMEA Output", "3.3V–5V"],
     features: ["Real-time GPS coordinates", "UART NMEA data output", "Integrated antenna", "Cold start: <27s", "Hot start: <1s"]
   },
@@ -395,7 +395,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["ESP8266", "802.11 b/g/n", "AT Commands / SDK"],
     features: ["Wi-Fi 802.11 b/g/n", "AT command mode", "TCP/IP stack built-in", "Station + AP modes", "UART interface"]
   },
@@ -412,7 +412,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 99,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["18650 Li-ion", "9V Alkaline", "AA / AAA Cells"],
     features: ["18650: 3.7V 2600mAh", "9V block batteries", "Rechargeable variants", "Battery holder included", "Multiple capacities available"]
   },
@@ -426,7 +426,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 199,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Polycrystalline / Monocrystalline", "5V–12V Output", "0.5W–5W"],
     features: ["5V / 6V / 12V variants", "0.5W to 5W power", "Compact size", "Suitable for outdoor demos", "For charging & direct supply"]
   },
@@ -440,7 +440,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 79,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["5V 2A / 9V 1A / 12V 1A", "Barrel Jack (5.5mm)", "AC-DC"],
     features: ["5V, 9V, 12V available", "1A to 2A current rating", "Regulated DC output", "LED power indicator", "Barrel jack connector"]
   },
@@ -457,7 +457,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 49,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["Active / Passive Buzzer", "3V–5V", "Digital Control"],
     features: ["Active: beeps on HIGH signal", "Passive: tone via PWM frequency", "Loud 85dB output", "Small and compact", "Works with any GPIO pin"]
   },
@@ -474,7 +474,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 69,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["400 / 830 Tie Points", "Solderless", "ABS Plastic"],
     features: ["400 or 830 tie-point options", "Power rail strips", "Reusable", "No soldering needed", "Universal component fit"]
   },
@@ -488,7 +488,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 49,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["20cm / 30cm Lengths", "M-M / M-F / F-F", "Flexible PVC"],
     features: ["M-M, M-F, F-F variants", "40-wire sets", "20cm standard length", "Color coded", "Fits breadboard headers"]
   },
@@ -502,7 +502,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 29,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["5mm Through-Hole", "2V–3.3V Forward Voltage", "20mA"],
     features: ["Red, Green, Blue, Yellow, White", "5mm standard size", "2V–3.3V forward voltage", "20mA rated current", "Use with 220Ω–330Ω resistor"]
   },
@@ -516,7 +516,7 @@ const COMPONENTS = [
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 29,
-    project: "ECE Department Inventory",
+    project: "Kalam Hub Inventory",
     tech: ["SPST Momentary", "Through-Hole", "12mm / 6mm"],
     features: ["Momentary action", "12mm and 6mm sizes", "Breadboard compatible", "50mA / 12V rated", "Satisfying tactile click"]
   }

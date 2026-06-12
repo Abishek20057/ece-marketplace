@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — MARKETPLACE JS
+// Kalam Hub — MARKETPLACE JS
 // Stock-aware: reads from stock.js getStock()
 // ============================================
 
@@ -243,7 +243,7 @@ function openModal(c) {
       </button>
     </div>` : ''}
     <p style="font-size:0.78rem;color:var(--slate-dk);margin-top:0.75rem;text-align:center;">
-      Purchases support the ECE Department directly.
+      Purchases support the Kalam Hub directly.
     </p>`;
 
   overlay.classList.add('active');

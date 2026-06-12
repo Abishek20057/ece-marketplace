@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment — ECE Hub</title>
+  <title>Payment — Kalam Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
@@ -311,7 +311,7 @@
 
   <!-- Navbar -->
   <nav class="navbar">
-    <a href="index.html" class="logo">ECE<span>Hub</span></a>
+    <a href="index.html" class="logo">Kalam<span>Hub</span></a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="marketplace.html" class="active">Marketplace</a></li>
@@ -388,7 +388,7 @@
         <button class="pay-btn" id="t-pay-btn" onclick="showQR()" disabled style="opacity:0.4;cursor:not-allowed;">
           📱 Make UPI Payment &nbsp;— ₹<span id="t-pay-label">20</span>
         </button>
-        <div class="secure-note">🔐 Pay via UPI · Amount goes directly to ECE Department</div>
+        <div class="secure-note">🔐 Pay via UPI · Amount goes directly to Kalam Hub</div>
       </div>
 
       <!-- ══════════════════════════════════════
@@ -468,8 +468,8 @@
         <!-- Cash panel -->
         <div id="panel-cash" style="display:none;">
           <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;font-size:0.9rem;color:#92400e;">
-            <strong>💵 Pay at HOD Cabin</strong><br><br>
-            Visit the <strong>HOD Cabin, ECE Department</strong> with the exact amount: <strong id="cash-amount">₹0</strong>.<br>
+            <strong>💵 Pay at Kalam Hub</strong><br><br>
+            Visit the <strong>Kalam Hub Collection Desk</strong> with the exact amount: <strong id="cash-amount">₹0</strong>.<br>
             Office hours: <strong>9 AM – 5 PM</strong> (Mon–Sat).<br>
             Bring your <strong>College ID Card</strong>.
           </div>
@@ -504,7 +504,7 @@
         <button class="pay-btn" id="p-pay-btn" onclick="processPermanent()" disabled style="opacity:0.4;cursor:not-allowed;">
           🔒 Pay &nbsp;₹<span id="p-pay-label">0</span>
         </button>
-        <div class="secure-note">🔐 Secure payment · All data stays within ECE Department</div>
+        <div class="secure-note">🔐 Secure payment · All data stays within Kalam Hub</div>
       </div>
 
     </div>
@@ -593,7 +593,7 @@
       <div class="success-icon" id="success-icon">✅</div>
       <h2 id="success-title">Payment Successful!</h2>
       <p id="success-msg">Your component is confirmed.</p>
-      <div class="order-id" id="order-id">Order #ECE-000000</div>
+      <div class="order-id" id="order-id">Order #KH-000000</div>
       <p style="font-size:0.82rem;color:#64748b;margin-bottom:1.5rem;" id="success-sub"></p>
       <a href="marketplace.html" class="btn btn-primary" style="display:block;" id="success-btn">← Back to Marketplace</a>
     </div>
@@ -602,8 +602,8 @@
   <script src="js/data.js"></script>
   <script>
     // ── CONFIG ─────────────────────────────────────────────
-    const OUR_UPI          = 'ecehub@oksbi';
-    const OUR_NAME         = 'ECE Hub';
+    const OUR_UPI          = 'djabi1515@oksbi';
+    const OUR_NAME         =  'Kalam Hub';
     const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwiQ8AhNe9bUJinoe6p94o6t5isIrlDM_CT401nVOjToAKEvIfxv8tb9Q1PVhrL580ymQ/exec';
 
     // ── URL PARAMS ─────────────────────────────────────────
@@ -773,7 +773,7 @@
                    + '&pn=' + encodeURIComponent(OUR_NAME)
                    + '&am=' + amount
                    + '&cu=INR'
-                   + '&tn=' + encodeURIComponent('ECE Hub - ' + label + ': ' + compName);
+                   + '&tn=' + encodeURIComponent('Kalam Hub - ' + label + ': ' + compName);
       return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(upiStr);
     }
 
@@ -862,7 +862,7 @@
       } else {
         document.getElementById('success-title').textContent = 'Order Placed!';
         document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
-        document.getElementById('success-sub').textContent   = 'Show this Order ID at the HOD Cabin, ECE Department to collect your component.';
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the HOD Cabin, Kalam Hub to collect your component.';
         document.getElementById('success-btn').href          = 'marketplace.html';
         document.getElementById('success-btn').textContent   = '← Back to Marketplace';
       }
@@ -873,7 +873,7 @@
     // ── CONFIRM PAYMENT (QR modal submit btn) ──────────────
     function confirmPayment() {
       const utr     = document.getElementById('utr-input').value.trim();
-      const orderId = 'ECE-' + Date.now().toString().slice(-6);
+      const orderId = 'KH-' + Date.now().toString().slice(-6);
       const type    = isTemp ? 'temporary' : 'permanent';
 
       // Read correct form fields based on type

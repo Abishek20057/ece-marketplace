@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — MAIN JS (Homepage)
+// Kalam Hub — MAIN JS (Homepage)
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {

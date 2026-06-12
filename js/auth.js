@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — AUTH JS
+// Kalam Hub — AUTH JS
 // Login  → set logged_in → redirect
 // Register → NO logged_in → go to login page
 // ============================================

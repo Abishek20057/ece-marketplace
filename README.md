@@ -100,4 +100,4 @@ All colors, fonts, and spacing are in CSS variables at the top of `css/style.css
 
 ---
 
-Built for the ECE Department. © 2025
+Built for the Kalam Hub. © 2025
