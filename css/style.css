@@ -217,13 +217,72 @@ input, textarea, select {
 
 /* ============= COMPONENT CARDS ============= */
 .components-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
 }
+
+/* ===== PREMIUM MARKETPLACE EFFECTS ===== */
+
 .component-card {
-  background: var(--card-bg); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
-  cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  background: linear-gradient(135deg, #13203a 0%, #172b4d 100%);
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.component-card::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 250%;
+  height: 250%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.08),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: all 0.8s ease;
+}
+
+.component-card:hover::before {
+  top: 100%;
+  left: 100%;
+}
+
+.component-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(59,130,246,0.35);
+  border-color: #60a5fa;
+}
+
+.card-img {
+  transition: transform 0.5s ease;
+}
+
+.component-card:hover .card-img {
+  transform: scale(1.12);
+}
+
+.card-body h3 {
+  transition: color 0.3s ease;
+}
+
+.component-card:hover h3 {
+  color: #60a5fa;
+}
+
+.stock-badge {
+  animation: pulseStock 2s infinite;
+}
+
+@keyframes pulseStock {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 .component-card:hover {
   transform: translateY(-4px); box-shadow: var(--shadow);
