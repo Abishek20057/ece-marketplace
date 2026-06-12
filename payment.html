@@ -606,9 +606,7 @@
     const compId    = parseInt(params.get('id')) || null;
     const compName  = decodeURIComponent(params.get('name') || 'Component');
     const isTemp    = params.get('type') === 'temporary';
-    const compPrice = isTemp
-      ? (parseInt(params.get('amount')) || 20)
-      : (parseInt(params.get('price'))  || 0);
+    const compPrice = parseInt(params.get('price')) || 0;
 
     // ── Decrement stock by 1 (persisted via localStorage) ──
     function decrementStock() {
@@ -633,7 +631,7 @@
     if (isTemp) {
       document.getElementById('type-badge').textContent     = '⏱ Temporary Borrow';
       document.getElementById('type-badge').classList.add('temp');
-      document.getElementById('page-subtitle').textContent  = 'Pay ₹20 to borrow this component';
+      document.getElementById('page-subtitle').textContent  =`Pay ₹${compPrice} to borrow this component`;
       document.getElementById('license-label').textContent  = '⏱ Borrow Period';
       document.getElementById('license-val').textContent    = '7 Days';
       document.getElementById('temp-section').style.display = 'block';
