@@ -823,6 +823,32 @@
     // ── SUCCESS SCREEN ─────────────────────────────────────
     function showSuccess(orderId, type) {
       decrementStock();
+
+      // ── Save order to localStorage for Admin Panel ──
+      try {
+        const nameId  = isTemp ? 't-name'  : 'p-name';
+        const rollId  = isTemp ? 't-roll'  : 'p-roll';
+        const yearId  = isTemp ? 't-year'  : 'p-year';
+        const phoneId = isTemp ? 't-phone' : 'p-phone';
+        const utrVal  = (document.getElementById('utr-input')?.value || '').trim();
+        const order = {
+          orderId,
+          timestamp : new Date().toLocaleString('en-IN'),
+          name      : (document.getElementById(nameId)?.value || '').trim(),
+          roll      : (document.getElementById(rollId)?.value || '').trim(),
+          year      : (document.getElementById(yearId)?.value || ''),
+          phone     : (document.getElementById(phoneId)?.value || '').trim(),
+          email     : isTemp ? (document.getElementById('t-email')?.value || '').trim() : '',
+          component : compName,
+          amount    : compPrice,
+          type      : isTemp ? 'Temporary' : 'Permanent',
+          utr       : utrVal,
+        };
+        const orders = JSON.parse(localStorage.getItem('ece_orders') || '[]');
+        orders.push(order);
+        localStorage.setItem('ece_orders', JSON.stringify(orders));
+      } catch(e) { console.warn('Admin order save failed:', e); }
+      // ────────────────────────────────────────────────
       document.getElementById('success-icon').textContent = '✅';
       if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
