@@ -41,6 +41,13 @@ const DEFAULT_STOCK = {
   35: 7,  // Push Buttons
   36:  9,  // Li-Ion 18650
   37:  9,  // Water Pump
+  38:  5,  // Mini Breadboard
+  39:  4,  // Mini DC Fan
+  40:  5,  // 18650 Battery Holder
+  41:  2,  // Fingerprint Sensor
+  42:  4,  // HW-131 Battery Holder
+  43:  2,  // Step-Down Transformer
+  44:  3,  // Arduino UNO SMD
 };
 
 const STOCK_KEY = 'ece_stock';
