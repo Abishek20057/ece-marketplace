@@ -340,7 +340,7 @@ const COMPONENTS = [
     category: "motor",
     categoryLabel: "Motors",
     icon: "🎛️",
-    image: "image/Motor Driver Module.jpg",
+    image: "image/Motor Driver Module.png",
     type: ["temporary", "permanent"],
     tempPrice: 20,
     permPrice: 65,
