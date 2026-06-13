@@ -50,6 +50,7 @@ async function fetchLiveStock() {
     const inv = await res.json();
 
     console.log("Inventory received:", inv);
+    
 
     const map = {};
 
