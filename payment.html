@@ -149,14 +149,14 @@
       margin-top: 1rem;
     }
 
-    /* ── Payment metKalam Hubtabs (permanent only) ── */
+    /* ── Payment method tabs (permanent only) ── */
     .payment-methods {
       display: flex;
       gap: 0.75rem;
       margin-bottom: 1.5rem;
       flex-wrap: wrap;
     }
-    .pay-metKalam Hub{
+    .pay-method {
       flex: 1;
       min-width: 80px;
       border: 2px solid #e2e8f0;
@@ -174,7 +174,7 @@
       background: rgba(56,130,246,0.08);
       color: var(--electric);
     }
-    .pay-metKalam Hub.pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .pay-method .pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
 
     /* ── QR Modal overlay ── */
     .qr-overlay {
@@ -398,7 +398,7 @@
 
         <div class="section-label">💳 Payment Method</div>
         <div class="payment-methods">
-          <div class="pay-metKalam Hubactive" onclick="selectMethod(this,'upi')">
+          <div class="pay-method active" onclick="selectMethod(this,'upi')">
             <span class="pay-icon">📱</span>UPI
           </div>
           <div class="pay-method" onclick="selectMethod(this,'card')">
@@ -520,7 +520,7 @@
         <img id="qr-img" src="" alt="UPI QR Code" />
       </div>
 
-      <div class="upi-id-display" id="upi-display">djabi1515@oksbi@oksbi</div>
+      <div class="upi-id-display" id="upi-display">ecehub@oksbi</div>
 
       <p class="qr-note">
         Open GPay / PhonePe / Paytm, scan &amp; pay <strong>₹<span id="qr-note-amount">20</span></strong>.<br>
@@ -651,14 +651,14 @@
       document.getElementById('p-pay-label').textContent    = compPrice;
     }
 
-    // ── PAYMENT METKalam HubTABS (permanent) ───────────────────
-    let selectedMetKalam Hub= 'upi';
+    // ── PAYMENT METHOD TABS (permanent) ───────────────────
+    let selectedMethod = 'upi';
     const permPanels   = ['upi','card','netbanking','cash'];
 
     function selectMethod(el, method) {
       document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('active'));
       el.classList.add('active');
-      selectedMetKalam Hub= method;
+      selectedMethod = method;
       permPanels.forEach(p => document.getElementById('panel-' + p).style.display = 'none');
       document.getElementById('panel-' + method).style.display = 'block';
       validatePermForm();
@@ -757,7 +757,7 @@
       const year  = document.getElementById('p-year').value;
       const phone = document.getElementById('p-phone').value.trim();
       let methodOk = true;
-      if (selectedMetKalam Hub=== 'upi') {
+      if (selectedMethod === 'upi') {
         methodOk = document.getElementById('p-upi-id').value.trim().length > 0;
       }
       const ready = name && roll && year && isValidPhone(phone) && methodOk;
@@ -816,7 +816,7 @@
     // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
     function submitToSheet(payload, onDone) {
       fetch(SHEET_WEBAPP_URL, {
-        metKalam Hub: 'POST',
+        method : 'POST',
         mode   : 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body   : JSON.stringify(payload)
@@ -855,14 +855,14 @@
       document.getElementById('success-icon').textContent = '✅';
       if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
-        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the Kalam HubKalam Hub.';
-        document.getElementById('success-sub').textContent   = 'Show this order ID at the Kalam HubKalam Hub. Return within 7 days.';
+        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the Kalam Hub.';
+        document.getElementById('success-sub').textContent   = 'Show this order ID at the Kalam Hub. Return within 7 days.';
         document.getElementById('success-btn').href          = 'collect.html?name=' + encodeURIComponent(compName) + '&order=' + orderId;
         document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
       } else {
         document.getElementById('success-title').textContent = 'Order Placed!';
         document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
-        document.getElementById('success-sub').textContent   = 'Show this Order ID at the Kalam HubKalam Hub, Kalam Hub to collect your component.';
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the  Kalam Hub to collect your component.';
         document.getElementById('success-btn').href          = 'marketplace.html';
         document.getElementById('success-btn').textContent   = '← Back to Marketplace';
       }
@@ -941,12 +941,12 @@
         alert('Please enter a valid 10-digit Phone Number.'); return;
       }
 
-      if (selectedMetKalam Hub=== 'upi') {
+      if (selectedMethod === 'upi') {
         const upi = document.getElementById('p-upi-id').value.trim();
         if (!upi) { alert('Please enter your UPI ID.'); return; }
         openQRModal(compPrice, 'Buy');
 
-      } else if (selectedMetKalam Hub=== 'cash') {
+      } else if (selectedMethod === 'cash') {
         // Cash — submit to sheet with "CASH" as UTR, no screenshot needed
         const orderId = 'ECE-' + Date.now().toString().slice(-6);
         const payload = {
