@@ -271,7 +271,7 @@
 <!-- ════════════════ LOGIN SCREEN ════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="logo">⚡ ECE<span>Hub</span></div>
+    <div class="logo">⚡ Kalam<span>Hub</span></div>
     <p>Admin Access Only</p>
     <input type="text"     id="adm-user" placeholder="Admin username" />
     <input type="password" id="adm-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
@@ -882,7 +882,7 @@ function emptyHTML(title, sub) {
   return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
 }
 
-let toastTimer
+let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1159,7 +1159,7 @@ if (sessionStorage.getItem('kalam_admin') === '1') initApp();
 <!-- ════════════════ LOGIN SCREEN ════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="logo">⚡ ECE<span>Hub</span></div>
+    <div class="logo">⚡ Kalam<span>Hub</span></div>
     <p>Admin Access Only</p>
     <input type="text"     id="adm-user" placeholder="Admin username" />
     <input type="password" id="adm-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
@@ -1331,8 +1331,8 @@ if (sessionStorage.getItem('kalam_admin') === '1') initApp();
 // ════════════════════════════════════════════
 //  ADMIN CONFIG — change password here
 // ════════════════════════════════════════════
-const ADMIN_USER = 'Kalamhub57';
-const ADMIN_PASS = 'Kalam@Hb57';   // ← change this to your password
+const ADMIN_USER = 'kalamhub_admin';
+const ADMIN_PASS = 'Kalam@hub57';   // ← change this to your password
 
 // ════════════════════════════════════════════
 //  AUTH
@@ -1647,7 +1647,7 @@ function emptyHTML(title, sub) {
   return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
 }
 
-let(toastTimer);
+let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
