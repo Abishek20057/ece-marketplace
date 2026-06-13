@@ -60,10 +60,22 @@ async function fetchLiveStock() {
 
     LIVE_STOCK = map;
 
-    writeStockCache(map);
+console.log("LIVE_STOCK UPDATED:", LIVE_STOCK);
 
-    return map;
+writeStockCache(map);
 
+localStorage.removeItem('kalam_stock_cache');
+localStorage.setItem(
+  'kalam_stock_cache',
+  JSON.stringify({
+    data: map,
+    ts: Date.now()
+  })
+);
+
+console.log("CACHE UPDATED");
+
+return map;
   } catch(e){
 
     console.error("Inventory Error:", e);
