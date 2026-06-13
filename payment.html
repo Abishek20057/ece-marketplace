@@ -855,14 +855,14 @@
       document.getElementById('success-icon').textContent = '✅';
       if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
-        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the HOD Cabin.';
-        document.getElementById('success-sub').textContent   = 'Show this order ID at the HOD Cabin. Return within 7 days.';
+        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the HOD Kalam Hub.';
+        document.getElementById('success-sub').textContent   = 'Show this order ID at the HOD Kalam Hub. Return within 7 days.';
         document.getElementById('success-btn').href          = 'collect.html?name=' + encodeURIComponent(compName) + '&order=' + orderId;
         document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
       } else {
         document.getElementById('success-title').textContent = 'Order Placed!';
         document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
-        document.getElementById('success-sub').textContent   = 'Show this Order ID at the HOD Cabin, Kalam Hub to collect your component.';
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the HOD Kalam Hub, Kalam Hub to collect your component.';
         document.getElementById('success-btn').href          = 'marketplace.html';
         document.getElementById('success-btn').textContent   = '← Back to Marketplace';
       }
