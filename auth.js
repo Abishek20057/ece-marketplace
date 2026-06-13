@@ -1,5 +1,5 @@
 // ============================================
-// ECE HUB — AUTH JS — v2 (Login/Signup separation)
+// Kalam Hub — AUTH JS — v2 (Login/Signup separation)
 // If you see this comment in DevTools Sources tab,
 // the correct file is loaded.
 // ============================================
