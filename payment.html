@@ -604,7 +604,7 @@
     // ── CONFIG ─────────────────────────────────────────────
     const OUR_UPI          = 'djabi1515@oksbi';
     const OUR_NAME         =  'Kalam Hub';
-    const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwiQ8AhNe9bUJinoe6p94o6t5isIrlDM_CT401nVOjToAKEvIfxv8tb9Q1PVhrL580ymQ/exec';
+    const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
     // ── URL PARAMS ─────────────────────────────────────────
     const params    = new URLSearchParams(window.location.search);
@@ -949,6 +949,8 @@
       } else if (selectedMethod === 'cash') {
         // Cash — submit to sheet with "CASH" as UTR, no screenshot needed
         const orderId = 'ECE-' + Date.now().toString().slice(-6);
+        console.log("Screenshot Data:", screenshotB64);
+        console.log("Screenshot Length:", screenshotB64 ? screenshotB64.length : 0);
         const payload = {
           timestamp : new Date().toLocaleString('en-IN'),
           orderId,
