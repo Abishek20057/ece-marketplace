@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -19,7 +21,7 @@ font-family:'Inter',sans-serif;
 
 body{
 background:#08111f;
-color:white;
+color:#ffffff;
 min-height:100vh;
 }
 
@@ -30,6 +32,9 @@ align-items:center;
 padding:20px 40px;
 background:#0f172a;
 border-bottom:1px solid rgba(255,255,255,.08);
+position:sticky;
+top:0;
+z-index:100;
 }
 
 .logo{
@@ -39,10 +44,10 @@ font-weight:800;
 
 .logout-btn{
 background:#ef4444;
+color:#fff;
 border:none;
-padding:10px 18px;
+padding:12px 18px;
 border-radius:10px;
-color:white;
 cursor:pointer;
 font-weight:600;
 }
@@ -50,6 +55,10 @@ font-weight:600;
 .container{
 padding:30px;
 }
+
+/* ==========================
+   Stats Cards
+========================== */
 
 .stats{
 display:grid;
@@ -63,6 +72,11 @@ background:#111c31;
 padding:25px;
 border-radius:18px;
 border:1px solid rgba(255,255,255,.05);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-3px);
 }
 
 .card h3{
@@ -73,12 +87,25 @@ margin-bottom:10px;
 
 .card h1{
 font-size:34px;
+font-weight:800;
+}
+
+/* ==========================
+   Orders Section
+========================== */
+
+.section-title{
+font-size:22px;
+font-weight:700;
+margin-bottom:15px;
 }
 
 .table-wrapper{
 background:#111c31;
 border-radius:20px;
 overflow:hidden;
+margin-bottom:35px;
+border:1px solid rgba(255,255,255,.05);
 }
 
 table{
@@ -90,11 +117,14 @@ th{
 background:#17243d;
 padding:15px;
 text-align:left;
+font-size:14px;
+font-weight:700;
 }
 
 td{
 padding:15px;
 border-top:1px solid rgba(255,255,255,.05);
+font-size:14px;
 }
 
 .pending{
@@ -112,24 +142,70 @@ color:#ef4444;
 font-weight:700;
 }
 
-.btn{
-padding:8px 12px;
+/* ==========================
+   Inventory Section
+========================== */
+
+.inventory-section{
+background:#111c31;
+padding:25px;
+border-radius:20px;
+border:1px solid rgba(255,255,255,.05);
+}
+
+.inventory-section h2{
+margin-bottom:20px;
+}
+
+.inventory-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.inventory-table th{
+background:#17243d;
+padding:15px;
+}
+
+.inventory-table td{
+padding:15px;
+border-top:1px solid rgba(255,255,255,.05);
+}
+
+.stock-btn{
+background:#2563eb;
+color:white;
 border:none;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+font-weight:700;
+margin:0 4px;
+}
+
+.price-input{
+width:100px;
+padding:8px;
+border:none;
+border-radius:8px;
+background:#1e293b;
+color:#fff;
+outline:none;
+}
+
+.save-btn{
+background:#22c55e;
+color:#fff;
+border:none;
+padding:10px 14px;
 border-radius:8px;
 cursor:pointer;
 font-weight:600;
-margin-right:5px;
 }
 
-.verify-btn{
-background:#22c55e;
-color:white;
-}
-
-.reject-btn{
-background:#ef4444;
-color:white;
-}
+/* ==========================
+   Responsive
+========================== */
 
 @media(max-width:768px){
 
@@ -138,32 +214,55 @@ padding:20px;
 }
 
 .container{
-padding:20px;
+padding:15px;
+}
+
+.logo{
+font-size:18px;
 }
 
 table{
-font-size:13px;
+font-size:12px;
+}
+
+th,
+td{
+padding:10px;
+}
+
+.price-input{
+width:70px;
 }
 
 }
 
 </style>
+
 </head>
+
 <body>
 
 <div class="header">
 
 <div class="logo">
-🚀 Kalam Hub Admin
+🚀 Kalam Hub Admin Dashboard
 </div>
 
-<button class="logout-btn" onclick="logout()">
-Logout
-</button>
+<button
+class="logout-btn"
+onclick="logout()"
+
+>
+
+Logout </button>
 
 </div>
 
 <div class="container">
+
+<!-- ==========================
+     STATS
+========================== -->
 
 <div class="stats">
 
@@ -178,8 +277,8 @@ Logout
 </div>
 
 <div class="card">
-<h3>Verified Orders</h3>
-<h1 id="verifiedOrders">0</h1>
+<h3>Total Components</h3>
+<h1 id="totalComponents">0</h1>
 </div>
 
 <div class="card">
@@ -188,6 +287,14 @@ Logout
 </div>
 
 </div>
+
+<!-- ==========================
+     ORDERS
+========================== -->
+
+<h2 class="section-title">
+📋 Orders List
+</h2>
 
 <div class="table-wrapper">
 
@@ -202,7 +309,6 @@ Logout
 <th>Amount</th>
 <th>UTR</th>
 <th>Status</th>
-<th>Action</th>
 </tr>
 
 </thead>
@@ -214,36 +320,53 @@ Logout
 </table>
 
 </div>
-<!-- Inventory Management -->
+
+<!-- ==========================
+     INVENTORY
+========================== -->
 
 <div class="inventory-section">
 
-  <h2>📦 Inventory Management</h2>
+<h2>
+📦 Inventory Management
+</h2>
 
-  <table class="inventory-table">
+<table class="inventory-table">
 
-    <thead>
-      <tr>
-        <th>Component</th>
-        <th>Stock</th>
-        <th>Temp Price</th>
-        <th>Perm Price</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+<thead>
 
-    <tbody id="inventoryTable">
-    </tbody>
+<tr>
+<th>Component</th>
+<th>Stock</th>
+<th>Temp Price</th>
+<th>Perm Price</th>
+<th>Actions</th>
+</tr>
 
-  </table>
+</thead>
+
+<tbody id="inventoryTable">
+
+</tbody>
+
+</table>
 
 </div>
+
 </div>
 
+<!-- PART 2 JAVASCRIPT WILL BE ADDED HERE -->
+
+</body>
+</html>
 <script>
 
 const WEB_APP_URL =
 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
+
+/* ==========================
+   LOGIN CHECK
+========================== */
 
 if(
 sessionStorage.getItem(
@@ -263,6 +386,10 @@ window.location.href =
 
 }
 
+/* ==========================
+   LOAD ORDERS
+========================== */
+
 async function loadOrders(){
 
 try{
@@ -273,39 +400,45 @@ WEB_APP_URL +
 '?action=getOrders'
 );
 
-const data =
+const orders =
 await response.json();
 
-renderOrders(data);
+renderOrders(orders);
 
 }catch(err){
 
-console.error(err);
+console.error(
+'Orders Error:',
+err
+);
 
 }
 
 }
 
-function renderOrders(data){
+function renderOrders(orders){
 
 let html='';
 
-let total=0;
-let pending=0;
-let verified=0;
+let totalOrders=0;
+let pendingOrders=0;
 let revenue=0;
 
-data.forEach(order=>{
+orders.forEach(order=>{
 
-total++;
+totalOrders++;
 
-if(order.status==="Pending Verification")
-pending++;
-
-if(order.status==="Verified"){
-verified++;
-revenue += Number(order.amount);
+if(
+order.status ===
+'Pending Verification'
+){
+pendingOrders++;
 }
+
+revenue +=
+Number(
+order.amount || 0
+);
 
 html += `
 
@@ -322,35 +455,136 @@ html += `
 <td>${order.utr}</td>
 
 <td class="
-${order.status==='Verified'
-?'verified'
-:order.status==='Rejected'
-?'rejected'
-:'pending'}
+${order.status === 'Verified'
+? 'verified'
+: order.status === 'Rejected'
+? 'rejected'
+: 'pending'}
 ">
-
 ${order.status}
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById(
+'totalOrders'
+).innerText =
+totalOrders;
+
+document.getElementById(
+'pendingOrders'
+).innerText =
+pendingOrders;
+
+document.getElementById(
+'totalRevenue'
+).innerText =
+'₹' + revenue;
+
+document.getElementById(
+'ordersTable'
+).innerHTML =
+html;
+
+}
+
+/* ==========================
+   INVENTORY
+========================== */
+
+async function loadInventory(){
+
+try{
+
+const response =
+await fetch(
+WEB_APP_URL +
+'?action=getInventory'
+);
+
+const items =
+await response.json();
+
+renderInventory(items);
+
+}catch(err){
+
+console.error(
+'Inventory Error:',
+err
+);
+
+}
+
+}
+
+function renderInventory(items){
+
+let html='';
+
+document.getElementById(
+'totalComponents'
+).innerText =
+items.length;
+
+items.forEach(item=>{
+
+html += `
+
+<tr>
+
+<td>${item.name}</td>
+
+<td>
+
+<button
+class="stock-btn"
+onclick="changeStock(${item.id},-1)">
+-
+</button>
+
+<strong>
+${item.stock}
+</strong>
+
+<button
+class="stock-btn"
+onclick="changeStock(${item.id},1)">
++
+</button>
+
+</td>
+
+<td>
+
+<input
+class="price-input"
+id="temp-${item.id}"
+value="${item.tempPrice}"
+>
+
+</td>
+
+<td>
+
+<input
+class="price-input"
+id="perm-${item.id}"
+value="${item.permPrice}"
+>
 
 </td>
 
 <td>
 
 <button
-class="btn verify-btn"
-onclick="updateStatus(
-'${order.orderId}',
-'Verified'
-)">
-Verify
-</button>
-
-<button
-class="btn reject-btn"
-onclick="updateStatus(
-'${order.orderId}',
-'Rejected'
-)">
-Reject
+class="save-btn"
+onclick="saveInventory(${item.id})">
+Save
 </button>
 
 </td>
@@ -362,46 +596,36 @@ Reject
 });
 
 document.getElementById(
-'totalOrders'
-).innerText=total;
-
-document.getElementById(
-'pendingOrders'
-).innerText=pending;
-
-document.getElementById(
-'verifiedOrders'
-).innerText=verified;
-
-document.getElementById(
-'totalRevenue'
-).innerText='₹'+revenue;
-
-document.getElementById(
-'ordersTable'
-).innerHTML=html;
+'inventoryTable'
+).innerHTML =
+html;
 
 }
 
-async function updateStatus(
-orderId,
-status
+/* ==========================
+   STOCK CHANGE
+========================== */
+
+async function changeStock(
+id,
+delta
 ){
 
 try{
 
 await fetch(
-WEB_APP_URL +
-'?action=updateStatus'
-+
-'&orderId=' +
-orderId
-+
-'&status=' +
-status
+WEB_APP_URL,
+{
+method:'POST',
+body:JSON.stringify({
+action:'adjustStock',
+id:id,
+delta:delta
+})
+}
 );
 
-loadOrders();
+loadInventory();
 
 }catch(err){
 
@@ -411,32 +635,66 @@ console.error(err);
 
 }
 
+/* ==========================
+   SAVE PRICE
+========================== */
+
+async function saveInventory(id){
+
+try{
+
+const tempPrice =
+document.getElementById(
+'temp-' + id
+).value;
+
+const permPrice =
+document.getElementById(
+'perm-' + id
+).value;
+
+await fetch(
+WEB_APP_URL,
+{
+method:'POST',
+body:JSON.stringify({
+action:'updateStock',
+id:id,
+tempPrice:tempPrice,
+permPrice:permPrice
+})
+}
+);
+
+alert(
+'Inventory Updated'
+);
+
+loadInventory();
+
+}catch(err){
+
+console.error(err);
+
+}
+
+}
+
+/* ==========================
+   INITIAL LOAD
+========================== */
+
 loadOrders();
+loadInventory();
+
+setInterval(
+loadOrders,
+30000
+);
+
+setInterval(
+loadInventory,
+30000
+);
 
 </script>
-
-</body>
-</html>
-<!-- Inventory Management -->
-
-<div class="inventory-section">
-
-  <h2>📦 Inventory Management</h2>
-
-  <table class="inventory-table">
-
-    <thead>
-      <tr>
-        <th>Component</th>
-        <th>Stock</th>
-        <th>Price (₹)</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-
-    <tbody id="inventoryTable">
-    </tbody>
-
-  </table>
-
-</div>
