@@ -38,18 +38,39 @@ function writeStockCache(data) {
 
 // ── Fetch live inventory from Sheet (returns Promise<{id: stock}>) ──
 async function fetchLiveStock() {
+
   try {
-    const res = await fetch(SHEET_API_URL + '?action=inventory');
+
+    console.log("Fetching inventory...");
+
+    const res = await fetch(
+      SHEET_API_URL + '?action=getInventory'
+    );
+
     const inv = await res.json();
+
+    console.log("Inventory received:", inv);
+
     const map = {};
-    inv.forEach(c => { map[c.id] = c.stock; });
+
+    inv.forEach(c=>{
+      map[c.id] = c.stock;
+    });
+
     LIVE_STOCK = map;
+
     writeStockCache(map);
+
     return map;
-  } catch (e) {
-    console.warn('[Kalam Hub] Live stock fetch failed, using cache/defaults:', e.message);
+
+  } catch(e){
+
+    console.error("Inventory Error:", e);
+
     return null;
+
   }
+
 }
 
 // ── Init: load cache immediately, refresh in background ──
