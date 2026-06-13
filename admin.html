@@ -423,8 +423,8 @@
 // ════════════════════════════════════════════
 //  ADMIN CONFIG — change password here
 // ════════════════════════════════════════════
-const ADMIN_USER = 'ecehub_admin';
-const ADMIN_PASS = 'ece@2025';   // ← change this to your password
+const ADMIN_USER = 'kalamhub_admin';
+const ADMIN_PASS = 'Kalam@hub57';   // ← change this to your password
 
 // ════════════════════════════════════════════
 //  AUTH
@@ -528,7 +528,7 @@ function renderDashboard() {
   document.getElementById('stat-cards').innerHTML = `
     <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value blue">${orders.length}</div><div class="stat-sub">All time</div></div>
     <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value gold">₹${totalRevenue.toLocaleString('en-IN')}</div><div class="stat-sub">From payments</div></div>
-    <div class="stat-card"><div class="stat-label">Registered Users</div><div class="stat-value green">${users.length}</div><div class="stat-sub">On ECEHub</div></div>
+    <div class="stat-card"><div class="stat-label">Registered Users</div><div class="stat-value green">${users.length}</div><div class="stat-sub">On KalamHub</div></div>
     <div class="stat-card"><div class="stat-label">Temp Borrows</div><div class="stat-value gold">${tempOrders.length}</div><div class="stat-sub">₹20 each</div></div>
     <div class="stat-card"><div class="stat-label">Permanent Buys</div><div class="stat-value blue">${permOrders.length}</div><div class="stat-sub">Paid purchases</div></div>
     <div class="stat-card"><div class="stat-label">Low Stock Items</div><div class="stat-value ${lowStock.length > 0 ? 'red' : 'green'}">${lowStock.length}</div><div class="stat-sub">≤ 2 remaining</div></div>
@@ -716,7 +716,7 @@ function exportCSV() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `ecehub-orders-${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `kalamhub-orders-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   showToast('CSV exported!');

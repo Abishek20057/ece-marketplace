@@ -1,6 +1,6 @@
-# ECE Component Hub 🔌
+# kalam Hub🔌
 
-A department-exclusive marketplace for ECE project components.  
+Empowering innovation by connecting students with reusable electronics components through Kalam Hub.  
 Students and faculty can browse, borrow (temporary) or purchase (permanent) reusable modules from senior projects.
 
 ---
