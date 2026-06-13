@@ -3,7 +3,7 @@
 // If you see this comment in DevTools Sources tab,
 // the correct file is loaded.
 // ============================================
-console.log('[ECE Hub] auth.js v2 loaded — login/signup validation active');
+console.log('[Kalam Hub] auth.js v2 loaded — login/signup validation active');
 
 // ── Registered users storage ──────────────────────────────
 function getUsers() {

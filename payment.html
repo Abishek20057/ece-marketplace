@@ -613,18 +613,10 @@
     const isTemp    = params.get('type') === 'temporary';
     const compPrice = parseInt(params.get('price')) || 0;
 
-    // ── Decrement stock by 1 (persisted via localStorage) ──
+    // ── Invalidate local stock cache so marketplace refetches live stock ──
+    // (Actual decrement happens server-side in Code.gs on submission)
     function decrementStock() {
-      if (compId === null) return;
-      try {
-        const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
-        const current = (typeof COMPONENTS !== 'undefined')
-          ? (overrides[compId] !== undefined ? overrides[compId] : (COMPONENTS.find(c => c.id === compId) || {}).stock)
-          : overrides[compId];
-        const newStock = Math.max(0, (current !== undefined ? current : 1) - 1);
-        overrides[compId] = newStock;
-        localStorage.setItem('ece_stock_overrides', JSON.stringify(overrides));
-      } catch (e) { /* ignore */ }
+      try { localStorage.removeItem('kalam_stock_cache'); } catch (e) { /* ignore */ }
     }
 
     // ── POPULATE ORDER SUMMARY ─────────────────────────────
@@ -892,6 +884,7 @@
       const payload = {
         timestamp : new Date().toLocaleString('en-IN'),
         orderId,
+        id        : compId,
         name      : document.getElementById(nameId).value.trim(),
         roll      : document.getElementById(rollId).value.trim(),
         year      : document.getElementById(yearId).value,
@@ -954,6 +947,7 @@
         const payload = {
           timestamp : new Date().toLocaleString('en-IN'),
           orderId,
+          id        : compId,
           name,
           roll      : document.getElementById('p-roll').value.trim(),
           year      : document.getElementById('p-year').value,

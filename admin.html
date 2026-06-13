@@ -285,7 +285,7 @@
 
   <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-logo">⚡ ECE<span>Hub</span></div>
+    <div class="topbar-logo">⚡ Kalam<span>Hub</span></div>
     <div class="topbar-badge">ADMIN PANEL</div>
     <div class="topbar-right">
       <a href="marketplace.html" target="_blank" style="color:var(--slate);font-size:0.82rem;text-decoration:none;">↗ View Site</a>
@@ -399,11 +399,919 @@
       <div class="page" id="page-components">
         <div class="page-header">
           <h1>Components List</h1>
-          <p>All components in the marketplace (read from data.js)</p>
+          <p>All components in the marketplace (live from Inventory sheet)</p>
         </div>
         <div class="search-bar">
           <input class="search-input" id="comp-search" placeholder="Search…" oninput="renderComponents()" />
+          <button class="logout-btn" style="border-color:var(--gold);color:var(--gold);" onclick="openAddComponent()">+ Add Component</button>
         </div>
+
+        <!-- Add Component Form (hidden by default) -->
+        <div class="card" id="add-comp-card" style="display:none;margin-bottom:1.25rem;">
+          <div class="card-header"><h3>➕ Add New Component</h3></div>
+          <div style="padding:1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.85rem;">
+            <input class="search-input" id="nc-name" placeholder="Component name" />
+            <input class="search-input" id="nc-icon" placeholder="Icon (emoji)" value="📦" />
+            <input class="search-input" id="nc-category" placeholder="category (e.g. sensor)" />
+            <input class="search-input" id="nc-categoryLabel" placeholder="Category Label (e.g. Sensor)" />
+            <input class="search-input" id="nc-temp" type="number" placeholder="Temp Price ₹" value="20" />
+            <input class="search-input" id="nc-perm" type="number" placeholder="Permanent Price ₹" />
+            <input class="search-input" id="nc-stock" type="number" placeholder="Initial Stock" value="5" />
+          </div>
+          <div style="padding:0 1.25rem 1.25rem;display:flex;gap:0.75rem;">
+            <button class="logout-btn" style="border-color:var(--green);color:var(--green);" onclick="submitAddComponent()">✅ Save Component</button>
+            <button class="logout-btn" onclick="closeAddComponent()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>All Components</h3>
+            <span class="count" id="comp-count">0</span>
+          </div>
+          <div id="comp-table"></div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script src="js/data.js"></script>
+<script>
+// ════════════════════════════════════════════
+//  CONFIG — Apps Script Web App URL
+// ════════════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
+
+let INVENTORY = [];
+let ORDERS    = [];
+
+// ════════════════════════════════════════════
+//  API HELPERS
+// ════════════════════════════════════════════
+async function apiGet(action) {
+  const res = await fetch(API_URL + '?action=' + action);
+  return res.json();
+}
+async function apiPost(payload) {
+  // Apps Script POST + no-cors means we can't read the response directly
+  // in some hosting setups, but Apps Script web apps DO allow reading
+  // response when deployed with "Anyone" access — try normal fetch first.
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  } catch (e) {
+    console.warn('apiPost failed:', e.message);
+    return { status: 'error', message: e.message };
+  }
+}
+
+// ════════════════════════════════════════════
+//  AUTH (email + password via Admins sheet)
+// ════════════════════════════════════════════
+async function doLogin() {
+  const email = document.getElementById('adm-user').value.trim();
+  const pass  = document.getElementById('adm-pass').value;
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+
+  if (!email || !pass) {
+    err.textContent = '❌ Enter email and password.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  const result = await apiPost({ action: 'adminLogin', email, password: pass });
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In →';
+
+  if (result.status === 'success') {
+    sessionStorage.setItem('kalam_admin', '1');
+    sessionStorage.setItem('kalam_admin_name', result.name || 'Admin');
+    sessionStorage.setItem('kalam_admin_email', result.email || email);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    err.textContent = '❌ ' + (result.message || 'Invalid email or password.');
+    err.style.display = 'block';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('kalam_admin');
+  location.reload();
+}
+
+// Auto-login if already in session
+if (sessionStorage.getItem('kalam_admin') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// ════════════════════════════════════════════
+//  USERS (still localStorage — student signups happen client-side)
+// ════════════════════════════════════════════
+function getUsers() {
+  const raw = JSON.parse(localStorage.getItem('ece_users') || '{}');
+  return Object.entries(raw).map(([email, u]) => ({ email, ...u }));
+}
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+  if (name === 'dashboard')  renderDashboard();
+  if (name === 'orders')     renderOrders();
+  if (name === 'users')      renderUsers();
+  if (name === 'stock')      renderStock();
+  if (name === 'components') renderComponents();
+}
+
+// ════════════════════════════════════════════
+//  INIT — fetch live data from Sheet
+// ════════════════════════════════════════════
+async function initApp() {
+  await refreshAllData();
+  renderDashboard();
+}
+
+async function refreshAllData() {
+  showToast('Syncing with sheet…');
+  const [inv, orders] = await Promise.all([apiGet('inventory'), apiGet('orders')]);
+  INVENTORY = Array.isArray(inv) ? inv : [];
+  ORDERS    = Array.isArray(orders) ? orders : [];
+  showToast('Synced ✓');
+}
+
+// ════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════
+function renderDashboard() {
+  const orders = ORDERS;
+  const users  = getUsers();
+  const comps  = INVENTORY;
+
+  const totalRevenue = orders.reduce((s, o) => s + (parseFloat(o.amount) || 0), 0);
+  const tempOrders   = orders.filter(o => o.type === 'Temporary');
+  const permOrders   = orders.filter(o => o.type === 'Permanent');
+  const lowStock     = comps.filter(c => c.stock <= 2);
+
+  document.getElementById('stat-cards').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value blue">${orders.length}</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value gold">₹${totalRevenue.toLocaleString('en-IN')}</div><div class="stat-sub">From payments</div></div>
+    <div class="stat-card"><div class="stat-label">Registered Users</div><div class="stat-value green">${users.length}</div><div class="stat-sub">On KalamHub</div></div>
+    <div class="stat-card"><div class="stat-label">Temp Borrows</div><div class="stat-value gold">${tempOrders.length}</div><div class="stat-sub">₹20 each</div></div>
+    <div class="stat-card"><div class="stat-label">Permanent Buys</div><div class="stat-value blue">${permOrders.length}</div><div class="stat-sub">Paid purchases</div></div>
+    <div class="stat-card"><div class="stat-label">Low Stock Items</div><div class="stat-value ${lowStock.length > 0 ? 'red' : 'green'}">${lowStock.length}</div><div class="stat-sub">≤ 2 remaining</div></div>
+  `;
+
+  const recent = [...orders].reverse().slice(0, 10);
+  document.getElementById('recent-count').textContent = recent.length;
+  document.getElementById('recent-orders-table').innerHTML = recent.length
+    ? ordersTableHTML(recent)
+    : emptyHTML('No orders yet', 'Orders will appear here after students make payments.');
+}
+
+// ════════════════════════════════════════════
+//  ORDERS
+// ════════════════════════════════════════════
+function renderOrders() {
+  const search = (document.getElementById('order-search')?.value || '').toLowerCase();
+  const typeF  = document.getElementById('order-type-filter')?.value || '';
+  let   orders = ORDERS;
+
+  if (search) orders = orders.filter(o =>
+    (o.name||'').toLowerCase().includes(search) ||
+    (o.roll||'').toLowerCase().includes(search) ||
+    (o.component||'').toLowerCase().includes(search) ||
+    (o.orderId||'').toLowerCase().includes(search)
+  );
+  if (typeF) orders = orders.filter(o => o.type === typeF);
+
+  orders = [...orders].reverse();
+  document.getElementById('order-count').textContent = orders.length;
+  document.getElementById('orders-table').innerHTML = orders.length
+    ? ordersTableHTML(orders, true)
+    : emptyHTML('No orders found', 'Try adjusting your search or filters.');
+}
+
+function ordersTableHTML(orders, withActions) {
+  return `<table>
+    <thead><tr>
+      <th>Order ID</th><th>Student</th><th>Roll No</th>
+      <th>Component</th><th>Type</th><th>Amount</th>
+      <th>UTR</th><th>Screenshot</th><th>Status</th><th>Date</th>
+      ${withActions ? '<th>Action</th>' : ''}
+    </tr></thead>
+    <tbody>
+      ${orders.map(o => `<tr>
+        <td><code style="font-size:0.75rem;color:var(--gold)">${o.orderId||'—'}</code></td>
+        <td>${o.name||'—'}</td>
+        <td><span style="color:var(--slate)">${o.roll||'—'}</span></td>
+        <td>${o.component||'—'}</td>
+        <td><span class="badge ${o.type==='Temporary'?'badge-temp':'badge-perm'}">${o.type||'—'}</span></td>
+        <td style="color:var(--green);font-weight:600">₹${o.amount||'—'}</td>
+        <td><code style="font-size:0.75rem">${o.utr||'—'}</code></td>
+        <td>${o.screenshot && o.screenshot.startsWith('http') ? `<a href="${o.screenshot}" target="_blank" style="color:var(--blue)">View</a>` : '—'}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td style="color:var(--slate);font-size:0.78rem">${o.timestamp||'—'}</td>
+        ${withActions ? `<td>
+          <select class="filter-select" style="font-size:0.75rem;padding:0.3rem 0.5rem;" onchange="updateOrderStatus(${o.row}, this.value)">
+            <option value="">Set status…</option>
+            <option value="Verified" ${o.status==='Verified'?'selected':''}>✅ Verified</option>
+            <option value="Rejected" ${o.status==='Rejected'?'selected':''}>❌ Rejected</option>
+            <option value="Pending Verification" ${o.status==='Pending Verification'?'selected':''}>⏳ Pending</option>
+          </select>
+        </td>` : ''}
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function statusBadge(status) {
+  if (status === 'Verified') return '<span class="badge badge-green">✅ Verified</span>';
+  if (status === 'Rejected') return '<span class="badge badge-red">❌ Rejected</span>';
+  return '<span class="badge badge-temp">⏳ Pending</span>';
+}
+
+async function updateOrderStatus(row, status) {
+  if (!status) return;
+  showToast('Updating status…');
+  const result = await apiPost({ action: 'updateStatus', row, status });
+  if (result.status === 'success') {
+    const order = ORDERS.find(o => o.row === row);
+    if (order) order.status = status;
+    showToast('Status updated → ' + status);
+    renderOrders();
+  } else {
+    showToast('Failed: ' + (result.message || 'unknown error'));
+  }
+}
+
+// ════════════════════════════════════════════
+//  USERS
+// ════════════════════════════════════════════
+function renderUsers() {
+  const search = (document.getElementById('user-search')?.value || '').toLowerCase();
+  let users = getUsers();
+  if (search) users = users.filter(u =>
+    (u.name||'').toLowerCase().includes(search) ||
+    (u.email||'').toLowerCase().includes(search) ||
+    (u.roll||'').toLowerCase().includes(search)
+  );
+
+  document.getElementById('user-count').textContent = users.length;
+  document.getElementById('users-table').innerHTML = users.length ? `
+    <table>
+      <thead><tr>
+        <th>Name</th><th>Email</th><th>Roll No</th><th>Year</th><th>Dept</th><th>Joined</th>
+      </tr></thead>
+      <tbody>
+        ${users.map(u => `<tr>
+          <td>${u.name||'—'}</td>
+          <td style="color:var(--slate)">${u.email||'—'}</td>
+          <td>${u.roll||'—'}</td>
+          <td>${u.year||'—'}</td>
+          <td>${u.dept||'ECE'}</td>
+          <td style="color:var(--slate);font-size:0.78rem">${u.createdAt||'—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  ` : emptyHTML('No users yet', 'Registered students will appear here.');
+}
+
+// ════════════════════════════════════════════
+//  STOCK MANAGER — live Sheet-backed
+// ════════════════════════════════════════════
+function renderStock() {
+  const search = (document.getElementById('stock-search')?.value || '').toLowerCase();
+  const catF   = document.getElementById('stock-filter')?.value || '';
+
+  let filtered = INVENTORY.filter(c => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search);
+    const matchCat    = !catF   || c.category === catF;
+    return matchSearch && matchCat;
+  });
+
+  document.getElementById('stock-grid').innerHTML = filtered.map(c => {
+    const qty = c.stock;
+    const cls = qty <= 2 ? 'low' : qty <= 5 ? 'mid' : 'ok';
+    return `<div class="stock-item">
+      <div class="stock-info">
+        <div class="stock-name">${c.icon || ''} ${c.name}</div>
+        <div class="stock-cat">${c.categoryLabel || c.category}</div>
+      </div>
+      <div class="stock-ctrl">
+        <button class="ctrl-btn minus" onclick="adjustStock(${c.id}, -1)">−</button>
+        <div class="stock-num ${cls}" id="stock-num-${c.id}">${qty}</div>
+        <button class="ctrl-btn" onclick="adjustStock(${c.id}, +1)">+</button>
+      </div>
+    </div>`;
+  }).join('') || `<div style="color:var(--slate);padding:2rem">No components match.</div>`;
+}
+
+async function adjustStock(id, delta) {
+  const comp = INVENTORY.find(c => c.id === id);
+  if (!comp) return;
+  const optimistic = Math.max(0, comp.stock + delta);
+
+  // Optimistic UI update
+  comp.stock = optimistic;
+  const el = document.getElementById('stock-num-' + id);
+  if (el) {
+    el.textContent = optimistic;
+    el.className   = 'stock-num ' + (optimistic <= 2 ? 'low' : optimistic <= 5 ? 'mid' : 'ok');
+  }
+
+  const result = await apiPost({ action: 'updateStock', id, delta });
+  if (result.status === 'success') {
+    comp.stock = result.stock;
+    if (el) {
+      el.textContent = result.stock;
+      el.className   = 'stock-num ' + (result.stock <= 2 ? 'low' : result.stock <= 5 ? 'mid' : 'ok');
+    }
+    showToast(`Stock updated → ${result.stock}`);
+    if (document.getElementById('page-dashboard').classList.contains('active')) renderDashboard();
+    if (document.getElementById('page-components').classList.contains('active')) renderComponents();
+  } else {
+    showToast('Failed to update stock: ' + (result.message||'error'));
+    await refreshAllData();
+    renderStock();
+  }
+}
+
+// ════════════════════════════════════════════
+//  COMPONENTS LIST + ADD COMPONENT
+// ════════════════════════════════════════════
+function renderComponents() {
+  const search = (document.getElementById('comp-search')?.value || '').toLowerCase();
+  const filtered = INVENTORY.filter(c => !search || c.name.toLowerCase().includes(search) || (c.categoryLabel||'').toLowerCase().includes(search));
+
+  document.getElementById('comp-count').textContent = filtered.length;
+  document.getElementById('comp-table').innerHTML = filtered.length ? `
+    <table>
+      <thead><tr>
+        <th>ID</th><th>Name</th><th>Category</th><th>Temp Price</th><th>Perm Price</th><th>Stock</th><th>Action</th>
+      </tr></thead>
+      <tbody>
+        ${filtered.map(c => {
+          const qty = c.stock;
+          const cls = qty <= 2 ? 'badge-red' : qty <= 5 ? 'badge-temp' : 'badge-green';
+          return `<tr>
+            <td style="color:var(--slate)">#${c.id}</td>
+            <td>${c.icon||''} ${c.name}</td>
+            <td><span style="color:var(--slate)">${c.categoryLabel||c.category}</span></td>
+            <td style="color:var(--gold)">₹${c.tempPrice}</td>
+            <td style="color:var(--blue)">₹${c.permPrice}</td>
+            <td><span class="badge ${cls}">${qty} left</span></td>
+            <td><button class="logout-btn" style="border-color:var(--red);color:var(--red);font-size:0.75rem;padding:0.3rem 0.6rem;" onclick="deleteComponent(${c.id})">Delete</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  ` : emptyHTML('No components found', '');
+}
+
+function openAddComponent() {
+  document.getElementById('add-comp-card').style.display = 'block';
+}
+function closeAddComponent() {
+  document.getElementById('add-comp-card').style.display = 'none';
+}
+
+async function submitAddComponent() {
+  const name          = document.getElementById('nc-name').value.trim();
+  const icon          = document.getElementById('nc-icon').value.trim() || '📦';
+  const category      = document.getElementById('nc-category').value.trim();
+  const categoryLabel = document.getElementById('nc-categoryLabel').value.trim();
+  const tempPrice     = Number(document.getElementById('nc-temp').value) || 0;
+  const permPrice     = Number(document.getElementById('nc-perm').value) || 0;
+  const stock         = Number(document.getElementById('nc-stock').value) || 0;
+
+  if (!name || !category || !categoryLabel) {
+    showToast('Please fill Name, Category and Category Label.');
+    return;
+  }
+
+  showToast('Adding component…');
+  const result = await apiPost({
+    action: 'addComponent',
+    name, icon, category, categoryLabel, tempPrice, permPrice, stock
+  });
+
+  if (result.status === 'success') {
+    showToast('Component added ✓');
+    closeAddComponent();
+    ['nc-name','nc-category','nc-categoryLabel','nc-perm'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('nc-icon').value = '📦';
+    document.getElementById('nc-temp').value = '20';
+    document.getElementById('nc-stock').value = '5';
+    await refreshAllData();
+    renderComponents();
+  } else {
+    showToast('Failed: ' + (result.message||'error'));
+  }
+}
+
+async function deleteComponent(id) {
+  if (!confirm('Delete this component from inventory? This cannot be undone.')) return;
+  showToast('Deleting…');
+  const result = await apiPost({ action: 'deleteComponent', id });
+  if (result.status === 'success') {
+    INVENTORY = INVENTORY.filter(c => c.id !== id);
+    showToast('Deleted ✓');
+    renderComponents();
+  } else {
+    showToast('Failed: ' + (result.message||'error'));
+  }
+}
+
+// ════════════════════════════════════════════
+//  EXPORT CSV
+// ════════════════════════════════════════════
+function exportCSV() {
+  const orders = ORDERS;
+  if (!orders.length) { showToast('No orders to export!'); return; }
+
+  const headers = ['OrderID','Name','Roll','Year','Phone','Email','Component','Type','Amount','UTR','Status','Timestamp'];
+  const rows    = orders.map(o => [
+    o.orderId, o.name, o.roll, o.year, o.phone, o.email,
+    o.component, o.type, o.amount, o.utr, o.status, o.timestamp
+  ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`));
+
+  const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `kalamhub-orders-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported!');
+}
+
+// ════════════════════════════════════════════
+//  CLEAR ORDERS — disabled (Sheet is source of truth)
+// ════════════════════════════════════════════
+function clearOrders() {
+  showToast('To clear orders, delete rows directly in the Google Sheet.');
+}
+
+// ════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════
+function emptyHTML(title, sub) {
+  return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
+}
+
+let toastTimer
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init on load if already logged in
+if (sessionStorage.getItem('kalam_admin') === '1') initApp();
+</script>
+  <script src="js/stock.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0f172a;
+      --navy2:   #1e293b;
+      --navy3:   #334155;
+      --gold:    #f59e0b;
+      --blue:    #3b82f6;
+      --green:   #22c55e;
+      --red:     #ef4444;
+      --slate:   #94a3b8;
+      --text:    #e2e8f0;
+      --card:    #1e293b;
+      --border:  rgba(255,255,255,0.07);
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ────────────────────────── */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 60% 40%, rgba(59,130,246,0.12) 0%, transparent 60%),
+                  var(--navy);
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+    .login-box .logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .login-box .logo span { color: var(--gold); }
+    .login-box p { color: var(--slate); font-size: 0.85rem; margin-bottom: 2rem; }
+    .login-box input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: var(--navy); border: 1px solid var(--navy3);
+      border-radius: 8px; color: var(--text); font-size: 0.95rem;
+      margin-bottom: 0.75rem; outline: none;
+      transition: border 0.2s;
+    }
+    .login-box input:focus { border-color: var(--gold); }
+    .login-box button {
+      width: 100%; padding: 0.8rem;
+      background: var(--gold); color: var(--navy);
+      border: none; border-radius: 8px;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      font-family: var(--font-display);
+      transition: opacity 0.2s;
+    }
+    .login-box button:hover { opacity: 0.9; }
+    #login-err { color: var(--red); font-size: 0.82rem; margin-top: 0.5rem; display: none; }
+
+    /* ── MAIN LAYOUT ─────────────────────────── */
+    #app { display: none; }
+
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-logo { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+    .topbar-logo span { color: var(--gold); }
+    .topbar-badge {
+      background: rgba(245,158,11,0.15); color: var(--gold);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 6px; padding: 0.25rem 0.75rem;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 1rem; }
+    .logout-btn {
+      background: none; border: 1px solid var(--navy3);
+      color: var(--slate); border-radius: 7px;
+      padding: 0.35rem 0.9rem; font-size: 0.82rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .layout { display: flex; min-height: calc(100vh - 60px); }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: sticky; top: 60px; height: calc(100vh - 60px);
+    }
+    .sidebar-label {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--slate); padding: 0 1.25rem; margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.6rem 1.25rem; cursor: pointer;
+      color: var(--slate); font-size: 0.88rem; font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(245,158,11,0.07); }
+    .nav-divider { height: 1px; background: var(--border); margin: 0.75rem 1.25rem; }
+
+    /* ── MAIN CONTENT ────────────────────────── */
+    .main { flex: 1; padding: 2rem; overflow-y: auto; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-header { margin-bottom: 1.75rem; }
+    .page-header h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; }
+    .page-header p { color: var(--slate); font-size: 0.88rem; margin-top: 0.25rem; }
+
+    /* ── STAT CARDS ──────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--slate); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.red { color: var(--red); }
+    .stat-sub { font-size: 0.75rem; color: var(--slate); margin-top: 0.35rem; }
+
+    /* ── TABLES ──────────────────────────────── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;
+    }
+    .card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; }
+    .card-header .count {
+      background: var(--navy3); border-radius: 20px;
+      padding: 0.15rem 0.6rem; font-size: 0.75rem; color: var(--slate);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 0.65rem 1rem; text-align: left;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--slate);
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem;
+      border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+    }
+    .badge-temp  { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .badge-perm  { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .badge-green { background: rgba(34,197,94,0.15);  color: #22c55e; }
+    .badge-red   { background: rgba(239,68,68,0.15);  color: #ef4444; }
+
+    /* ── STOCK PAGE ──────────────────────────── */
+    .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; }
+    .stock-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .stock-info { flex: 1; min-width: 0; }
+    .stock-name { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stock-cat  { font-size: 0.72rem; color: var(--slate); margin-top: 0.15rem; }
+    .stock-ctrl { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .stock-num  { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; min-width: 2rem; text-align: center; }
+    .stock-num.low  { color: var(--red); }
+    .stock-num.mid  { color: var(--gold); }
+    .stock-num.ok   { color: var(--green); }
+    .ctrl-btn {
+      width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--navy3);
+      background: var(--navy); color: var(--text); font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; line-height: 1;
+    }
+    .ctrl-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .ctrl-btn.minus:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── SEARCH BAR ──────────────────────────── */
+    .search-bar {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.55rem 1rem;
+      color: var(--text); font-size: 0.88rem; outline: none;
+      min-width: 220px; transition: border 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .filter-select {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.55rem 0.75rem;
+      color: var(--text); font-size: 0.88rem; outline: none; cursor: pointer;
+    }
+
+    /* ── EMPTY STATE ─────────────────────────── */
+    .empty {
+      text-align: center; padding: 3rem 1rem; color: var(--slate);
+    }
+    .empty .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty p { font-size: 0.88rem; }
+
+    /* ── ACTION BTNS ─────────────────────────── */
+    .btn-sm {
+      padding: 0.3rem 0.75rem; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:hover { opacity: 0.8; }
+    .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); }
+    .btn-success { background: rgba(34,197,94,0.15); color: var(--green); }
+
+    /* ── TOAST ───────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--green); color: #fff;
+      padding: 0.75rem 1.25rem; border-radius: 10px;
+      font-weight: 600; font-size: 0.88rem;
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s; z-index: 999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════ LOGIN SCREEN ════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="logo">⚡ ECE<span>Hub</span></div>
+    <p>Admin Access Only</p>
+    <input type="text"     id="adm-user" placeholder="Admin username" />
+    <input type="password" id="adm-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button onclick="doLogin()">Sign In →</button>
+    <div id="login-err">❌ Wrong credentials. Try again.</div>
+  </div>
+</div>
+
+<!-- ════════════════ MAIN APP ════════════════ -->
+<div id="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">⚡ Kalam<span>Hub</span></div>
+    <div class="topbar-badge">ADMIN PANEL</div>
+    <div class="topbar-right">
+      <a href="marketplace.html" target="_blank" style="color:var(--slate);font-size:0.82rem;text-decoration:none;">↗ View Site</a>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</div>
+      <div class="nav-item" onclick="showPage('orders')">🛒 Orders</div>
+      <div class="nav-item" onclick="showPage('users')">👥 Users</div>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Inventory</div>
+      <div class="nav-item" onclick="showPage('stock')">📦 Stock Manager</div>
+      <div class="nav-item" onclick="showPage('components')">🔧 Components</div>
+      <div class="nav-divider"></div>
+      <div class="sidebar-label">Tools</div>
+      <div class="nav-item" onclick="exportCSV()">⬇️ Export CSV</div>
+      <div class="nav-item" onclick="clearOrders()">🗑️ Clear Orders</div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Overview of Kalam Hub activity</p>
+        </div>
+        <div class="stats-grid" id="stat-cards"></div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Orders</h3>
+            <span class="count" id="recent-count">0</span>
+          </div>
+          <div id="recent-orders-table"></div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS ── -->
+      <div class="page" id="page-orders">
+        <div class="page-header">
+          <h1>All Orders</h1>
+          <p>Every payment submitted through the site</p>
+        </div>
+        <div class="search-bar">
+          <input class="search-input" id="order-search" placeholder="Search name, roll, component…" oninput="renderOrders()" />
+          <select class="filter-select" id="order-type-filter" onchange="renderOrders()">
+            <option value="">All Types</option>
+            <option value="Temporary">Temporary</option>
+            <option value="Permanent">Permanent</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Order History</h3>
+            <span class="count" id="order-count">0</span>
+          </div>
+          <div id="orders-table"></div>
+        </div>
+      </div>
+
+      <!-- ── USERS ── -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <h1>Registered Users</h1>
+          <p>Students who have signed up on Kalam Hub</p>
+        </div>
+        <div class="search-bar">
+          <input class="search-input" id="user-search" placeholder="Search name, email, roll…" oninput="renderUsers()" />
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>All Users</h3>
+            <span class="count" id="user-count">0</span>
+          </div>
+          <div id="users-table"></div>
+        </div>
+      </div>
+
+      <!-- ── STOCK ── -->
+      <div class="page" id="page-stock">
+        <div class="page-header">
+          <h1>Stock Manager</h1>
+          <p>Adjust component quantities — changes save instantly</p>
+        </div>
+        <div class="search-bar">
+          <input class="search-input" id="stock-search" placeholder="Search component…" oninput="renderStock()" />
+          <select class="filter-select" id="stock-filter" onchange="renderStock()">
+            <option value="">All Categories</option>
+            <option value="microcontroller">Dev Boards</option>
+            <option value="sensor">Sensors</option>
+            <option value="display">Displays</option>
+            <option value="relay">Relay</option>
+            <option value="motor">Motors</option>
+            <option value="communication">Communication</option>
+            <option value="power">Power</option>
+            <option value="audio">Audio</option>
+            <option value="prototyping">Prototyping</option>
+          </select>
+        </div>
+        <div class="stock-grid" id="stock-grid"></div>
+      </div>
+
+      <!-- ── COMPONENTS ── -->
+      <div class="page" id="page-components">
+        <div class="page-header">
+          <h1>Components List</h1>
+          <p>All components in the marketplace (live from Inventory sheet)</p>
+        </div>
+        <div class="search-bar">
+          <input class="search-input" id="comp-search" placeholder="Search…" oninput="renderComponents()" />
+          <button class="logout-btn" style="border-color:var(--gold);color:var(--gold);" onclick="openAddComponent()">+ Add Component</button>
+        </div>
+
+        <!-- Add Component Form (hidden by default) -->
+        <div class="card" id="add-comp-card" style="display:none;margin-bottom:1.25rem;">
+          <div class="card-header"><h3>➕ Add New Component</h3></div>
+          <div style="padding:1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.85rem;">
+            <input class="search-input" id="nc-name" placeholder="Component name" />
+            <input class="search-input" id="nc-icon" placeholder="Icon (emoji)" value="📦" />
+            <input class="search-input" id="nc-category" placeholder="category (e.g. sensor)" />
+            <input class="search-input" id="nc-categoryLabel" placeholder="Category Label (e.g. Sensor)" />
+            <input class="search-input" id="nc-temp" type="number" placeholder="Temp Price ₹" value="20" />
+            <input class="search-input" id="nc-perm" type="number" placeholder="Permanent Price ₹" />
+            <input class="search-input" id="nc-stock" type="number" placeholder="Initial Stock" value="5" />
+          </div>
+          <div style="padding:0 1.25rem 1.25rem;display:flex;gap:0.75rem;">
+            <button class="logout-btn" style="border-color:var(--green);color:var(--green);" onclick="submitAddComponent()">✅ Save Component</button>
+            <button class="logout-btn" onclick="closeAddComponent()">Cancel</button>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <h3>All Components</h3>
@@ -739,7 +1647,7 @@ function emptyHTML(title, sub) {
   return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
 }
 
-let toastTimer;
+let(toastTimer);
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
