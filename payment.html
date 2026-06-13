@@ -547,8 +547,8 @@
         </p>
       </div>
 
-      <!-- Screenshot upload -->
-      <div style="margin-bottom:1.2rem;text-align:left;">
+      <!-- Screenshot upload disabled: UTR-only manual verification is more reliable for Apps Script. -->
+      <div style="display:none;margin-bottom:1.2rem;text-align:left;">
         <label style="font-size:0.82rem;font-weight:700;color:#1e293b;display:block;margin-bottom:0.4rem;">
           📸 Payment Screenshot
         </label>
@@ -573,7 +573,7 @@
       <div id="confirm-hint" style="font-size:0.78rem;color:#f59e0b;font-weight:600;
            margin-bottom:0.6rem;padding:0.5rem 0.8rem;background:#fffbeb;
            border-radius:8px;border:1px solid #fde68a;text-align:left;">
-        ⚠️ <span id="hint-text">Enter UTR and upload screenshot to confirm</span>
+        ⚠️ <span id="hint-text">Enter your 12-digit UTR / Transaction ID to confirm</span>
       </div>
 
       <button
@@ -713,8 +713,7 @@
       const utrEl   = document.getElementById('utr-input');
       const utr     = utrEl ? utrEl.value : '';
       const hasUTR  = utr.length === 12;
-      const hasSS   = screenshotFile !== null;
-      const ready   = hasUTR && hasSS;
+      const ready   = hasUTR;
 
       const btn  = document.getElementById('confirm-btn');
       const hint = document.getElementById('confirm-hint');
@@ -730,9 +729,7 @@
           hint.style.display = 'none';
         } else {
           hint.style.display = 'block';
-          if (!hasUTR && !hasSS) hintTxt.textContent = 'Enter UTR and upload screenshot to confirm';
-          else if (!hasUTR)      hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID';
-          else                   hintTxt.textContent = 'Upload your payment screenshot';
+          hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID';
         }
       }
     }
@@ -863,7 +860,7 @@
       const hint = document.getElementById('confirm-hint');
       if (hint) hint.style.display = 'block';
       const hintTxt = document.getElementById('hint-text');
-      if (hintTxt) hintTxt.textContent = 'Enter UTR and upload screenshot to confirm';
+      if (hintTxt) hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID to confirm';
     }
 
     // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
@@ -964,7 +961,7 @@
         type      : isTemp ? 'Temporary' : 'Permanent',
         utr,
         dueDate,
-        screenshot: screenshotB64 || ''
+        screenshot: ''
       };
 
       // Loading state
