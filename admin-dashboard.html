@@ -606,32 +606,33 @@ html;
    STOCK CHANGE
 ========================== */
 
-async function changeStock(
-id,
-delta
-){
+async function changeStock(id,delta){
 
-try{
+  try{
 
-await fetch(
-WEB_APP_URL,
-{
-method:'POST',
-body:JSON.stringify({
-action:'adjustStock',
-id:id,
-delta:delta
-})
-}
-);
+    const res = await fetch(
+      WEB_APP_URL,
+      {
+        method:'POST',
+        body:JSON.stringify({
+          action:'adjustStock',
+          id:id,
+          delta:delta
+        })
+      }
+    );
 
-loadInventory();
+    const data = await res.json();
 
-}catch(err){
+    console.log('Stock Update:', data);
 
-console.error(err);
+    loadInventory();
 
-}
+  }catch(err){
+
+    console.error('Stock Error:', err);
+
+  }
 
 }
 
@@ -641,44 +642,43 @@ console.error(err);
 
 async function saveInventory(id){
 
-try{
+  try{
 
-const tempPrice =
-document.getElementById(
-'temp-' + id
-).value;
+    const tempPrice =
+      document.getElementById('temp-' + id).value;
 
-const permPrice =
-document.getElementById(
-'perm-' + id
-).value;
+    const permPrice =
+      document.getElementById('perm-' + id).value;
 
-await fetch(
-WEB_APP_URL,
-{
-method:'POST',
-body:JSON.stringify({
-action:'updateStock',
-id:id,
-tempPrice:tempPrice,
-permPrice:permPrice
-})
-}
-);
+    const res = await fetch(
+      WEB_APP_URL,
+      {
+        method:'POST',
+        body:JSON.stringify({
+          action:'updateStock',
+          id:id,
+          tempPrice:tempPrice,
+          permPrice:permPrice
+        })
+      }
+    );
 
-alert(
-'Inventory Updated'
-);
+    const data = await res.json();
 
-loadInventory();
+    console.log('Save Result:', data);
 
-}catch(err){
+    alert('Inventory Updated');
 
-console.error(err);
+    loadInventory();
 
-}
+  }catch(err){
+
+    console.error(err);
+
+  }
 
 }
+
 
 /* ==========================
    INITIAL LOAD
