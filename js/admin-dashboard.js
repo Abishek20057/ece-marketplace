@@ -26,30 +26,26 @@ function logout() {
 }
 
 // Load Orders
-async function loadOrders() {
-
+async function loadInventory() {
   try {
 
-    const response =
-      await fetch(
-        WEB_APP_URL +
-        '?action=getOrders'
-      );
+    console.log(WEB_APP_URL + '?action=getInventory');
 
-    const orders =
-      await response.json();
-
-    renderOrders(orders);
-
-  } catch (err) {
-
-    console.error(
-      'Load Orders Error:',
-      err
+    const response = await fetch(
+      WEB_APP_URL + '?action=getInventory'
     );
 
-  }
+    const data = await response.json();
 
+    const items = Array.isArray(data)
+      ? data
+      : (data.items || data.data || []);
+
+    renderInventory(items);
+
+  } catch (err) {
+    console.error('Inventory Error:', err);
+  }
 }
 
 // Render Dashboard Data
