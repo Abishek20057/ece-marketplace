@@ -4,7 +4,7 @@
 // with localStorage cache for instant render.
 // ============================================
 
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec'; 
 const STOCK_CACHE_KEY = 'kalam_stock_cache';
 const STOCK_CACHE_TTL = 60 * 1000; // 1 minute
 
