@@ -232,107 +232,54 @@ loadInventory();
 
 async function loadInventory() {
 
-  try {
+  const response = await fetch(
+    WEB_APP_URL + '?action=getInventory'
+  );
 
-    const response =
-      await fetch(
-        WEB_APP_URL +
-        '?action=getInventory'
-      );
+  const items = await response.json();
 
-    const inventory =
-      await response.json();
+  let html = '';
 
-    renderInventory(
-      inventory
-    );
-
-  } catch (err) {
-
-    console.error(
-      'Inventory Error:',
-      err
-    );
-
-  }
-
-}
-
-async function loadInventory(){
-
-  try{
-
-    const response =
-    await fetch(
-      WEB_APP_URL +
-      '?action=getInventory'
-    );
-
-    const items =
-    await response.json();
-
-    renderInventory(items);
-
-  }catch(err){
-
-    console.error(
-      'Inventory Error:',
-      err
-    );
-
-  }
-
-}
-
-function renderInventory(items){
-
-  let html='';
-
-  items.forEach(item=>{
+  items.forEach(item => {
 
     html += `
-      <tr>
+    <tr>
 
-        <td>${item.name}</td>
+      <td>${item.name}</td>
 
-        <td>
+      <td>${item.stock}</td>
 
-          ${item.stock}
+      <td>
+        <input
+          id="temp_${item.id}"
+          value="${item.tempPrice}"
+        >
+      </td>
 
-          <button
-          class="stock-btn plus-btn"
-          onclick="adjustStock('${item.id}',1)">
+      <td>
+        <input
+          id="perm_${item.id}"
+          value="${item.permPrice}"
+        >
+      </td>
+
+      <td>
+
+        <button onclick="adjustStock(${item.id},1)">
           +
-          </button>
+        </button>
 
-          <button
-          class="stock-btn minus-btn"
-          onclick="adjustStock('${item.id}',-1)">
+        <button onclick="adjustStock(${item.id},-1)">
           -
-          </button>
+        </button>
 
-        </td>
-
-        <td>
-
-          <input
-          class="price-input"
-          id="price_${item.id}"
-          value="${item.permPrice}">
-
-        </td>
-
-        <td>
-
-          <button
-          class="btn verify-btn"
-          onclick="updatePrice('${item.id}')">
+        <button onclick="saveItem(${item.id})">
           Save
-          </button>
+        </button>
 
-        </td>
+      </td>
 
-      </tr>
+    </tr>
     `;
 
   });
@@ -340,54 +287,47 @@ function renderInventory(items){
   document.getElementById(
     'inventoryTable'
   ).innerHTML = html;
-
 }
 
-async function adjustStock(id,delta){
+async function adjustStock(id, delta) {
 
-  try{
+  await fetch(WEB_APP_URL,{
+    method:'POST',
+    body:JSON.stringify({
+      action:'adjustStock',
+      id:id,
+      delta:delta
+    })
+  });
 
-    await fetch(
-      WEB_APP_URL +
-      '?action=adjustStock' +
-      '&id=' + id +
-      '&delta=' + delta
-    );
-
-    loadInventory();
-
-  }catch(err){
-
-    console.error(err);
-
-  }
-
+  loadInventory();
 }
 
-async function updatePrice(id){
+async function saveItem(id){
 
-  try{
-
-    const price =
+  const tempPrice =
     document.getElementById(
-      'price_' + id
+      'temp_' + id
     ).value;
 
-    await fetch(
-      WEB_APP_URL +
-      '?action=updatePrice' +
-      '&id=' + id +
-      '&price=' + price
-    );
+  const permPrice =
+    document.getElementById(
+      'perm_' + id
+    ).value;
 
-    loadInventory();
+  await fetch(WEB_APP_URL,{
+    method:'POST',
+    body:JSON.stringify({
+      action:'updateStock',
+      id:id,
+      tempPrice:tempPrice,
+      permPrice:permPrice
+    })
+  });
 
-  }catch(err){
+  alert('Saved');
 
-    console.error(err);
-
-  }
-
+  loadInventory();
 }
 
 async function changeStock(
