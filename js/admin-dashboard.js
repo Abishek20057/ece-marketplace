@@ -4,7 +4,7 @@
 
 // Replace with your Apps Script URL
 const WEB_APP_URL =
-'https://YOUR-APPS-SCRIPT-URL/exec';
+'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
 // Check Login
 if (
@@ -199,7 +199,8 @@ async function updateStatus(
       encodeURIComponent(status)
     );
 
-    loadOrders();
+   loadOrders();
+loadInventory();
 
   } catch (err) {
 
@@ -224,3 +225,211 @@ setInterval(
 
 // Initial Load
 loadOrders();
+loadInventory();
+// ==========================
+// Inventory Management
+// ==========================
+
+async function loadInventory() {
+
+  try {
+
+    const response =
+      await fetch(
+        WEB_APP_URL +
+        '?action=getInventory'
+      );
+
+    const inventory =
+      await response.json();
+
+    renderInventory(
+      inventory
+    );
+
+  } catch (err) {
+
+    console.error(
+      'Inventory Error:',
+      err
+    );
+
+  }
+
+}
+
+async function loadInventory(){
+
+  try{
+
+    const response =
+    await fetch(
+      WEB_APP_URL +
+      '?action=getInventory'
+    );
+
+    const items =
+    await response.json();
+
+    renderInventory(items);
+
+  }catch(err){
+
+    console.error(
+      'Inventory Error:',
+      err
+    );
+
+  }
+
+}
+
+function renderInventory(items){
+
+  let html='';
+
+  items.forEach(item=>{
+
+    html += `
+      <tr>
+
+        <td>${item.name}</td>
+
+        <td>
+
+          ${item.stock}
+
+          <button
+          class="stock-btn plus-btn"
+          onclick="adjustStock('${item.id}',1)">
+          +
+          </button>
+
+          <button
+          class="stock-btn minus-btn"
+          onclick="adjustStock('${item.id}',-1)">
+          -
+          </button>
+
+        </td>
+
+        <td>
+
+          <input
+          class="price-input"
+          id="price_${item.id}"
+          value="${item.permPrice}">
+
+        </td>
+
+        <td>
+
+          <button
+          class="btn verify-btn"
+          onclick="updatePrice('${item.id}')">
+          Save
+          </button>
+
+        </td>
+
+      </tr>
+    `;
+
+  });
+
+  document.getElementById(
+    'inventoryTable'
+  ).innerHTML = html;
+
+}
+
+async function adjustStock(id,delta){
+
+  try{
+
+    await fetch(
+      WEB_APP_URL +
+      '?action=adjustStock' +
+      '&id=' + id +
+      '&delta=' + delta
+    );
+
+    loadInventory();
+
+  }catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+async function updatePrice(id){
+
+  try{
+
+    const price =
+    document.getElementById(
+      'price_' + id
+    ).value;
+
+    await fetch(
+      WEB_APP_URL +
+      '?action=updatePrice' +
+      '&id=' + id +
+      '&price=' + price
+    );
+
+    loadInventory();
+
+  }catch(err){
+
+    console.error(err);
+
+  }
+
+}
+
+async function changeStock(
+  component,
+  change
+) {
+
+  await fetch(
+    WEB_APP_URL +
+    '?action=adjustStock' +
+    '&component=' +
+    encodeURIComponent(component) +
+    '&change=' +
+    change
+  );
+
+  loadInventory();
+
+}
+
+async function saveComponent(
+  component
+) {
+
+  const price =
+    document.getElementById(
+      `price-${component}`
+    ).value;
+
+  await fetch(
+    WEB_APP_URL +
+    '?action=updatePrice' +
+    '&component=' +
+    encodeURIComponent(component) +
+    '&price=' +
+    price
+  );
+
+  alert(
+    'Updated Successfully'
+  );
+
+}
+
+loadInventory();

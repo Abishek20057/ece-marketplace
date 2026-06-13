@@ -220,7 +220,7 @@ Logout
 <script>
 
 const WEB_APP_URL =
-'YOUR_APPS_SCRIPT_URL';
+'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
 if(
 sessionStorage.getItem(
@@ -394,3 +394,26 @@ loadOrders();
 
 </body>
 </html>
+<!-- Inventory Management -->
+
+<div class="inventory-section">
+
+  <h2>📦 Inventory Management</h2>
+
+  <table class="inventory-table">
+
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Stock</th>
+        <th>Price (₹)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="inventoryTable">
+    </tbody>
+
+  </table>
+
+</div>
