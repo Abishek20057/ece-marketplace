@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalam Hub Admin Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#07111f;
+      --bg2:#0b172a;
+      --card:rgba(255,255,255,0.06);
+      --card2:rgba(255,255,255,0.08);
+      --line:rgba(255,255,255,0.12);
+      --text:#e5eefc;
+      --muted:#9fb2d0;
+      --accent:#4f8cff;
+      --accent2:#6ee7ff;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --shadow:0 24px 80px rgba(0,0,0,.45);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Inter',sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(79,140,255,.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(110,231,255,.14), transparent 26%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .shell{
+      width:100%;
+      max-width:1100px;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    .hero, .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, var(--card), rgba(255,255,255,0.03));
+      backdrop-filter: blur(18px);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
+    }
+
+    .hero{
+      padding:42px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:auto -80px -80px auto;
+      width:260px;
+      height:260px;
+      background:radial-gradient(circle, rgba(79,140,255,.26), transparent 65%);
+      filter:blur(8px);
+      pointer-events:none;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border:1px solid rgba(110,231,255,.2);
+      background:rgba(255,255,255,.04);
+      border-radius:999px;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:22px;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 0 18px rgba(79,140,255,.6);
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(34px, 4vw, 54px);
+      line-height:1.02;
+      letter-spacing:-0.04em;
+    }
+
+    .sub{
+      margin:0 0 28px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.7;
+      max-width:54ch;
+    }
+
+    .feature-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-top:22px;
+    }
+
+    .feature{
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .feature strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:14px;
+      color:#fff;
+    }
+
+    .feature span{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .card{
+      padding:30px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-height:520px;
+    }
+
+    .card h2{
+      margin:0 0 8px;
+      font-family:'Space Grotesk',sans-serif;
+      font-size:28px;
+      letter-spacing:-0.03em;
+    }
+
+    .card p{
+      margin:0 0 24px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .form-group{
+      margin-bottom:16px;
+    }
+
+    label{
+      display:block;
+      margin:0 0 8px;
+      font-size:13px;
+      font-weight:700;
+      color:#d9e6fb;
+      letter-spacing:.02em;
+    }
+
+    input{
+      width:100%;
+      border:none;
+      outline:none;
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:16px;
+      padding:15px 16px;
+      font-size:15px;
+      transition:.2s ease;
+    }
+
+    input::placeholder{color:#7f93b3}
+    input:focus{
+      border-color:rgba(79,140,255,.65);
+      box-shadow:0 0 0 4px rgba(79,140,255,.18);
+      background:rgba(255,255,255,.08);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:16px;
+      padding:15px 18px;
+      font-weight:800;
+      font-size:15px;
+      cursor:pointer;
+      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+      letter-spacing:.02em;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#06111f;
+      box-shadow:0 14px 30px rgba(79,140,255,.24);
+      margin-top:6px;
+    }
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .msg{
+      margin-top:14px;
+      min-height:22px;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .msg.ok{color:#8bf7b5}
+    .msg.err{color:#ff9a9a}
+
+    .mini{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+      flex-wrap:wrap;
+    }
+
+    .link{
+      color:#b8d2ff;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    .link:hover{text-decoration:underline}
+
+    .footer-note{
+      margin-top:18px;
+      color:#8399b9;
+      font-size:12px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 900px){
+      .shell{grid-template-columns:1fr}
+      .hero{padding:30px}
+      .card{min-height:auto}
+      .feature-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="shell">
+      <section class="hero">
+        <div class="badge"><span class="dot"></span> Kalam Hub Admin Access</div>
+        <h1>Admin dashboard for stock, prices, and verification.</h1>
+        <p class="sub">
+          Sign in to manage orders, update component prices, increase or decrease stock, and verify student payments from one clean dashboard.
+        </p>
+
+        <div class="feature-grid">
+          <div class="feature">
+            <strong>Order Verification</strong>
+            <span>Review UTR submissions and move orders from Pending to Verified.</span>
+          </div>
+          <div class="feature">
+            <strong>Inventory Control</strong>
+            <span>Adjust stock counts quickly with plus and minus controls.</span>
+          </div>
+          <div class="feature">
+            <strong>Price Updates</strong>
+            <span>Change temporary and permanent prices instantly.</span>
+          </div>
+          <div class="feature">
+            <strong>Clean Reporting</strong>
+            <span>See paid orders, pending items, and component usage in one place.</span>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          Use this page only for admin access. Keep the login link private.
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Admin Login</h2>
+        <p>Enter your username and password to open the Kalam Hub dashboard.</p>
+
+        <form id="loginForm" autocomplete="off">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" placeholder="Enter username" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Enter password" required />
+          </div>
+
+          <button class="btn btn-primary" id="loginBtn" type="submit">Login to Dashboard</button>
+          <div id="msg" class="msg"></div>
+        </form>
+
+        <div class="mini">
+          <span>Login only. No sign up.</span>
+          <a class="link" href="index.html">Back to site</a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Replace this with your deployed Apps Script Web App URL
+    const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+
+    const form = document.getElementById('loginForm');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('loginBtn');
+
+    function setMessage(text, type) {
+      msg.textContent = text;
+      msg.className = 'msg ' + (type || '');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (!user || !pass) {
+        setMessage('Please enter username and password.', 'err');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      setMessage('', '');
+
+      try {
+        const url = `${WEB_APP_URL}?action=verifyAdmin&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
+        const res = await fetch(url, { method: 'GET' });
+        const data = await res.json();
+
+        if (data.ok) {
+          sessionStorage.setItem('kalam_admin_logged_in', '1');
+          sessionStorage.setItem('kalam_admin_name', data.name || 'Admin');
+          setMessage('Login successful. Opening dashboard...', 'ok');
+
+          setTimeout(() => {
+            window.location.href = 'admin-dashboard.html';
+          }, 500);
+        } else {
+          setMessage('Invalid username or password.', 'err');
+        }
+      } catch (err) {
+        setMessage('Login failed. Check Apps Script URL and deployment.', 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login to Dashboard';
+      }
+    });
+  </script>
+</body>
+</html>
