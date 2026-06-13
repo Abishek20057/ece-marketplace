@@ -4,7 +4,7 @@
 
 // Replace with your deployed Apps Script URL
 const WEB_APP_URL =
-'https://YOUR-APPS-SCRIPT-URL/exec';
+'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
 // ==========================================
 // Generic GET Request
