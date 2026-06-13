@@ -39,7 +39,13 @@ function writeStockCache(data) {
 // ── Fetch live inventory from Sheet (returns Promise<{id: stock}>) ──
 async function fetchLiveStock() {
   try {
-    const res = await fetch(SHEET_API_URL + '?action=inventory');
+   const res = await fetch(
+  SHEET_API_URL + '?action=getInventory',
+  {
+    method: 'GET',
+    mode: 'cors'
+  }
+);
     const inv = await res.json();
     const map = {};
     inv.forEach(c => { map[c.id] = c.stock; });
