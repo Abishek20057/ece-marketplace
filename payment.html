@@ -807,12 +807,25 @@
 
     // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
     function submitToSheet(payload, onDone) {
+      // If screenshot is very large (>500KB base64), skip it to avoid timeout
+      const sendPayload = { ...payload };
+      if (sendPayload.screenshot && sendPayload.screenshot.length > 500000) {
+        console.warn('Screenshot too large, sending without it');
+        sendPayload.screenshot = '';
+      }
+      sendPayload.action = 'submitOrder';
+
       fetch(SHEET_WEBAPP_URL, {
         method : 'POST',
         mode   : 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify(payload)
-      }).then(onDone).catch(onDone); // always proceed
+        body   : JSON.stringify(sendPayload)
+      })
+      .then(onDone)
+      .catch(err => {
+        console.warn('Sheet submit error (proceeding anyway):', err);
+        onDone(); // Always show success to user even if sheet fails
+      });
     }
 
     // ── SUCCESS SCREEN ─────────────────────────────────────

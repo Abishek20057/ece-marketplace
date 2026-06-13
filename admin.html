@@ -484,7 +484,7 @@ async function doLogin() {
   err.style.display = 'none';
 
   if (!email || !pass) {
-    err.textContent = '❌ Enter email and password.';
+    err.textContent = '❌ Enter username and password.';
     err.style.display = 'block';
     return;
   }
@@ -492,7 +492,20 @@ async function doLogin() {
   btn.disabled = true;
   btn.textContent = 'Signing in…';
 
-  const result = await apiPost({ action: 'adminLogin', email, password: pass });
+  let result = { status: 'error', message: 'Cannot reach server' };
+  try {
+    // Try GET-based login (more reliable for Apps Script)
+    const params = new URLSearchParams({ action: 'verifyAdmin', user: email, pass });
+    const res = await fetch(API_URL + '?' + params);
+    const data = await res.json();
+    if (data.ok) {
+      result = { status: 'success', name: data.name || 'Admin', email };
+    } else {
+      result = { status: 'error', message: 'Invalid username or password.' };
+    }
+  } catch(e) {
+    result = { status: 'error', message: 'Cannot reach server. Check Apps Script URL.' };
+  }
 
   btn.disabled = false;
   btn.textContent = 'Sign In →';
@@ -505,7 +518,7 @@ async function doLogin() {
     document.getElementById('app').style.display = 'block';
     initApp();
   } else {
-    err.textContent = '❌ ' + (result.message || 'Invalid email or password.');
+    err.textContent = '❌ ' + (result.message || 'Invalid username or password.');
     err.style.display = 'block';
   }
 }
@@ -1647,7 +1660,7 @@ function emptyHTML(title, sub) {
   return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
 }
 
-let toastTimer;
+let toastimer
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
