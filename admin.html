@@ -895,14 +895,7 @@ function emptyHTML(title, sub) {
   return `<div class="empty"><div class="icon">📭</div><p><strong>${title}</strong></p><p style="margin-top:0.4rem">${sub}</p></div>`;
 }
 
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
+
 
 // Init on load if already logged in
 if (sessionStorage.getItem('kalam_admin') === '1') initApp();
