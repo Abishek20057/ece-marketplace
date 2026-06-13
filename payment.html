@@ -35,7 +35,6 @@
       font-size: 0.95rem;
       margin-bottom: 2rem;
     }
-    /* Type badge at top */
     .type-badge {
       display: inline-block;
       border-radius: 20px;
@@ -149,7 +148,6 @@
       margin-top: 1rem;
     }
 
-    /* ── Payment method tabs (permanent only) ── */
     .payment-methods {
       display: flex;
       gap: 0.75rem;
@@ -176,7 +174,6 @@
     }
     .pay-method .pay-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
 
-    /* ── QR Modal overlay ── */
     .qr-overlay {
       display: none;
       position: fixed;
@@ -272,7 +269,6 @@
     }
     .qr-cancel-btn:hover { border-color: var(--electric); }
 
-    /* ── Success overlay ── */
     .success-overlay {
       display: none;
       position: fixed;
@@ -309,7 +305,6 @@
 </head>
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar">
     <a href="index.html" class="logo">Kalam<span>Hub</span></a>
     <ul class="nav-links">
@@ -319,22 +314,22 @@
       <li><a href="contact.html">Contact</a></li>
     </ul>
   </nav>
-  
+
   <div class="payment-page">
     <div class="payment-card">
 
-      <!-- Dynamic badge: Temporary / Permanent -->
       <div id="type-badge" class="type-badge"></div>
+
       <div style="margin-bottom:15px;">
-  <button onclick="window.location.href='marketplace.html'"
-  style="background:#2563eb;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">
-    ← Back to Marketplace
-  </button>
-</div>
+        <button onclick="window.location.href='marketplace.html'"
+          style="background:#2563eb;color:white;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">
+          ← Back to Marketplace
+        </button>
+      </div>
+
       <h1>💳 Payment Details</h1>
       <p class="subtitle" id="page-subtitle">Complete your purchase securely</p>
 
-      <!-- Order Summary -->
       <div class="order-summary">
         <h3>🛒 Order Summary</h3>
         <div class="order-row">
@@ -351,9 +346,6 @@
         </div>
       </div>
 
-      <!-- ══════════════════════════════════════
-           TEMPORARY SECTION — UPI only
-           ══════════════════════════════════════ -->
       <div id="temp-section" style="display:none;">
         <div class="section-label">👤 Your Details</div>
         <div class="form-group">
@@ -381,7 +373,7 @@
           <input type="tel" id="t-phone" placeholder="10-digit mobile number" maxlength="10" oninput="validateTempForm()" />
         </div>
         <div class="form-group">
-          <label>Email (for return reminders &amp; fine notices)</label>
+          <label>Email (for return reminders &amp; notices)</label>
           <input type="email" id="t-email" placeholder="you@example.com" oninput="validateTempForm()" />
         </div>
 
@@ -391,11 +383,7 @@
         <div class="secure-note">🔐 Pay via UPI · Amount goes directly to Kalam Hub</div>
       </div>
 
-      <!-- ══════════════════════════════════════
-           PERMANENT SECTION — multiple methods
-           ══════════════════════════════════════ -->
       <div id="perm-section" style="display:none;">
-
         <div class="section-label">💳 Payment Method</div>
         <div class="payment-methods">
           <div class="pay-method active" onclick="selectMethod(this,'upi')">
@@ -412,7 +400,6 @@
           </div>
         </div>
 
-        <!-- UPI panel -->
         <div id="panel-upi">
           <div class="form-group">
             <label>Your UPI ID</label>
@@ -423,7 +410,6 @@
           </p>
         </div>
 
-        <!-- Card panel -->
         <div id="panel-card" style="display:none;">
           <div class="form-group">
             <label>Cardholder Name</label>
@@ -445,7 +431,6 @@
           </div>
         </div>
 
-        <!-- Net Banking panel -->
         <div id="panel-netbanking" style="display:none;">
           <div class="form-group">
             <label>Select Bank</label>
@@ -465,7 +450,6 @@
           </div>
         </div>
 
-        <!-- Cash panel -->
         <div id="panel-cash" style="display:none;">
           <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;font-size:0.9rem;color:#92400e;">
             <strong>💵 Pay at Kalam Hub</strong><br><br>
@@ -510,7 +494,6 @@
     </div>
   </div>
 
-  <!-- ══ QR Code Modal ══ -->
   <div class="qr-overlay" id="qr-overlay">
     <div class="qr-box">
       <h2>📱 Scan &amp; Pay</h2>
@@ -522,12 +505,11 @@
 
       <div class="upi-id-display" id="upi-display">ecehub@oksbi</div>
 
-      <p class="qr-note">
+      <p class="qr-note" id="qr-note">
         Open GPay / PhonePe / Paytm, scan &amp; pay <strong>₹<span id="qr-note-amount">20</span></strong>.<br>
-        After payment, paste your <strong>UTR / Transaction ID</strong> below.
+        After payment, enter your <strong>12-digit UTR / Transaction ID</strong> below. No screenshot is needed.
       </p>
 
-      <!-- UTR input -->
       <div style="margin-bottom:1rem;text-align:left;">
         <label style="font-size:0.82rem;font-weight:700;color:#1e293b;display:block;margin-bottom:0.4rem;">
           🔢 UTR / Transaction ID
@@ -547,29 +529,6 @@
         </p>
       </div>
 
-      <!-- Screenshot upload disabled: UTR-only manual verification is more reliable for Apps Script. -->
-      <div style="display:none;margin-bottom:1.2rem;text-align:left;">
-        <label style="font-size:0.82rem;font-weight:700;color:#1e293b;display:block;margin-bottom:0.4rem;">
-          📸 Payment Screenshot
-        </label>
-        <div id="upload-zone"
-          onclick="document.getElementById('screenshot-input').click()"
-          style="border:2px dashed #cbd5e1;border-radius:10px;padding:1.2rem 1rem;text-align:center;
-                 cursor:pointer;transition:all 0.2s;background:#f8fafc;">
-          <div id="upload-placeholder">
-            <div style="font-size:1.8rem;margin-bottom:0.3rem;">📤</div>
-            <div style="font-size:0.85rem;font-weight:600;color:#475569;">Click to upload screenshot</div>
-            <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.2rem;">JPG / PNG · Max 5MB, auto-compressed</div>
-          </div>
-          <div id="upload-preview" style="display:none;">
-            <img id="preview-img" style="max-height:120px;border-radius:8px;margin-bottom:0.4rem;" />
-            <div id="preview-name" style="font-size:0.78rem;color:#16a34a;font-weight:600;"></div>
-          </div>
-        </div>
-        <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="onScreenshot(this)" />
-      </div>
-
-      <!-- Progress hint -->
       <div id="confirm-hint" style="font-size:0.78rem;color:#f59e0b;font-weight:600;
            margin-bottom:0.6rem;padding:0.5rem 0.8rem;background:#fffbeb;
            border-radius:8px;border:1px solid #fde68a;text-align:left;">
@@ -587,7 +546,6 @@
     </div>
   </div>
 
-  <!-- ══ Success Overlay ══ -->
   <div class="success-overlay" id="success-overlay">
     <div class="success-box">
       <div class="success-icon" id="success-icon">✅</div>
@@ -601,25 +559,29 @@
 
   <script src="js/data.js"></script>
   <script>
-    // ── CONFIG ─────────────────────────────────────────────
     const OUR_UPI          = 'djabi1515@oksbi';
-    const OUR_NAME         =  'Kalam Hub';
+    const OUR_NAME         = 'Kalam Hub';
     const SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
-    // ── URL PARAMS ─────────────────────────────────────────
     const params    = new URLSearchParams(window.location.search);
     const compId    = parseInt(params.get('id')) || null;
     const compName  = decodeURIComponent(params.get('name') || 'Component');
     const isTemp    = params.get('type') === 'temporary';
     const compPrice = parseInt(params.get('price')) || 0;
 
-    // ── Invalidate local stock cache so marketplace refetches live stock ──
-    // (Actual decrement happens server-side in Code.gs on submission)
     function decrementStock() {
-      try { localStorage.removeItem('kalam_stock_cache'); } catch (e) { /* ignore */ }
+      if (compId === null) return;
+      try {
+        const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
+        const current = (typeof COMPONENTS !== 'undefined')
+          ? (overrides[compId] !== undefined ? overrides[compId] : (COMPONENTS.find(c => c.id === compId) || {}).stock)
+          : overrides[compId];
+        const newStock = Math.max(0, (current !== undefined ? current : 1) - 1);
+        overrides[compId] = newStock;
+        localStorage.setItem('ece_stock_overrides', JSON.stringify(overrides));
+      } catch (e) { /* ignore */ }
     }
 
-    // ── POPULATE ORDER SUMMARY ─────────────────────────────
     document.getElementById('comp-name-display').textContent  = compName;
     document.getElementById('comp-price-display').textContent = '₹' + compPrice;
     document.getElementById('comp-total').textContent         = '₹' + compPrice;
@@ -628,7 +590,7 @@
     if (isTemp) {
       document.getElementById('type-badge').textContent     = '⏱ Temporary Borrow';
       document.getElementById('type-badge').classList.add('temp');
-      document.getElementById('page-subtitle').textContent  =`Pay ₹${compPrice} to borrow this component`;
+      document.getElementById('page-subtitle').textContent  = `Pay ₹${compPrice} to borrow this component`;
       document.getElementById('license-label').textContent  = '⏱ Borrow Period';
       document.getElementById('license-val').textContent    = '7 Days';
       document.getElementById('temp-section').style.display = 'block';
@@ -643,7 +605,6 @@
       document.getElementById('p-pay-label').textContent    = compPrice;
     }
 
-    // ── PAYMENT METHOD TABS (permanent) ───────────────────
     let selectedMethod = 'upi';
     const permPanels   = ['upi','card','netbanking','cash'];
 
@@ -656,7 +617,6 @@
       validatePermForm();
     }
 
-    // Card number formatting
     const cardInput = document.getElementById('card-num');
     if (cardInput) {
       cardInput.addEventListener('input', (e) => {
@@ -665,71 +625,26 @@
       });
     }
 
-    // ── SCREENSHOT & UTR STATE ─────────────────────────────
-    let screenshotFile = null;
-    let screenshotB64  = null;
-    const MAX_SCREENSHOT_UPLOAD_CHARS = 950000;
-
-    function dataUrlSizeBytes(dataUrl) {
-      const comma = dataUrl.indexOf(',');
-      if (comma === -1) return dataUrl.length;
-      return Math.ceil((dataUrl.length - comma - 1) * 3 / 4);
-    }
-
-    function compressScreenshot(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => reject(new Error('Could not read screenshot file.'));
-        reader.onload = () => {
-          const img = new Image();
-          img.onerror = () => reject(new Error('Could not load screenshot image.'));
-          img.onload = () => {
-            const maxSide = 1400;
-            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            let quality = 0.78;
-            let dataUrl = canvas.toDataURL('image/jpeg', quality);
-            while (dataUrl.length > MAX_SCREENSHOT_UPLOAD_CHARS && quality > 0.45) {
-              quality -= 0.08;
-              dataUrl = canvas.toDataURL('image/jpeg', quality);
-            }
-            resolve(dataUrl);
-          };
-          img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
     function checkConfirmReady() {
       const utrEl   = document.getElementById('utr-input');
-      const utr     = utrEl ? utrEl.value : '';
+      const utr     = utrEl ? utrEl.value.trim() : '';
       const hasUTR  = utr.length === 12;
-      const ready   = hasUTR;
 
-      const btn  = document.getElementById('confirm-btn');
-      const hint = document.getElementById('confirm-hint');
+      const btn     = document.getElementById('confirm-btn');
+      const hint    = document.getElementById('confirm-hint');
       const hintTxt = document.getElementById('hint-text');
       if (!btn) return;
 
-      btn.disabled      = !ready;
-      btn.style.opacity = ready ? '1'       : '0.38';
-      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+      btn.disabled      = !hasUTR;
+      btn.style.opacity = hasUTR ? '1' : '0.38';
+      btn.style.cursor  = hasUTR ? 'pointer' : 'not-allowed';
 
       if (hint && hintTxt) {
-        if (ready) {
+        if (hasUTR) {
           hint.style.display = 'none';
         } else {
           hint.style.display = 'block';
-          hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID';
+          hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID to confirm';
         }
       }
     }
@@ -740,51 +655,6 @@
       checkConfirmReady();
     }
 
-    async function onScreenshot(input) {
-      const file = input.files[0];
-      if (!file) return;
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File too large. Please upload a screenshot under 5MB.');
-        input.value = '';
-        return;
-      }
-
-      screenshotFile = null;
-      screenshotB64 = null;
-      checkConfirmReady();
-
-      document.getElementById('upload-placeholder').style.display = 'none';
-      document.getElementById('upload-preview').style.display     = 'block';
-      document.getElementById('preview-img').removeAttribute('src');
-      document.getElementById('preview-name').textContent         = 'Compressing screenshot...';
-
-      try {
-        screenshotB64 = await compressScreenshot(file);
-        if (screenshotB64.length > MAX_SCREENSHOT_UPLOAD_CHARS) {
-          throw new Error('Screenshot is still too large after compression.');
-        }
-        screenshotFile = file;
-        document.getElementById('upload-placeholder').style.display = 'none';
-        document.getElementById('upload-preview').style.display     = 'block';
-        document.getElementById('preview-img').src                  = screenshotB64;
-        document.getElementById('preview-name').textContent         = 'Ready: ' + file.name + ' (' + Math.round(dataUrlSizeBytes(screenshotB64) / 1024) + ' KB)';
-        document.getElementById('upload-zone').style.borderColor    = '#16a34a';
-        document.getElementById('upload-zone').style.background     = '#f0fdf4';
-        checkConfirmReady();
-      } catch (err) {
-        screenshotFile = null;
-        screenshotB64 = null;
-        input.value = '';
-        document.getElementById('upload-placeholder').style.display = 'block';
-        document.getElementById('upload-preview').style.display     = 'none';
-        document.getElementById('upload-zone').style.borderColor    = '#dc2626';
-        document.getElementById('upload-zone').style.background     = '#fef2f2';
-        alert((err && err.message) ? err.message : 'Could not prepare screenshot. Please try another image.');
-        checkConfirmReady();
-      }
-    }
-
-    // ── FORM VALIDATION (enable/disable Pay buttons) ──────
     function isValidPhone(v) { return /^\d{10}$/.test(v); }
 
     function validateTempForm() {
@@ -797,8 +667,8 @@
       const ready = name && roll && year && isValidPhone(phone) && validEmail;
       const btn = document.getElementById('t-pay-btn');
       btn.disabled      = !ready;
-      btn.style.opacity = ready ? '1' : '0.4';
-      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+      btn.style.opacity  = ready ? '1' : '0.4';
+      btn.style.cursor   = ready ? 'pointer' : 'not-allowed';
     }
 
     function validatePermForm() {
@@ -813,11 +683,10 @@
       const ready = name && roll && year && isValidPhone(phone) && methodOk;
       const btn = document.getElementById('p-pay-btn');
       btn.disabled      = !ready;
-      btn.style.opacity = ready ? '1' : '0.4';
-      btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+      btn.style.opacity  = ready ? '1' : '0.4';
+      btn.style.cursor   = ready ? 'pointer' : 'not-allowed';
     }
 
-    // ── QR HELPERS ─────────────────────────────────────────
     function buildQR(amount, label) {
       const upiStr = 'upi://pay?pa=' + OUR_UPI
                    + '&pn=' + encodeURIComponent(OUR_NAME)
@@ -828,70 +697,59 @@
     }
 
     function openQRModal(amount, label) {
-      document.getElementById('qr-img').src              = buildQR(amount, label);
+      document.getElementById('qr-img').src                = buildQR(amount, label);
       document.getElementById('qr-amount-label').textContent = amount;
       document.getElementById('qr-note-amount').textContent  = amount;
       document.getElementById('upi-display').textContent     = OUR_UPI;
+      document.getElementById('qr-note').innerHTML =
+        'Open GPay / PhonePe / Paytm, scan &amp; pay <strong>₹<span id="qr-note-amount">' + amount + '</span></strong>.<br>' +
+        'After payment, enter your <strong>12-digit UTR / Transaction ID</strong> below. No screenshot is needed.';
       document.getElementById('qr-overlay').classList.add('show');
     }
 
     function closeQR() {
       document.getElementById('qr-overlay').classList.remove('show');
-      // Reset all modal state
-      screenshotFile = null;
-      screenshotB64  = null;
+
       const utrEl = document.getElementById('utr-input');
-      if (utrEl) { utrEl.value = ''; utrEl.style.borderColor = '#e2e8f0'; }
+      if (utrEl) {
+        utrEl.value = '';
+        utrEl.style.borderColor = '#e2e8f0';
+      }
+
       const btn = document.getElementById('confirm-btn');
       if (btn) {
         btn.disabled      = true;
-        btn.style.opacity = '0.38';
-        btn.style.cursor  = 'not-allowed';
-        btn.textContent   = '✅ Confirm Payment';
+        btn.style.opacity  = '0.38';
+        btn.style.cursor   = 'not-allowed';
+        btn.textContent    = '✅ Confirm Payment';
       }
-      const zone = document.getElementById('upload-zone');
-      if (zone) { zone.style.borderColor = '#cbd5e1'; zone.style.background = '#f8fafc'; }
-      const ph = document.getElementById('upload-placeholder');
-      if (ph) ph.style.display = 'block';
-      const pv = document.getElementById('upload-preview');
-      if (pv) pv.style.display = 'none';
-      const si = document.getElementById('screenshot-input');
-      if (si) si.value = '';
+
       const hint = document.getElementById('confirm-hint');
       if (hint) hint.style.display = 'block';
+
       const hintTxt = document.getElementById('hint-text');
       if (hintTxt) hintTxt.textContent = 'Enter your 12-digit UTR / Transaction ID to confirm';
     }
 
-    // ── SUBMIT TO GOOGLE SHEET ─────────────────────────────
     function submitToSheet(payload, onDone) {
-      const sendPayload = { ...payload };
-      sendPayload.action = 'submitOrder';
-
       fetch(SHEET_WEBAPP_URL, {
         method : 'POST',
         mode   : 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body   : JSON.stringify(sendPayload)
-      })
-      .then(onDone)
-      .catch(err => {
-        console.warn('Sheet submit error (proceeding anyway):', err);
-        onDone(); // Always show success to user even if sheet fails
-      });
+        body   : JSON.stringify(payload)
+      }).then(onDone).catch(onDone);
     }
 
-    // ── SUCCESS SCREEN ─────────────────────────────────────
     function showSuccess(orderId, type) {
       decrementStock();
 
-      // ── Save order to localStorage for Admin Panel ──
       try {
         const nameId  = isTemp ? 't-name'  : 'p-name';
         const rollId  = isTemp ? 't-roll'  : 'p-roll';
         const yearId  = isTemp ? 't-year'  : 'p-year';
         const phoneId = isTemp ? 't-phone' : 'p-phone';
         const utrVal  = (document.getElementById('utr-input')?.value || '').trim();
+
         const order = {
           orderId,
           timestamp : new Date().toLocaleString('en-IN'),
@@ -905,11 +763,12 @@
           type      : isTemp ? 'Temporary' : 'Permanent',
           utr       : utrVal,
         };
+
         const orders = JSON.parse(localStorage.getItem('ece_orders') || '[]');
         orders.push(order);
         localStorage.setItem('ece_orders', JSON.stringify(orders));
       } catch(e) { console.warn('Admin order save failed:', e); }
-      // ────────────────────────────────────────────────
+
       document.getElementById('success-icon').textContent = '✅';
       if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
@@ -920,21 +779,20 @@
       } else {
         document.getElementById('success-title').textContent = 'Order Placed!';
         document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
-        document.getElementById('success-sub').textContent   = 'Show this Order ID at the  Kalam Hub to collect your component.';
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the Kalam Hub to collect your component.';
         document.getElementById('success-btn').href          = 'marketplace.html';
         document.getElementById('success-btn').textContent   = '← Back to Marketplace';
       }
+
       document.getElementById('order-id').textContent = 'Order #' + orderId;
       document.getElementById('success-overlay').classList.add('show');
     }
 
-    // ── CONFIRM PAYMENT (QR modal submit btn) ──────────────
     function confirmPayment() {
-      const utr     = document.getElementById('utr-input').value.trim();
+      const utr    = document.getElementById('utr-input').value.trim();
       const orderId = 'KH-' + Date.now().toString().slice(-6);
       const type    = isTemp ? 'temporary' : 'permanent';
 
-      // Read correct form fields based on type
       const nameId  = isTemp ? 't-name'  : 'p-name';
       const rollId  = isTemp ? 't-roll'  : 'p-roll';
       const yearId  = isTemp ? 't-year'  : 'p-year';
@@ -948,6 +806,7 @@
       }
 
       const payload = {
+        action: 'submitOrder',
         timestamp : new Date().toLocaleString('en-IN'),
         orderId,
         id        : compId,
@@ -960,11 +819,9 @@
         amount    : compPrice,
         type      : isTemp ? 'Temporary' : 'Permanent',
         utr,
-        dueDate,
-        screenshot: ''
+        dueDate
       };
 
-      // Loading state
       const btn = document.getElementById('confirm-btn');
       btn.textContent   = '⏳ Submitting…';
       btn.disabled      = true;
@@ -976,7 +833,6 @@
       });
     }
 
-    // ── TEMPORARY: show QR after form validation ───────────
     function showQR() {
       const name  = document.getElementById('t-name').value.trim();
       const roll  = document.getElementById('t-roll').value.trim();
@@ -989,7 +845,6 @@
       openQRModal(compPrice, 'Temporary');
     }
 
-    // ── PERMANENT: validate form → show QR for UPI, or direct submit for cash ──
     function processPermanent() {
       const name  = document.getElementById('p-name').value.trim();
       const roll  = document.getElementById('p-roll').value.trim();
@@ -1004,13 +859,10 @@
         const upi = document.getElementById('p-upi-id').value.trim();
         if (!upi) { alert('Please enter your UPI ID.'); return; }
         openQRModal(compPrice, 'Buy');
-
       } else if (selectedMethod === 'cash') {
-        // Cash — submit to sheet with "CASH" as UTR, no screenshot needed
         const orderId = 'ECE-' + Date.now().toString().slice(-6);
-        console.log("Screenshot Data:", screenshotB64);
-        console.log("Screenshot Length:", screenshotB64 ? screenshotB64.length : 0);
         const payload = {
+          action: 'submitOrder',
           timestamp : new Date().toLocaleString('en-IN'),
           orderId,
           id        : compId,
@@ -1022,12 +874,10 @@
           amount    : compPrice,
           type      : 'Permanent',
           utr       : 'CASH',
-          screenshot: ''
+          dueDate   : '',
         };
         submitToSheet(payload, () => showSuccess(orderId, 'permanent'));
-
       } else {
-        // Card / Net banking — same QR + UTR + screenshot flow
         openQRModal(compPrice, 'Buy');
       }
     }
