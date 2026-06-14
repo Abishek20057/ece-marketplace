@@ -53,9 +53,22 @@ document.addEventListener('DOMContentLoaded', () => {
         foundEmail = Object.keys(users).find(e => (users[e].roll || '').toLowerCase() === input);
       }
 
+      // ── Fallback: input looks like roll number (no '@') but wasn't saved yet.
+      //    Match by password across accounts missing a roll number, then auto-save it. ──
+      if (!foundEmail && !input.includes('@')) {
+        const candidates = Object.keys(users).filter(e =>
+          !users[e].roll && users[e].password === password
+        );
+        if (candidates.length === 1) {
+          foundEmail = candidates[0];
+          users[foundEmail].roll = input;   // auto-attach roll for future logins
+          saveUsers(users);
+        }
+      }
+
       // ── New user trying to log in directly → block ──
       if (!foundEmail) {
-        showError(loginForm, 'No account found. Please sign up first.');
+        showError(loginForm, 'No account found. Try logging in with your Email instead, or sign up.');
         return;
       }
 
