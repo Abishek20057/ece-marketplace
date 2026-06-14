@@ -14,6 +14,20 @@ function saveUsers(users) {
   localStorage.setItem('ece_users', JSON.stringify(users));
 }
 
+// ── One-time migration: patch old accounts missing 'roll' field ──
+(function migrateUsers() {
+  const users = getUsers();
+  let changed = false;
+  Object.keys(users).forEach(email => {
+    if (users[email].roll === undefined) {
+      users[email].roll = '';
+      changed = true;
+    }
+  });
+  if (changed) saveUsers(users);
+})();
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
@@ -86,8 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const users = getUsers();
 
-      // ── Already registered → must use Login instead ──
+      // ── Already registered ──
       if (users[email]) {
+        // Old account missing roll number + same password → patch it (one-time migration)
+        if (!users[email].roll && users[email].password === password) {
+          users[email].roll = roll;
+          saveUsers(users);
+          showError(registerForm, '✅ Account updated! You can now log in with your Roll Number or Email.');
+          return;
+        }
         showError(registerForm, 'An account with this email already exists. Please log in instead.');
         return;
       }
