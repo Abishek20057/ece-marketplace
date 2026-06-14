@@ -1,16 +1,13 @@
 // ============================================
-// Kalam Hub — STOCK MANAGEMENT v4
+// Kalam Hub — STOCK MANAGEMENT v5
 // Source of truth: Google Sheet (Inventory tab)
-// Syncs both STOCK and PRICES to marketplace
+// NO cache — always fetches live on page load
 // ============================================
 
 const WEB_APP_URL_STOCK =
 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
-const STOCK_KEY    = 'kalam_stock_v4';
-const STOCK_TTL_MS = 30 * 1000; // 30 seconds
-
-// Fallback stock (used only while first fetch is loading)
+// Fallback stock (used only while fetch is in progress)
 const DEFAULT_STOCK = {
    1: 30,  2:  3,  3: 11,  4: 20,  5:  1,  6:  7,  7:  7,  8:  4,  9:  6, 10:  8,
   11:  1, 12: 11, 13:  3, 14:  1, 15:  2, 16:  1, 17:  8, 18:  2, 19:  2, 20:  4,
@@ -19,44 +16,47 @@ const DEFAULT_STOCK = {
   41:  2, 42:  4, 43:  2, 44:  3
 };
 
-let _liveStock    = null; // { id: qty }
-let _livePrices   = null; // { id: { tempPrice, permPrice } }
+let _liveStock  = null; // { id: qty }
+let _livePrices = null; // { id: { tempPrice, permPrice, imageUrl } }
+let _fetchDone  = false;
 let _fetchPromise = null;
 
-// ── Cache: stores BOTH stock AND prices ──
-function _readCache() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(STOCK_KEY) || 'null');
-    if (!raw || !raw.ts || !raw.stock) return null;
-    if (Date.now() - raw.ts > STOCK_TTL_MS) return null; // stale
-    return raw;
-  } catch(e) { return null; }
-}
+// ── Apply live prices + stock + images to COMPONENTS[] ──
+function _patchComponents(inv) {
+  if (!Array.isArray(inv) || typeof COMPONENTS === 'undefined') return;
 
-function _writeCache(stock, prices) {
-  try {
-    localStorage.setItem(STOCK_KEY, JSON.stringify({
-      ts: Date.now(),
-      stock,
-      prices
-    }));
-  } catch(e) {}
-}
-
-// ── Patch COMPONENTS[] with live prices from Sheet ──
-function _patchPrices(prices) {
-  if (!prices || typeof COMPONENTS === 'undefined') return;
-  Object.entries(prices).forEach(([idStr, p]) => {
-    const id   = Number(idStr);
+  inv.forEach(c => {
+    const id   = Number(c.id);
     const comp = COMPONENTS.find(x => x.id === id);
+
     if (comp) {
-      if (p.tempPrice !== undefined) comp.tempPrice = p.tempPrice;
-      if (p.permPrice !== undefined) comp.permPrice = p.permPrice;
+      // Update existing component
+      if (c.stock     !== undefined) comp.stock     = Number(c.stock);
+      if (c.tempPrice !== undefined) comp.tempPrice = Number(c.tempPrice);
+      if (c.permPrice !== undefined) comp.permPrice = Number(c.permPrice);
+      if (c.imageUrl  && c.imageUrl.trim()) comp.image = c.imageUrl.trim();
+    } else {
+      // Brand-new component added via admin — inject into COMPONENTS array
+      COMPONENTS.push({
+        id,
+        name:          c.name          || 'Component',
+        icon:          c.icon          || '📦',
+        category:      c.category      || 'common',
+        categoryLabel: c.categoryLabel || 'Common',
+        tempPrice:     Number(c.tempPrice) || 0,
+        permPrice:     Number(c.permPrice) || 0,
+        stock:         Number(c.stock)     || 0,
+        image:         c.imageUrl || '',
+        description:   c.description || '',
+        features:      [],
+        type:          ['temporary', 'permanent'],
+        project:       'Kalam Hub Inventory'
+      });
     }
   });
 }
 
-// ── Fetch live inventory from Sheet ──
+// ── Fetch all inventory from Sheet ──
 function _fetchLive() {
   if (_fetchPromise) return _fetchPromise;
 
@@ -64,77 +64,62 @@ function _fetchLive() {
     .then(r => r.json())
     .then(inv => {
       _fetchPromise = null;
+      _fetchDone    = true;
 
-      if (!Array.isArray(inv) || inv.length === 0) return null;
+      if (!Array.isArray(inv) || inv.length === 0) return;
 
-      const stock  = {};
-      const prices = {};
-
+      // Build quick-access maps
+      const stockMap  = {};
+      const priceMap  = {};
       inv.forEach(c => {
         const id = Number(c.id);
-        stock[id] = Number(c.stock);
-        prices[id] = {
+        stockMap[id] = Number(c.stock);
+        priceMap[id] = {
           tempPrice: Number(c.tempPrice),
-          permPrice: Number(c.permPrice)
+          permPrice: Number(c.permPrice),
+          imageUrl:  c.imageUrl || ''
         };
       });
+      _liveStock  = stockMap;
+      _livePrices = priceMap;
 
-      _liveStock  = stock;
-      _livePrices = prices;
-      _writeCache(stock, prices);
+      // Patch COMPONENTS[] with live data
+      _patchComponents(inv);
 
-      // Patch COMPONENTS[] with live prices then re-render
-      _patchPrices(prices);
+      // Re-render marketplace with updated data
       if (typeof renderGrid === 'function') renderGrid();
 
-      console.log('[Kalam Hub] Stock + Prices synced from Sheet ✓');
-      return stock;
+      console.log('[Kalam Hub] Live inventory synced ✓', Object.keys(stockMap).length, 'components');
     })
     .catch(err => {
       _fetchPromise = null;
-      console.warn('[Kalam Hub] Fetch failed, using cache/defaults:', err.message);
-      return null;
+      console.warn('[Kalam Hub] Inventory fetch failed:', err.message);
     });
 
   return _fetchPromise;
 }
 
-// ── Init: load from cache or defaults, then fetch live ──
-function _ensureStock() {
-  if (_liveStock) return _liveStock;
-
-  const cached = _readCache();
-  if (cached) {
-    _liveStock  = cached.stock;
-    _livePrices = cached.prices || null;
-    // Apply cached prices immediately (no wait for fetch)
-    _patchPrices(_livePrices);
-    // Refresh in background
-    _fetchLive();
-    return _liveStock;
-  }
-
-  // No cache — use defaults, fetch in background
-  _liveStock = { ...DEFAULT_STOCK };
-  _fetchLive();
-  return _liveStock;
-}
-
-// ── Public API (identical signatures to old stock.js) ──
+// ── Public API ──────────────────────────────────
 
 function getStock(id) {
-  const s   = _ensureStock();
-  const qty = s[Number(id)];
-  return qty !== undefined ? qty : (DEFAULT_STOCK[Number(id)] ?? 5);
+  // If live data available, use it; otherwise use DEFAULT_STOCK
+  if (_liveStock) {
+    const qty = _liveStock[Number(id)];
+    return qty !== undefined ? qty : (DEFAULT_STOCK[Number(id)] ?? 5);
+  }
+  return DEFAULT_STOCK[Number(id)] ?? 5;
 }
 
 function decrementStock(id) {
-  const s = _ensureStock();
+  if (!_liveStock) return false;
   const n = Number(id);
-  if (s[n] === undefined || s[n] <= 0) return false;
-  s[n]--;
-  _liveStock = s;
-  _writeCache(s, _livePrices);
+  if (_liveStock[n] === undefined || _liveStock[n] <= 0) return false;
+  _liveStock[n]--;
+  // Also patch COMPONENTS[]
+  if (typeof COMPONENTS !== 'undefined') {
+    const comp = COMPONENTS.find(x => x.id === n);
+    if (comp) comp.stock = _liveStock[n];
+  }
   return true;
 }
 
@@ -148,9 +133,9 @@ function stockBadgeHTML(id) {
 function resetStock() {
   _liveStock  = null;
   _livePrices = null;
-  try { localStorage.removeItem(STOCK_KEY); } catch(e) {}
+  _fetchDone  = false;
   _fetchLive();
 }
 
-// Start fetching immediately on script load
+// Fetch immediately on script load — no cache
 _fetchLive();

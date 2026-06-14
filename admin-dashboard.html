@@ -252,6 +252,10 @@ td{ padding:15px; border-top:1px solid rgba(255,255,255,.05); font-size:14px; }
         <label>Description</label>
         <input type="text" id="nc-desc" placeholder="Short description of the component" />
       </div>
+      <div class="form-group full">
+        <label>Image URL (direct link to component photo)</label>
+        <input type="url" id="nc-image" placeholder="https://example.com/image.jpg  (or leave empty to use icon)" />
+      </div>
       <div class="form-group">
         <label>Icon (emoji)</label>
         <input type="text" id="nc-icon" value="📦" placeholder="📦" maxlength="4" />
@@ -575,7 +579,8 @@ async function addComponent() {
         categoryLabel: catLabel,
         tempPrice: temp,
         permPrice: perm,
-        stock
+        stock,
+        imageUrl: document.getElementById('nc-image').value.trim()
       })
     });
     const data = await res.json();
@@ -590,6 +595,7 @@ async function addComponent() {
       document.getElementById('nc-temp').value    = '20';
       document.getElementById('nc-perm').value    = '0';
       document.getElementById('nc-stock').value   = '0';
+      document.getElementById('nc-image').value   = '';
       // Reload inventory
       loadInventory();
     } else {
