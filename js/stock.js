@@ -43,13 +43,24 @@ function _fetchLive() {
     .then(inv => {
       const map = {};
       if (Array.isArray(inv)) {
-        inv.forEach(c => { map[Number(c.id)] = Number(c.stock); });
+        inv.forEach(c => {
+          const id = Number(c.id);
+          map[id] = Number(c.stock);
+
+          // ── Also update prices in COMPONENTS[] so marketplace shows live prices ──
+          if (typeof COMPONENTS !== 'undefined') {
+            const comp = COMPONENTS.find(x => x.id === id);
+            if (comp) {
+              if (c.tempPrice !== undefined) comp.tempPrice = Number(c.tempPrice);
+              if (c.permPrice !== undefined) comp.permPrice = Number(c.permPrice);
+            }
+          }
+        });
       }
       if (Object.keys(map).length > 0) {
         _liveStock = map;
         _writeCache(map);
-        console.log('[Kalam Hub] Live stock loaded from Sheet:', map);
-        // Re-render marketplace with live data
+        console.log('[Kalam Hub] Live stock + prices loaded from Sheet');
         if (typeof renderGrid === 'function') renderGrid();
       }
       _fetchPromise = null;
