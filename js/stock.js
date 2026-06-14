@@ -1,103 +1,113 @@
 // ============================================
-// Kalam Hub — STOCK MANAGEMENT
-// localStorage-based stock tracking
+// Kalam Hub — STOCK MANAGEMENT v3
+// Source of truth: Google Sheet (Inventory tab)
+// localStorage = 30-second cache only
 // ============================================
 
+const WEB_APP_URL_STOCK =
+'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
+
+const STOCK_KEY    = 'kalam_stock_v3';
+const STOCK_TTL_MS = 30 * 1000; // 30 seconds
+
+// Fallback: used only while first fetch loads or if offline
 const DEFAULT_STOCK = {
-   1: 30,  // Arduino UNO
-   2:  3,  // ESP32
-   3: 11,  // NodeMCU ESP8266
-   4:  20,  // LCD Display
-   5:  1,  // OLED Display
-   6:  7,  // Smoke Sensor
-   7:  7,  // Soil Moisture
-   8:  4,  // Flame Sensor
-   9:  6,  // IR Sensor
-  10:  8,  // Ultrasonic HC-SR04
-  11:  1,  // LDR Sensor
-  12:  11,  // DHT11/DHT22
-  13:  3,  // Rain Sensor
-  14:  1,  // Vibration Sensor
-  15:  2,  // Tilt Sensor
-  16:  1,  // MPU6050
-  17:  8,  // Single Relay
-  18:  2,  // 2-Ch Relay
-  19:  2,  // 4-Ch Relay
-  20:  4,  // DC Motor
-  21:  5,  // Servo Motor
-  22:  6,  // Motor Driver
-  23:  2,  // Bluetooth HC-05
-  24:  1,  // RFID RC522
-  25:  3,  // GSM Module
-  26:  3,  // GPS Module
-  27:  5,  // DC-DC Booster
-  28: 11,  // Batteries
-  29:  3,  // Solar Panels
-  30:  8,  // Power Adapters
-  31: 5,  // Buzzer
-  32: 5,  // Breadboard
-  33: 50,  // Jumper Wires
-  34: 5,  // LEDs
-  35: 7,  // Push Buttons
-  36:  9,  // Li-Ion 18650
-  37:  9,  // Water Pump
-  38:  5,  // Mini Breadboard
-  39:  4,  // Mini DC Fan
-  40:  5,  // 18650 Battery Holder
-  41:  2,  // Fingerprint Sensor
-  42:  4,  // HW-131 Battery Holder
-  43:  2,  // Step-Down Transformer
-  44:  3,  // Arduino UNO SMD
+   1: 30,  2:  3,  3: 11,  4: 20,  5:  1,  6:  7,  7:  7,  8:  4,  9:  6, 10:  8,
+  11:  1, 12: 11, 13:  3, 14:  1, 15:  2, 16:  1, 17:  8, 18:  2, 19:  2, 20:  4,
+  21:  5, 22:  6, 23:  2, 24:  1, 25:  3, 26:  3, 27:  5, 28: 11, 29:  3, 30:  8,
+  31:  5, 32:  5, 33: 50, 34:  5, 35:  7, 36:  9, 37:  9, 38:  5, 39:  4, 40:  5,
+  41:  2, 42:  4, 43:  2, 44:  3
 };
 
-const STOCK_KEY = 'ece_stock';
+let _liveStock    = null;
+let _fetchPromise = null;
 
-// ── Init: load from localStorage OR set defaults ──
-function initStock() {
-  const saved = localStorage.getItem(STOCK_KEY);
-  if (!saved) {
-    localStorage.setItem(STOCK_KEY, JSON.stringify(DEFAULT_STOCK));
-    return { ...DEFAULT_STOCK };
+function _readCache() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STOCK_KEY) || 'null');
+    if (!raw || !raw.ts || !raw.data) return null;
+    if (Date.now() - raw.ts > STOCK_TTL_MS) return null;
+    return raw.data;
+  } catch(e) { return null; }
+}
+
+function _writeCache(data) {
+  try { localStorage.setItem(STOCK_KEY, JSON.stringify({ ts: Date.now(), data })); }
+  catch(e) {}
+}
+
+function _fetchLive() {
+  if (_fetchPromise) return _fetchPromise;
+  _fetchPromise = fetch(WEB_APP_URL_STOCK + '?action=getInventory')
+    .then(r => r.json())
+    .then(inv => {
+      const map = {};
+      if (Array.isArray(inv)) {
+        inv.forEach(c => { map[Number(c.id)] = Number(c.stock); });
+      }
+      if (Object.keys(map).length > 0) {
+        _liveStock = map;
+        _writeCache(map);
+        console.log('[Kalam Hub] Live stock loaded from Sheet:', map);
+        // Re-render marketplace with live data
+        if (typeof renderGrid === 'function') renderGrid();
+      }
+      _fetchPromise = null;
+      return map;
+    })
+    .catch(err => {
+      console.warn('[Kalam Hub] Stock fetch failed, using cache/defaults:', err.message);
+      _fetchPromise = null;
+      return null;
+    });
+  return _fetchPromise;
+}
+
+function _ensureStock() {
+  if (_liveStock) return _liveStock;
+
+  const cached = _readCache();
+  if (cached) {
+    _liveStock = cached;
+    _fetchLive(); // refresh in background
+    return _liveStock;
   }
-  // Merge: add any new IDs that aren't in saved
-  const current = JSON.parse(saved);
-  let changed = false;
-  Object.entries(DEFAULT_STOCK).forEach(([id, qty]) => {
-    if (current[id] === undefined) { current[id] = qty; changed = true; }
-  });
-  if (changed) localStorage.setItem(STOCK_KEY, JSON.stringify(current));
-  return current;
+
+  _liveStock = { ...DEFAULT_STOCK };
+  _fetchLive(); // fetch real data in background
+  return _liveStock;
 }
 
-// ── Get stock for one component ──
+// ── Public API (same signatures as old stock.js) ──
+
 function getStock(id) {
-  const stock = initStock();
-  return stock[id] !== undefined ? stock[id] : 5;
+  const s = _ensureStock();
+  const qty = s[Number(id)];
+  return qty !== undefined ? qty : (DEFAULT_STOCK[Number(id)] ?? 5);
 }
 
-// ── Decrement stock by 1 ──
 function decrementStock(id) {
-  const stock = initStock();
-  if (stock[id] === undefined) return false;
-  if (stock[id] <= 0) return false; // already out of stock
-  stock[id] = stock[id] - 1;
-  localStorage.setItem(STOCK_KEY, JSON.stringify(stock));
+  const s = _ensureStock();
+  const n = Number(id);
+  if (s[n] === undefined || s[n] <= 0) return false;
+  s[n]--;
+  _liveStock = s;
+  _writeCache(s);
   return true;
 }
 
-// ── Reset all to defaults (admin use) ──
-function resetStock() {
-  localStorage.setItem(STOCK_KEY, JSON.stringify(DEFAULT_STOCK));
-}
-
-// ── Stock badge HTML ──
 function stockBadgeHTML(id) {
   const qty = getStock(id);
-  if (qty <= 0) {
-    return `<span class="stock-badge stock-out">SOLD OUT</span>`;
-  } else if (qty <= 3) {
-    return `<span class="stock-badge stock-low">⚠ Only ${qty} left</span>`;
-  } else {
-    return `<span class="stock-badge stock-ok">${qty} in stock</span>`;
-  }
+  if (qty <= 0) return `<span class="stock-badge stock-out">SOLD OUT</span>`;
+  if (qty <= 3) return `<span class="stock-badge stock-low">⚠ Only ${qty} left</span>`;
+  return `<span class="stock-badge stock-ok">${qty} in stock</span>`;
 }
+
+function resetStock() {
+  _liveStock = null;
+  try { localStorage.removeItem(STOCK_KEY); } catch(e) {}
+  _fetchLive();
+}
+
+// Start fetching immediately on script load
+_fetchLive();
