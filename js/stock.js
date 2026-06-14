@@ -1,16 +1,16 @@
 // ============================================
-// Kalam Hub — STOCK MANAGEMENT v3
+// Kalam Hub — STOCK MANAGEMENT v4
 // Source of truth: Google Sheet (Inventory tab)
-// localStorage = 30-second cache only
+// Syncs both STOCK and PRICES to marketplace
 // ============================================
 
 const WEB_APP_URL_STOCK =
 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
-const STOCK_KEY    = 'kalam_stock_v3';
+const STOCK_KEY    = 'kalam_stock_v4';
 const STOCK_TTL_MS = 30 * 1000; // 30 seconds
 
-// Fallback: used only while first fetch loads or if offline
+// Fallback stock (used only while first fetch is loading)
 const DEFAULT_STOCK = {
    1: 30,  2:  3,  3: 11,  4: 20,  5:  1,  6:  7,  7:  7,  8:  4,  9:  6, 10:  8,
   11:  1, 12: 11, 13:  3, 14:  1, 15:  2, 16:  1, 17:  8, 18:  2, 19:  2, 20:  4,
@@ -19,80 +19,111 @@ const DEFAULT_STOCK = {
   41:  2, 42:  4, 43:  2, 44:  3
 };
 
-let _liveStock    = null;
+let _liveStock    = null; // { id: qty }
+let _livePrices   = null; // { id: { tempPrice, permPrice } }
 let _fetchPromise = null;
 
+// ── Cache: stores BOTH stock AND prices ──
 function _readCache() {
   try {
     const raw = JSON.parse(localStorage.getItem(STOCK_KEY) || 'null');
-    if (!raw || !raw.ts || !raw.data) return null;
-    if (Date.now() - raw.ts > STOCK_TTL_MS) return null;
-    return raw.data;
+    if (!raw || !raw.ts || !raw.stock) return null;
+    if (Date.now() - raw.ts > STOCK_TTL_MS) return null; // stale
+    return raw;
   } catch(e) { return null; }
 }
 
-function _writeCache(data) {
-  try { localStorage.setItem(STOCK_KEY, JSON.stringify({ ts: Date.now(), data })); }
-  catch(e) {}
+function _writeCache(stock, prices) {
+  try {
+    localStorage.setItem(STOCK_KEY, JSON.stringify({
+      ts: Date.now(),
+      stock,
+      prices
+    }));
+  } catch(e) {}
 }
 
+// ── Patch COMPONENTS[] with live prices from Sheet ──
+function _patchPrices(prices) {
+  if (!prices || typeof COMPONENTS === 'undefined') return;
+  Object.entries(prices).forEach(([idStr, p]) => {
+    const id   = Number(idStr);
+    const comp = COMPONENTS.find(x => x.id === id);
+    if (comp) {
+      if (p.tempPrice !== undefined) comp.tempPrice = p.tempPrice;
+      if (p.permPrice !== undefined) comp.permPrice = p.permPrice;
+    }
+  });
+}
+
+// ── Fetch live inventory from Sheet ──
 function _fetchLive() {
   if (_fetchPromise) return _fetchPromise;
+
   _fetchPromise = fetch(WEB_APP_URL_STOCK + '?action=getInventory')
     .then(r => r.json())
     .then(inv => {
-      const map = {};
-      if (Array.isArray(inv)) {
-        inv.forEach(c => {
-          const id = Number(c.id);
-          map[id] = Number(c.stock);
-
-          // ── Also update prices in COMPONENTS[] so marketplace shows live prices ──
-          if (typeof COMPONENTS !== 'undefined') {
-            const comp = COMPONENTS.find(x => x.id === id);
-            if (comp) {
-              if (c.tempPrice !== undefined) comp.tempPrice = Number(c.tempPrice);
-              if (c.permPrice !== undefined) comp.permPrice = Number(c.permPrice);
-            }
-          }
-        });
-      }
-      if (Object.keys(map).length > 0) {
-        _liveStock = map;
-        _writeCache(map);
-        console.log('[Kalam Hub] Live stock + prices loaded from Sheet');
-        if (typeof renderGrid === 'function') renderGrid();
-      }
       _fetchPromise = null;
-      return map;
+
+      if (!Array.isArray(inv) || inv.length === 0) return null;
+
+      const stock  = {};
+      const prices = {};
+
+      inv.forEach(c => {
+        const id = Number(c.id);
+        stock[id] = Number(c.stock);
+        prices[id] = {
+          tempPrice: Number(c.tempPrice),
+          permPrice: Number(c.permPrice)
+        };
+      });
+
+      _liveStock  = stock;
+      _livePrices = prices;
+      _writeCache(stock, prices);
+
+      // Patch COMPONENTS[] with live prices then re-render
+      _patchPrices(prices);
+      if (typeof renderGrid === 'function') renderGrid();
+
+      console.log('[Kalam Hub] Stock + Prices synced from Sheet ✓');
+      return stock;
     })
     .catch(err => {
-      console.warn('[Kalam Hub] Stock fetch failed, using cache/defaults:', err.message);
       _fetchPromise = null;
+      console.warn('[Kalam Hub] Fetch failed, using cache/defaults:', err.message);
       return null;
     });
+
   return _fetchPromise;
 }
 
+// ── Init: load from cache or defaults, then fetch live ──
 function _ensureStock() {
   if (_liveStock) return _liveStock;
 
   const cached = _readCache();
   if (cached) {
-    _liveStock = cached;
-    _fetchLive(); // refresh in background
+    _liveStock  = cached.stock;
+    _livePrices = cached.prices || null;
+    // Apply cached prices immediately (no wait for fetch)
+    _patchPrices(_livePrices);
+    // Refresh in background
+    _fetchLive();
     return _liveStock;
   }
 
+  // No cache — use defaults, fetch in background
   _liveStock = { ...DEFAULT_STOCK };
-  _fetchLive(); // fetch real data in background
+  _fetchLive();
   return _liveStock;
 }
 
-// ── Public API (same signatures as old stock.js) ──
+// ── Public API (identical signatures to old stock.js) ──
 
 function getStock(id) {
-  const s = _ensureStock();
+  const s   = _ensureStock();
   const qty = s[Number(id)];
   return qty !== undefined ? qty : (DEFAULT_STOCK[Number(id)] ?? 5);
 }
@@ -103,7 +134,7 @@ function decrementStock(id) {
   if (s[n] === undefined || s[n] <= 0) return false;
   s[n]--;
   _liveStock = s;
-  _writeCache(s);
+  _writeCache(s, _livePrices);
   return true;
 }
 
@@ -115,7 +146,8 @@ function stockBadgeHTML(id) {
 }
 
 function resetStock() {
-  _liveStock = null;
+  _liveStock  = null;
+  _livePrices = null;
   try { localStorage.removeItem(STOCK_KEY); } catch(e) {}
   _fetchLive();
 }
