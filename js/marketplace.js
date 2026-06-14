@@ -17,7 +17,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.filter-check input[value="temporary"]').forEach(el => el.checked = false);
   }
 
+  // Render immediately with static data (fast first paint)...
   renderGrid();
+
+  // ...then re-render with live prices/stock/new-components once ready.
+  // Also flips a global flag so Borrow/Buy clicks always use fresh data.
+  window.KALAM_INVENTORY_LOADED = false;
+  if (window.KALAM_INVENTORY_READY && typeof window.KALAM_INVENTORY_READY.then === 'function') {
+    window.KALAM_INVENTORY_READY.then(() => {
+      window.KALAM_INVENTORY_LOADED = true;
+      renderGrid();
+    });
+  } else {
+    window.KALAM_INVENTORY_LOADED = true;
+  }
 
   document.getElementById('search-input').addEventListener('input', renderGrid);
   document.getElementById('sort-select').addEventListener('change', renderGrid);
@@ -288,9 +301,14 @@ function openModal(c) {
 
 // ── Borrow (Temporary) ─────────────────────────────────────
 function handleBorrow(id, name, amount) {
+  // Safety: re-check against current COMPONENTS in case live data
+  // loaded after the card was first rendered.
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
+  const finalAmount = (comp && comp.tempPrice !== undefined && comp.tempPrice !== null) ? comp.tempPrice : amount;
+
   const loggedIn = localStorage.getItem('ece_logged_in') === 'true';
   // Must go through payment first — same as Buy flow
-  const dest = `payment.html?id=${id}&name=${name}&price=${amount}&type=temporary`;
+  const dest = `payment.html?id=${id}&name=${name}&price=${finalAmount}&type=temporary`;
   if (loggedIn) {
     window.location.href = dest;
   } else {
@@ -301,8 +319,11 @@ function handleBorrow(id, name, amount) {
 
 // ── Buy (Permanent) ────────────────────────────────────────
 function handleBuy(id, name, price) {
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
+  const finalPrice = (comp && comp.permPrice !== undefined && comp.permPrice !== null) ? comp.permPrice : price;
+
   const loggedIn = localStorage.getItem('ece_logged_in') === 'true';
-  const dest = `payment.html?id=${id}&name=${name}&price=${price}`;
+  const dest = `payment.html?id=${id}&name=${name}&price=${finalPrice}`;
   if (loggedIn) {
     window.location.href = dest;   // decrement on payment success
   } else {

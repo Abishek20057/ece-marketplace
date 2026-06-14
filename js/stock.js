@@ -113,6 +113,10 @@ function _fetchLive() {
   return _fetchPromise;
 }
 
+// ── Global promise other scripts can await before rendering / navigating ──
+window.KALAM_INVENTORY_READY = _fetchLive();
+
+
 // ── Public API ──────────────────────────────────
 
 function getStock(id) {
@@ -150,6 +154,3 @@ function resetStock() {
   _fetchDone  = false;
   _fetchLive();
 }
-
-// Fetch immediately on script load — no cache
-_fetchLive();
