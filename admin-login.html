@@ -317,7 +317,10 @@
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input id="password" type="password" placeholder="Enter password" required />
+            <div class="password-field" style="position:relative;display:flex;">
+              <input id="password" type="password" placeholder="Enter password" required style="flex:1;" />
+              <button type="button" onclick="toggleAdminPw()" id="adminPwBtn" style="position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁</button>
+            </div>
           </div>
 
           <button class="btn btn-primary" id="loginBtn" type="submit">Login to Dashboard</button>
@@ -328,6 +331,14 @@
           <span>Login only. No sign up.</span>
           <a class="link" href="index.html">Back to site</a>
         </div>
+        <script>
+          function toggleAdminPw() {
+            const inp = document.getElementById('password');
+            const btn = document.getElementById('adminPwBtn');
+            if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+            else { inp.type = 'password'; btn.textContent = '👁'; }
+          }
+        </script>
       </section>
     </div>
   </div>

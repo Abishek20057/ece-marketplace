@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         localStorage.setItem('ece_logged_in', 'true');
         localStorage.setItem('ece_user', email);
+        localStorage.setItem('ece_user_name', users[email].name || email.split('@')[0]);
+        localStorage.setItem('ece_user_email', email);
 
         const redirect = localStorage.getItem('ece_after_login');
         if (redirect) {
@@ -89,6 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('ece_logged_in', 'true');
         localStorage.setItem('ece_user', email);
+        localStorage.setItem('ece_user_name', name);
+        localStorage.setItem('ece_user_email', email);
         const redirect = localStorage.getItem('ece_after_login');
         if (redirect) {
           localStorage.removeItem('ece_after_login');
