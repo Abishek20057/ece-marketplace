@@ -1311,3 +1311,38 @@ input, textarea, select {
 .footer-links a:hover { padding-left: 4px; }
 
 /* ── Scroll observer script helper ── */
+/* ── GLOBAL BACK BUTTON ─────────────────────────────────── */
+#global-back-btn {
+  position: fixed;
+  top: 90px;
+  left: 1.25rem;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+#global-back-btn:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+  transform: translateX(-3px);
+}
+@media (max-width: 768px) {
+  #global-back-btn {
+    top: 75px;
+    left: 0.75rem;
+    font-size: 0.78rem;
+    padding: 0.45rem 0.85rem;
+  }
+}

@@ -21,27 +21,37 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim().toLowerCase();
+      const input    = document.getElementById('email').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
 
-      if (!email || !password) {
+      if (!input || !password) {
         showError(loginForm, 'Please fill in all fields.');
         return;
       }
 
       const users = getUsers();
 
+      // ── Find user by email key OR by stored roll number ──
+      let foundEmail = null;
+      if (users[input]) {
+        foundEmail = input;
+      } else {
+        foundEmail = Object.keys(users).find(e => (users[e].roll || '').toLowerCase() === input);
+      }
+
       // ── New user trying to log in directly → block ──
-      if (!users[email]) {
-        showError(loginForm, 'No account found with this email. Please sign up first.');
+      if (!foundEmail) {
+        showError(loginForm, 'No account found. Please sign up first.');
         return;
       }
 
       // ── Existing user → check password ──
-      if (users[email].password !== password) {
+      if (users[foundEmail].password !== password) {
         showError(loginForm, 'Incorrect password. Please try again.');
         return;
       }
+
+      const email = foundEmail;
 
       const btn = loginForm.querySelector('button');
       showLoading(btn, 'Signing in…');
@@ -49,8 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         localStorage.setItem('ece_logged_in', 'true');
         localStorage.setItem('ece_user', email);
-        localStorage.setItem('ece_user_name', users[email].name || email.split('@')[0]);
-        localStorage.setItem('ece_user_email', email);
 
         const redirect = localStorage.getItem('ece_after_login');
         if (redirect) {
@@ -66,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (registerForm) {
     registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
+      const name  = document.getElementById('name').value.trim();
+      const roll  = (document.getElementById('roll')?.value || '').trim().toLowerCase();
       const email = document.getElementById('email').value.trim().toLowerCase();
       const password = document.getElementById('password').value;
       const confirm = document.getElementById('confirm').value;
@@ -86,13 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
       showLoading(registerForm.querySelector('button'), 'Creating account…');
       setTimeout(() => {
         // Save new user
-        users[email] = { name, password };
+        users[email] = { name, roll, password };
         saveUsers(users);
 
         localStorage.setItem('ece_logged_in', 'true');
         localStorage.setItem('ece_user', email);
-        localStorage.setItem('ece_user_name', name);
-        localStorage.setItem('ece_user_email', email);
         const redirect = localStorage.getItem('ece_after_login');
         if (redirect) {
           localStorage.removeItem('ece_after_login');
