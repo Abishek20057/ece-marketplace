@@ -1025,3 +1025,282 @@ input, textarea, select {
   text-transform: uppercase;
   backdrop-filter: blur(2px);
 }
+
+/* ══════════════════════════════════════════════════════════
+   PROFESSIONAL ANIMATIONS & UPGRADES — Kalam Hub
+══════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes badgePop {
+  0%   { opacity: 0; transform: scale(0.8) translateY(-8px); }
+  70%  { transform: scale(1.05) translateY(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  50%       { box-shadow: 0 0 20px 6px rgba(59,130,246,0.25); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(59,130,246,0.3); }
+  50%       { border-color: rgba(59,130,246,0.8); }
+}
+
+/* ── Hero animations ── */
+.animate-fadein      { animation: fadeIn 0.9s ease both; }
+.animate-fadein-up   { animation: fadeInUp 0.8s ease both; animation-delay: 0.15s; }
+.animate-badge       { animation: badgePop 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+.hero-content .hero-badge    { animation: badgePop 0.6s ease both; }
+.hero-content .hero-title    { animation: fadeInUp 0.8s ease both 0.1s; }
+.hero-content .hero-subtitle { animation: fadeInUp 0.8s ease both 0.25s; }
+.hero-content .hero-cta      { animation: fadeInUp 0.8s ease both 0.4s; }
+.hero-content .hero-stats    { animation: fadeInUp 0.8s ease both 0.55s; }
+
+/* ── Stat numbers floating effect ── */
+.stat-num {
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+.stat:nth-child(3) .stat-num { animation-delay: 0.5s; }
+.stat:nth-child(5) .stat-num { animation-delay: 1s; }
+
+/* ── Navbar: subtle entrance ── */
+.navbar {
+  animation: fadeIn 0.5s ease both;
+}
+
+/* ── Cards: hover lift + glow ── */
+.component-card {
+  transition: transform 0.28s cubic-bezier(0.34,1.3,0.64,1),
+              box-shadow 0.28s ease,
+              border-color 0.28s ease !important;
+}
+.component-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(59,130,246,0.25) !important;
+}
+
+/* ── Plan cards: animated border on hover ── */
+.plan-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+.plan-card:hover {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+.plan-card.featured {
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+/* ── Buttons: micro-interactions ── */
+.btn {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.08);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.btn:hover::after { opacity: 1; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+.btn:active { transform: translateY(0); }
+.btn-primary:hover { box-shadow: 0 6px 24px rgba(59,130,246,0.45) !important; }
+
+/* ── Announce bar: smoother ticker ── */
+.announce-bar {
+  position: relative;
+  z-index: 99;
+  background: linear-gradient(135deg, #0a1628 0%, #111c35 50%, #0f2044 100%);
+  border-bottom: 1px solid rgba(59,130,246,0.25);
+  padding: 0.55rem 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.announce-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.announce-dot {
+  width: 8px; height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: glowPulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px #22c55e;
+}
+.announce-label {
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+  padding: 0.15rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+.announce-ticker {
+  flex: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+.announce-cta {
+  background: linear-gradient(135deg, var(--electric), #2563eb);
+  color: white;
+  padding: 0.3rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.announce-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.4); }
+
+/* ── Scroll-triggered animations ── */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34,1.2,0.64,1);
+}
+.animate-on-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── WHY KALAM HUB section ── */
+.why-section { background: var(--navy-mid); }
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+.why-card {
+  background: var(--navy-lite);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  cursor: default;
+}
+.why-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(59,130,246,0.4);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.why-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+.why-card h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.4rem;
+}
+.why-card p {
+  color: var(--slate);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* ── Training highlight: slide-in ── */
+.th-schedule  { animation: slideInLeft  0.8s ease both 0.2s; }
+.th-info      { animation: slideInRight 0.8s ease both 0.2s; }
+
+/* ── Training feat cards: hover ── */
+.th-feat {
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+.th-feat:hover {
+  transform: translateX(6px);
+  background: rgba(59,130,246,0.1) !important;
+  border-color: rgba(59,130,246,0.35) !important;
+}
+
+/* ── Tags: shimmer effect ── */
+.th-tag {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.th-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+}
+
+/* ── Price-free override — show borrow price, not "Free" ── */
+.price-free { color: var(--amber) !important; }
+
+/* ── Featured cards entrance ── */
+#featured-grid .component-card {
+  animation: fadeInUp 0.6s ease both;
+}
+#featured-grid .component-card:nth-child(1) { animation-delay: 0.05s; }
+#featured-grid .component-card:nth-child(2) { animation-delay: 0.12s; }
+#featured-grid .component-card:nth-child(3) { animation-delay: 0.19s; }
+#featured-grid .component-card:nth-child(4) { animation-delay: 0.26s; }
+
+/* ── Stock badges: pulse on low stock ── */
+.stock-low {
+  animation: glowPulse 2s ease-in-out infinite;
+  background: rgba(234,179,8,0.15) !important;
+  border-color: rgba(234,179,8,0.5) !important;
+  color: #eab308 !important;
+}
+.stock-out { opacity: 0.75; }
+
+/* ── Dept banner ── */
+.dept-banner {
+  background: linear-gradient(135deg, #0f2044, #1e3a5f) !important;
+  border-top: 1px solid rgba(59,130,246,0.2) !important;
+  border-bottom: 1px solid rgba(59,130,246,0.2) !important;
+}
+
+/* ── Footer links hover ── */
+.footer-links a {
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+.footer-links a:hover { padding-left: 4px; }
+
+/* ── Scroll observer script helper ── */

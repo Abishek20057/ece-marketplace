@@ -177,10 +177,10 @@ function buildCard(c) {
 
   const priceLabel = hasPerm
     ? `<span class="card-price price-paid">₹${c.permPrice}</span>`
-    : `<span class="card-price price-free">Free</span>`;
+    : `<span class="card-price price-free">₹${c.tempPrice} borrow</span>`;
 
   return `
-    <div class="component-card ${outOfStock ? 'card-sold-out' : ''}">
+    <div class="component-card animate-on-scroll ${outOfStock ? 'card-sold-out' : ''}">
       ${hasTemp ? `<div class="temp-fee-badge">₹${c.tempPrice} Temporary Access Fee</div>` : ''}
       <div class="card-img-wrap">
         ${imgSrc

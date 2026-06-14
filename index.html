@@ -62,15 +62,15 @@
   <!-- HERO -->
   <section class="hero">
     <canvas id="circuit-canvas"></canvas>
-    <div class="hero-content">
-      <div class="hero-badge">Kalam Hub — Component Exchange</div>
-      <h1 class="hero-title">
+    <div class="hero-content animate-fadein">
+      <div class="hero-badge animate-badge">Kalam Hub — Component Exchange</div>
+      <h1 class="hero-title animate-fadein-up">
         Build Smarter.<br/>
         <span class="gradient-text">Share Knowledge.</span>
       </h1>
       <p class="hero-subtitle">
-        Access reusable project components, circuits &amp; modules from the Kalam Hub inventory.
-        Borrow to learn, or purchase to build your own.
+        The ECE Department's component library — borrow for projects,
+        buy to keep, learn from seniors. From Arduino to IoT, we've got your build covered.
       </p>
       <div class="hero-cta">
         <a href="marketplace.html" class="btn btn-primary btn-lg">Browse Components</a>
@@ -139,7 +139,7 @@
 
         <!-- RIGHT: Training features -->
         <div class="th-info">
-          <span class="eyebrow">🎓 Free Initiative</span>
+          <span class="eyebrow">🎓 Live Training Initiative</span>
           <h2 class="th-title">Hands-On Training &amp; Workshops</h2>
           <p class="th-desc">
             Don't just borrow components — <strong>learn to build with them.</strong>
@@ -169,10 +169,10 @@
               </div>
             </div>
             <div class="th-feat">
-              <span class="feat-icon">🆓</span>
+              <span class="feat-icon">🚀</span>
               <div>
-                <strong>Completely Free</strong>
-                <p>No fee. Just show up during lab hours and start building.</p>
+                <strong>Project Showcase Ready</strong>
+                <p>Build real working prototypes you can demo at fests and placements.</p>
               </div>
             </div>
           </div>
@@ -214,7 +214,7 @@
             <span class="price-value">₹20</span>
             <span class="price-period">/ temporary fee</span>
           </div>
-          <a href="marketplace.html?type=temporary" class="btn btn-outline btn-full">Browse Free</a>
+          <a href="marketplace.html?type=temporary" class="btn btn-outline btn-full">Browse Components</a>
         </div>
 
         <div class="plan-card plan-perm featured">
@@ -249,6 +249,51 @@
         <a href="marketplace.html" class="see-all">See All →</a>
       </div>
       <div class="components-grid" id="featured-grid"></div>
+    </div>
+  </section>
+
+  <!-- WHY KALAM HUB -->
+  <section class="section why-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Why Choose Us</span>
+        <h2>Everything You Need to Build</h2>
+        <p style="color:var(--slate);max-width:540px;margin:0.75rem auto 0;font-size:1rem;line-height:1.6;">
+          From borrowing a sensor to buying a dev board, Kalam Hub makes sure no project is ever stuck waiting for parts.
+        </p>
+      </div>
+      <div class="why-grid">
+        <div class="why-card animate-on-scroll">
+          <div class="why-icon">⚡</div>
+          <h4>Instant Access</h4>
+          <p>Components available same-day from the lab desk. No shipping, no waiting.</p>
+        </div>
+        <div class="why-card animate-on-scroll" style="animation-delay:0.1s">
+          <div class="why-icon">🔒</div>
+          <h4>Verified Payments</h4>
+          <p>UPI-based payments with screenshot verification. Every transaction tracked.</p>
+        </div>
+        <div class="why-card animate-on-scroll" style="animation-delay:0.2s">
+          <div class="why-icon">📊</div>
+          <h4>Live Inventory</h4>
+          <p>Real-time stock counts. Know exactly what's available before you visit.</p>
+        </div>
+        <div class="why-card animate-on-scroll" style="animation-delay:0.3s">
+          <div class="why-icon">🎓</div>
+          <h4>Learn While You Build</h4>
+          <p>Senior mentors and faculty available Mon–Sat. Hands-on guidance included.</p>
+        </div>
+        <div class="why-card animate-on-scroll" style="animation-delay:0.4s">
+          <div class="why-icon">💰</div>
+          <h4>Budget-Friendly</h4>
+          <p>Borrow for ₹20. Buy permanently at department rates far below retail.</p>
+        </div>
+        <div class="why-card animate-on-scroll" style="animation-delay:0.5s">
+          <div class="why-icon">🏆</div>
+          <h4>Fest & Placement Ready</h4>
+          <p>Build projects that impress. We stock everything needed for real demos.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -299,5 +344,44 @@
   <script src="js/main.js"></script>
   <script src="js/circuit.js"></script>
   <script src="js/nav.js"></script>
+
+  <script>
+    // Scroll-triggered animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    // Smooth counter animation for stat numbers
+    function animateCount(el, end, duration) {
+      let start = 0, step = end / (duration / 16);
+      const run = () => {
+        start += step;
+        el.textContent = Math.min(Math.round(start), end) + '+';
+        if (start < end) requestAnimationFrame(run);
+      };
+      requestAnimationFrame(run);
+    }
+    // trigger on view
+    const statObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const nums = e.target.querySelectorAll('.stat-num');
+          nums.forEach(n => {
+            const val = parseInt(n.textContent);
+            if (!isNaN(val)) animateCount(n, val, 1200);
+          });
+          statObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    const statsEl = document.querySelector('.hero-stats');
+    if (statsEl) statObs.observe(statsEl);
+  </script>
 </body>
 </html>
