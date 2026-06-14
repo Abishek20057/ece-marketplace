@@ -37,11 +37,16 @@ function _patchComponents(inv) {
       if (c.imageUrl  && c.imageUrl.trim()) comp.image = c.imageUrl.trim();
     } else {
       // Brand-new component added via admin — inject into COMPONENTS array
+      // Map unknown categories to 'common' so sidebar filter always includes them
+      const VALID_CATEGORIES = ['microcontroller','sensor','display','relay','motor','communication','power','audio','common'];
+      const rawCat = (c.category || 'common').toLowerCase().trim();
+      const safeCat = VALID_CATEGORIES.includes(rawCat) ? rawCat : 'common';
+
       COMPONENTS.push({
         id,
         name:          c.name          || 'Component',
         icon:          c.icon          || '📦',
-        category:      c.category      || 'common',
+        category:      safeCat,
         categoryLabel: c.categoryLabel || 'Common',
         tempPrice:     Number(c.tempPrice) || 0,
         permPrice:     Number(c.permPrice) || 0,

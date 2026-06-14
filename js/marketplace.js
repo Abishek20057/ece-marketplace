@@ -54,7 +54,7 @@ function renderGrid() {
   let filtered = COMPONENTS.filter(c => {
     if (!c.type || !c.type.some(t => types.includes(t))) return false;
     if (categories.length && !categories.includes(c.category)) return false;
-    if (search && !c.name.toLowerCase().includes(search) && !c.description.toLowerCase().includes(search)) return false;
+    if (search && !c.name.toLowerCase().includes(search) && !(c.description||'').toLowerCase().includes(search)) return false;
     if (c.permPrice !== null && c.permPrice > maxPrice) return false;
     return true;
   });
