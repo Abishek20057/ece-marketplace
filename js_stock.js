@@ -1,14 +1,16 @@
 // ============================================
-// Kalam Hub — STOCK MANAGEMENT (v2)
-// Live stock from Google Sheet "Inventory" tab,
-// with localStorage cache for instant render.
+// Kalam Hub — STOCK MANAGEMENT v3
+// Source of truth: Google Sheet (Inventory tab)
+// localStorage used only as a short-lived cache
 // ============================================
 
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
-const STOCK_CACHE_KEY = 'kalam_stock_cache';
-const STOCK_CACHE_TTL = 60 * 1000; // 1 minute
+const WEB_APP_URL_STOCK =
+'https://script.google.com/macros/s/AKfycbwVpo-g5IOPpifC6FUx9h4ysxcc6ZF2nvfwZsSWpuXbRlq3uQIAsIhcTVzWYuGzCLbIvA/exec';
 
-// Fallback defaults (used until first successful fetch, or if offline)
+const STOCK_KEY     = 'kalam_stock_v3';
+const STOCK_TTL_MS  = 30 * 1000; // 30 seconds cache
+
+// Fallback defaults (used only while first fetch is in progress / offline)
 const DEFAULT_STOCK = {
    1: 30,  2:  3,  3: 11,  4: 20,  5:  1,  6:  7,  7:  7,  8:  4,  9:  6, 10:  8,
   11:  1, 12: 11, 13:  3, 14:  1, 15:  2, 16:  1, 17:  8, 18:  2, 19:  2, 20:  4,
@@ -17,131 +19,100 @@ const DEFAULT_STOCK = {
   41:  2, 42:  4, 43:  2, 44:  3
 };
 
-// ── In-memory live stock map (populated on fetch) ──
-let LIVE_STOCK = null;
+let _liveStock = null;    // in-memory map {id: qty}
+let _fetchPromise = null; // deduplicate concurrent fetches
 
-// ── Read cache ──
-function readStockCache() {
+// ── Read / write cache ──
+function _readCache() {
   try {
-    const raw = JSON.parse(localStorage.getItem(STOCK_CACHE_KEY) || 'null');
-    if (!raw || !raw.data || !raw.ts) return null;
-    return raw;
+    const raw = JSON.parse(localStorage.getItem(STOCK_KEY) || 'null');
+    if (!raw || !raw.ts || !raw.data) return null;
+    if (Date.now() - raw.ts > STOCK_TTL_MS) return null; // stale
+    return raw.data;
   } catch (e) { return null; }
 }
 
-// ── Write cache ──
-function writeStockCache(data) {
+function _writeCache(data) {
   try {
-    localStorage.setItem(STOCK_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+    localStorage.setItem(STOCK_KEY, JSON.stringify({ ts: Date.now(), data }));
   } catch (e) {}
 }
 
-// ── Fetch live inventory from Sheet (returns Promise<{id: stock}>) ──
-async function fetchLiveStock() {
-
-  try {
-
-    console.log("Fetching inventory...");
-
-    const res = await fetch(
-      SHEET_API_URL + '?action=getInventory'
-    );
-
-    const inv = await res.json();
-
-    console.log("Inventory received:", inv);
-    
-
-    const map = {};
-
-    inv.forEach(c=>{
-      map[c.id] = c.stock;
+// ── Fetch live stock from Sheet ──
+function _fetchLive() {
+  if (_fetchPromise) return _fetchPromise;
+  _fetchPromise = fetch(WEB_APP_URL_STOCK + '?action=getInventory')
+    .then(r => r.json())
+    .then(inv => {
+      const map = {};
+      if (Array.isArray(inv)) {
+        inv.forEach(c => { map[Number(c.id)] = Number(c.stock); });
+      }
+      _liveStock = map;
+      _writeCache(map);
+      _fetchPromise = null;
+      // Re-render marketplace if it's loaded
+      if (typeof renderGrid === 'function') renderGrid();
+      return map;
+    })
+    .catch(err => {
+      console.warn('[Kalam Hub] Stock fetch failed:', err.message);
+      _fetchPromise = null;
+      return null;
     });
-
-    LIVE_STOCK = map;
-
-console.log("LIVE_STOCK UPDATED:", LIVE_STOCK);
-
-writeStockCache(map);
-
-localStorage.removeItem('kalam_stock_cache');
-localStorage.setItem(
-  'kalam_stock_cache',
-  JSON.stringify({
-    data: map,
-    ts: Date.now()
-  })
-);
-
-console.log("CACHE UPDATED");
-
-return map;
-  } catch(e){
-
-    console.error("Inventory Error:", e);
-
-    return null;
-
-  }
-
+  return _fetchPromise;
 }
 
-// ── Init: load cache immediately, refresh in background ──
-function initStock() {
-  if (LIVE_STOCK) return LIVE_STOCK;
-  const cache = readStockCache();
-  if (cache) {
-    LIVE_STOCK = cache.data;
-    // Refresh in background if stale
-    if (Date.now() - cache.ts > STOCK_CACHE_TTL) {
-      fetchLiveStock().then(() => {
-        if (typeof renderGrid === 'function') renderGrid();
-      });
-    }
-    return LIVE_STOCK;
+// ── Ensure stock is initialised (sync best-effort) ──
+function _ensureStock() {
+  if (_liveStock) return _liveStock;
+
+  // Try cache first
+  const cached = _readCache();
+  if (cached) {
+    _liveStock = cached;
+    // Refresh in background
+    _fetchLive();
+    return _liveStock;
   }
-  // No cache — use defaults synchronously, fetch live in background
-  LIVE_STOCK = { ...DEFAULT_STOCK };
-  fetchLiveStock().then(() => {
-    if (typeof renderGrid === 'function') renderGrid();
-  });
-  return LIVE_STOCK;
+
+  // No cache — use defaults immediately, fetch in background
+  _liveStock = { ...DEFAULT_STOCK };
+  _fetchLive();
+  return _liveStock;
 }
 
-// ── Get stock for one component ──
+// ── Public API ──────────────────────────────────
+// Identical signatures to old stock.js so marketplace.js needs zero changes
+
 function getStock(id) {
-  const stock = initStock();
-  return stock[id] !== undefined ? stock[id] : (DEFAULT_STOCK[id] !== undefined ? DEFAULT_STOCK[id] : 5);
+  const s = _ensureStock();
+  const qty = s[Number(id)];
+  return qty !== undefined ? qty : (DEFAULT_STOCK[Number(id)] ?? 5);
 }
 
-// ── Decrement stock by 1 (local optimistic update; Sheet is source of truth) ──
 function decrementStock(id) {
-  const stock = initStock();
-  if (stock[id] === undefined) return false;
-  if (stock[id] <= 0) return false;
-  stock[id] = stock[id] - 1;
-  LIVE_STOCK = stock;
-  writeStockCache(stock);
+  const s = _ensureStock();
+  const n = Number(id);
+  if (s[n] === undefined || s[n] <= 0) return false;
+  s[n]--;
+  _liveStock = s;
+  _writeCache(s);
   return true;
 }
 
-// ── Force refresh from Sheet (call after a purchase) ──
-async function refreshStock() {
-  await fetchLiveStock();
-  if (typeof renderGrid === 'function') renderGrid();
-}
-
-// ── Stock badge HTML ──
 function stockBadgeHTML(id) {
   const qty = getStock(id);
-  if (qty <= 0) {
-    return `<span class="stock-badge stock-out">SOLD OUT</span>`;
-  } else if (qty <= 3) {
-    return `<span class="stock-badge stock-low">⚠ Only ${qty} left</span>`;
-  } else {
-    return `<span class="stock-badge stock-ok">${qty} in stock</span>`;
-  }
+  if (qty <= 0)  return `<span class="stock-badge stock-out">SOLD OUT</span>`;
+  if (qty <= 3)  return `<span class="stock-badge stock-low">⚠ Only ${qty} left</span>`;
+  return `<span class="stock-badge stock-ok">${qty} in stock</span>`;
 }
 
-// Kick off initial fetch as soon as this script loads
-fetchLiveStock();
+function resetStock() {
+  _liveStock = null;
+  try { localStorage.removeItem(STOCK_KEY); } catch(e) {}
+  _fetchLive();
+}
+
+// Kick off fetch immediately so data is ready by the time marketplace renders
+_fetchLive();
