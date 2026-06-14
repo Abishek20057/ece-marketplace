@@ -34,7 +34,12 @@ function _patchComponents(inv) {
       if (c.stock     !== undefined) comp.stock     = Number(c.stock);
       if (c.tempPrice !== undefined) comp.tempPrice = Number(c.tempPrice);
       if (c.permPrice !== undefined) comp.permPrice = Number(c.permPrice);
-      if (c.imageUrl  && c.imageUrl.trim()) comp.image = c.imageUrl.trim();
+      // Override image if admin provided a URL
+      if (c.imageUrl  && c.imageUrl.trim()) {
+        comp.image = c.imageUrl.trim();
+        // Also update COMPONENT_IMAGES so card/modal both pick it up
+        if (typeof COMPONENT_IMAGES !== 'undefined') COMPONENT_IMAGES[id] = c.imageUrl.trim();
+      }
     } else {
       // Brand-new component added via admin — inject into COMPONENTS array
       // Map unknown categories to 'common' so sidebar filter always includes them
@@ -57,6 +62,10 @@ function _patchComponents(inv) {
         type:          ['temporary', 'permanent'],
         project:       'Kalam Hub Inventory'
       });
+      // Register image in COMPONENT_IMAGES so card rendering picks it up
+      if (c.imageUrl && c.imageUrl.trim() && typeof COMPONENT_IMAGES !== 'undefined') {
+        COMPONENT_IMAGES[id] = c.imageUrl.trim();
+      }
     }
   });
 }
