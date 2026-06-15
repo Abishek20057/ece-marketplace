@@ -257,17 +257,17 @@ function openModal(c) {
       </div>
     </div>
     <p class="modal-meta">${c.categoryLabel} · ${c.project}</p>
-    <p class="modal-desc">${c.description}</p>
+    <p class="modal-desc">${c.description||''}</p>
     <div style="margin-bottom:1rem;">
       <strong style="font-family:var(--font-display);font-size:0.85rem;color:var(--slate-dk);display:block;margin-bottom:0.5rem;">TECH STACK</strong>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-        ${c.tech.map(t => `<span class="badge badge-cat">${t}</span>`).join('')}
+        ${(c.tech||[]).map(t => `<span class="badge badge-cat">${t}</span>`).join('')}
       </div>
     </div>
     <div style="margin-bottom:1.5rem;">
       <strong style="font-family:var(--font-display);font-size:0.85rem;color:var(--slate-dk);display:block;margin-bottom:0.5rem;">FEATURES</strong>
       <ul style="display:flex;flex-direction:column;gap:0.4rem;">
-        ${c.features.map(f => `<li style="color:var(--slate);font-size:0.9rem;">✓ ${f}</li>`).join('')}
+        ${(c.features||[]).map(f => `<li style="color:var(--slate);font-size:0.9rem;">✓ ${f}</li>`).join('')}
       </ul>
     </div>
     ${hasTemp ? `

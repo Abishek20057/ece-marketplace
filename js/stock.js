@@ -31,9 +31,9 @@ function _patchComponents(inv) {
 
     if (comp) {
       // Update existing component
-      if (c.stock     !== undefined) comp.stock     = Number(c.stock);
-      if (c.tempPrice !== undefined) comp.tempPrice = Number(c.tempPrice);
-      if (c.permPrice !== undefined) comp.permPrice = Number(c.permPrice);
+      if (c.stock !== undefined) comp.stock = Number(c.stock);
+      if (c.tempPrice !== undefined && Number(c.tempPrice) > 0) comp.tempPrice = Number(c.tempPrice);
+      if (c.permPrice !== undefined && Number(c.permPrice) > 0) comp.permPrice = Number(c.permPrice);
       // Override image if admin provided a URL
       if (c.imageUrl  && c.imageUrl.trim()) {
         comp.image = c.imageUrl.trim();
@@ -53,12 +53,13 @@ function _patchComponents(inv) {
         icon:          c.icon          || '📦',
         category:      safeCat,
         categoryLabel: c.categoryLabel || 'Common',
-        tempPrice:     Number(c.tempPrice) || 0,
-        permPrice:     Number(c.permPrice) || 0,
+        tempPrice:     Number(c.tempPrice) > 0 ? Number(c.tempPrice) : 20,
+        permPrice:     Number(c.permPrice) > 0 ? Number(c.permPrice) : 50,
         stock:         Number(c.stock)     || 0,
         image:         c.imageUrl || '',
         description:   c.description || '',
         features:      [],
+        tech:          [],
         type:          ['temporary', 'permanent'],
         project:       'Kalam Hub Inventory'
       });
