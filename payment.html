@@ -740,8 +740,9 @@
       }).then(onDone).catch(onDone);
     }
 
-    function showSuccess(orderId, type) {
+    function showSuccess(orderId, type, autoStatus) {
       decrementStock();
+      const isVerified = (autoStatus === 'Verified');
 
       try {
         const nameId  = isTemp ? 't-name'  : 'p-name';
@@ -769,27 +770,35 @@
         localStorage.setItem('ece_orders', JSON.stringify(orders));
       } catch(e) { console.warn('Admin order save failed:', e); }
 
-      document.getElementById('success-icon').textContent = '✅';
+      const isVerified = (autoStatus === 'Verified');
+      const statusBadge = isVerified
+        ? '<span style="display:inline-block;margin-top:8px;padding:4px 14px;background:#dcfce7;color:#16a34a;border:1px solid #86efac;border-radius:99px;font-size:0.8rem;font-weight:700;">✓ Payment Verified</span>'
+        : '<span style="display:inline-block;margin-top:8px;padding:4px 14px;background:#fef9c3;color:#b45309;border:1px solid #fcd34d;border-radius:99px;font-size:0.8rem;font-weight:700;">⏳ Pending Verification</span>';
+
+      document.getElementById('success-icon').textContent = isVerified ? '✅' : '⏳';
       if (type === 'temporary') {
-        document.getElementById('success-title').textContent = 'Payment Confirmed!';
-        document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the Kalam Hub.';
-        document.getElementById('success-sub').textContent   = 'Show this order ID at the Kalam Hub. Return within 7 days.';
+        document.getElementById('success-title').textContent = isVerified ? 'Payment Verified!' : 'Payment Submitted!';
+        document.getElementById('success-msg').innerHTML     = 'You can now collect <strong>"' + compName + '"</strong> from Kalam Hub.' + statusBadge;
+        document.getElementById('success-sub').textContent   = isVerified
+          ? 'UTR verified! Show this Order ID at Kalam Hub. Return within 7 days.'
+          : 'UTR not recognized — Admin will verify manually. Show Order ID at Kalam Hub.';
         document.getElementById('success-btn').href          = 'collect.html?name=' + encodeURIComponent(compName) + '&order=' + orderId;
         document.getElementById('success-btn').textContent   = '🏢 View Collection Steps →';
       } else {
-        document.getElementById('success-title').textContent = 'Order Placed!';
-        document.getElementById('success-msg').textContent   = 'Your purchase of "' + compName + '" is confirmed.';
-        document.getElementById('success-sub').textContent   = 'Show this Order ID at the Kalam Hub to collect your component.';
+        document.getElementById('success-title').textContent = isVerified ? 'Order Verified!' : 'Order Placed!';
+        document.getElementById('success-msg').innerHTML     = 'Your purchase of <strong>"' + compName + '"</strong> is confirmed.' + statusBadge;
+        document.getElementById('success-sub').textContent   = isVerified
+          ? 'UTR verified! Show this Order ID at Kalam Hub to collect your component.'
+          : 'UTR not recognized — Admin will verify manually. Show Order ID at Kalam Hub.';
         document.getElementById('success-btn').href          = 'marketplace.html';
         document.getElementById('success-btn').textContent   = '← Back to Marketplace';
       }
-
       document.getElementById('order-id').textContent = 'Order #' + orderId;
       document.getElementById('success-overlay').classList.add('show');
     }
 
     function confirmPayment() {
-      const utr    = document.getElementById('utr-input').value.trim();
+      const utr     = document.getElementById('utr-input').value.trim();
       const orderId = 'KH-' + Date.now().toString().slice(-6);
       const type    = isTemp ? 'temporary' : 'permanent';
 
@@ -805,8 +814,14 @@
         dueDate = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
       }
 
+      // ── AUTO VERIFY LOGIC ─────────────────────────────────
+      // Valid UTR = exactly 12 digits (only numbers, no letters/spaces)
+      const isValidUTR = /^\d{12}$/.test(utr);
+      const autoStatus = isValidUTR ? 'Verified' : 'Pending Verification';
+      // ──────────────────────────────────────────────────────
+
       const payload = {
-        action: 'submitOrder',
+        action    : 'submitOrder',
         timestamp : new Date().toLocaleString('en-IN'),
         orderId,
         id        : compId,
@@ -819,7 +834,8 @@
         amount    : compPrice,
         type      : isTemp ? 'Temporary' : 'Permanent',
         utr,
-        dueDate
+        dueDate,
+        status    : autoStatus   // ← sent to Apps Script
       };
 
       const btn = document.getElementById('confirm-btn');
@@ -829,7 +845,7 @@
 
       submitToSheet(payload, () => {
         closeQR();
-        showSuccess(orderId, type);
+        showSuccess(orderId, type, autoStatus);
       });
     }
 
