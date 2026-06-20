@@ -188,13 +188,20 @@ function buildCard(c) {
     stockBadge = `<span class="stock-badge stock-ok">${qty} in stock</span>`;
   }
 
-  const priceLabel = hasPerm
-    ? `<span class="card-price price-paid">₹${c.permPrice}</span>`
-    : `<span class="card-price price-free">₹${c.tempPrice} borrow</span>`;
+  // ── Discount price block (market price vs selling price) ──
+  const sellingPrice = hasPerm ? c.permPrice : c.tempPrice;
+  const marketPrice   = hasPerm ? (c.marketPrice || c.permPrice) : (c.marketTempPrice || c.tempPrice);
+  const priceBlock = (typeof priceBlockHTML === 'function')
+    ? priceBlockHTML(marketPrice, sellingPrice, 'sm')
+    : `<span class="card-price price-paid">₹${sellingPrice}</span>`;
+
+  const dealBadge = (typeof getBadge === 'function') ? getBadge({ ...c, permPrice: sellingPrice, marketPrice }) : null;
+
+  const inCart = (typeof isInCart === 'function') && isInCart(c.id);
 
   return `
     <div class="component-card animate-on-scroll ${outOfStock ? 'card-sold-out' : ''}">
-      ${hasTemp ? `<div class="temp-fee-badge">₹${c.tempPrice} Temporary Access Fee</div>` : ''}
+      ${dealBadge ? `<div class="deal-ribbon ${dealBadge.cls}">${dealBadge.text}</div>` : ''}
       <div class="card-img-wrap">
         ${imgSrc
           ? `<img src="${imgSrc}" alt="${c.name}"
@@ -214,9 +221,13 @@ function buildCard(c) {
         </div>
         <h3>${c.name}</h3>
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
+        ${priceBlock}
         <div class="card-footer">
-          ${priceLabel}
-          <span class="btn btn-ghost" style="font-size:0.85rem;">Details →</span>
+          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" ${outOfStock ? 'disabled' : ''}
+            onclick="event.stopPropagation(); ${outOfStock ? '' : `quickAddToCart(${c.id})`}">
+            ${outOfStock ? 'Unavailable' : (inCart ? '✓ In Cart' : '🛒 Add to Cart')}
+          </button>
+          <span class="btn btn-ghost" style="font-size:0.85rem;" onclick="openModal(COMPONENTS.find(x=>x.id===${c.id}))">Details →</span>
         </div>
       </div>
     </div>`;
