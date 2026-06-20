@@ -332,7 +332,8 @@
 
       <div class="order-summary">
         <h3>🛒 Order Summary</h3>
-        <div class="order-row">
+        <div id="cart-items-rows" style="display:none;"></div>
+        <div class="order-row" id="single-item-row">
           <span id="comp-name-display">Component</span>
           <span id="comp-price-display">₹0</span>
         </div>
@@ -569,7 +570,41 @@
     const isTemp    = params.get('type') === 'temporary';
     const compPrice = parseInt(params.get('price')) || 0;
 
+    // ── Cart checkout (multi-item) ──────────────────────────
+    // Activated only when a 'cart' param is present. Does not alter
+    // compId/compName/isTemp/compPrice, which remain the single-item
+    // path used by the existing Borrow/Buy buttons.
+    let cartItems = null;
+    try {
+      const cartRaw = params.get('cart');
+      if (cartRaw) {
+        cartItems = JSON.parse(decodeURIComponent(cartRaw));
+        if (!Array.isArray(cartItems) || cartItems.length === 0) cartItems = null;
+      }
+    } catch (e) { cartItems = null; }
+    const isCartCheckout = !!cartItems;
+    const cartTotal = isCartCheckout
+      ? (parseInt(params.get('total')) || cartItems.reduce((s, i) => s + (i.price * i.qty), 0))
+      : 0;
+    // For a cart checkout, treat it as a single combined "permanent-style"
+    // payment of cartTotal — reuses the existing perm payment UI/flow as-is.
+    const effectivePrice = isCartCheckout ? cartTotal : compPrice;
+
     function decrementStock() {
+      if (isCartCheckout) {
+        try {
+          const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
+          cartItems.forEach(item => {
+            const current = overrides[item.id] !== undefined
+              ? overrides[item.id]
+              : (typeof COMPONENTS !== 'undefined' ? (COMPONENTS.find(c => c.id === item.id) || {}).stock : undefined);
+            overrides[item.id] = Math.max(0, (current !== undefined ? current : item.qty) - item.qty);
+          });
+          localStorage.setItem('ece_stock_overrides', JSON.stringify(overrides));
+          localStorage.removeItem('ece_cart'); // clear cart after successful order
+        } catch (e) { /* ignore */ }
+        return;
+      }
       if (compId === null) return;
       try {
         const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
@@ -582,12 +617,33 @@
       } catch (e) { /* ignore */ }
     }
 
-    document.getElementById('comp-name-display').textContent  = compName;
-    document.getElementById('comp-price-display').textContent = '₹' + compPrice;
-    document.getElementById('comp-total').textContent         = '₹' + compPrice;
-    document.getElementById('cash-amount').textContent        = '₹' + compPrice;
+    if (isCartCheckout) {
+      // Render multi-row summary, hide the single-item row.
+      document.getElementById('single-item-row').style.display = 'none';
+      const rowsHtml = cartItems.map(item => `
+        <div class="order-row">
+          <span>${item.name} × ${item.qty}</span>
+          <span>₹${item.price * item.qty}</span>
+        </div>`).join('');
+      const rowsContainer = document.getElementById('cart-items-rows');
+      rowsContainer.innerHTML = rowsHtml;
+      rowsContainer.style.display = 'block';
+      document.getElementById('license-row').style.display = 'none';
+    } else {
+      document.getElementById('comp-name-display').textContent  = compName;
+      document.getElementById('comp-price-display').textContent = '₹' + compPrice;
+    }
+    document.getElementById('comp-total').textContent  = '₹' + effectivePrice;
+    document.getElementById('cash-amount').textContent = '₹' + effectivePrice;
 
-    if (isTemp) {
+    if (isCartCheckout) {
+      // Combined cart payment reuses the existing Permanent payment UI.
+      document.getElementById('type-badge').textContent     = '🛒 Cart Checkout';
+      document.getElementById('type-badge').classList.add('perm');
+      document.getElementById('page-subtitle').textContent  = `Pay ₹${effectivePrice} for ${cartItems.length} item${cartItems.length !== 1 ? 's' : ''}`;
+      document.getElementById('perm-section').style.display = 'block';
+      document.getElementById('p-pay-label').textContent    = effectivePrice;
+    } else if (isTemp) {
       document.getElementById('type-badge').textContent     = '⏱ Temporary Borrow';
       document.getElementById('type-badge').classList.add('temp');
       document.getElementById('page-subtitle').textContent  = `Pay ₹${compPrice} to borrow this component`;
@@ -688,11 +744,12 @@
     }
 
     function buildQR(amount, label) {
+      const noteName = isCartCheckout ? `${cartItems.length} items` : compName;
       const upiStr = 'upi://pay?pa=' + OUR_UPI
                    + '&pn=' + encodeURIComponent(OUR_NAME)
                    + '&am=' + amount
                    + '&cu=INR'
-                   + '&tn=' + encodeURIComponent('Kalam Hub - ' + label + ': ' + compName);
+                   + '&tn=' + encodeURIComponent('Kalam Hub - ' + label + ': ' + noteName);
       return 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(upiStr);
     }
 
@@ -743,6 +800,9 @@
     function showSuccess(orderId, type) {
       decrementStock();
 
+      const displayName = isCartCheckout ? `${cartItems.length} item${cartItems.length !== 1 ? 's' : ''}` : compName;
+      const displayAmount = isCartCheckout ? cartTotal : compPrice;
+
       try {
         const nameId  = isTemp ? 't-name'  : 'p-name';
         const rollId  = isTemp ? 't-roll'  : 'p-roll';
@@ -758,9 +818,9 @@
           year      : (document.getElementById(yearId)?.value || ''),
           phone     : (document.getElementById(phoneId)?.value || '').trim(),
           email     : isTemp ? (document.getElementById('t-email')?.value || '').trim() : '',
-          component : compName,
-          amount    : compPrice,
-          type      : isTemp ? 'Temporary' : 'Permanent',
+          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+          amount    : displayAmount,
+          type      : isCartCheckout ? 'Cart' : (isTemp ? 'Temporary' : 'Permanent'),
           utr       : utrVal,
         };
 
@@ -770,7 +830,13 @@
       } catch(e) { console.warn('Admin order save failed:', e); }
 
       document.getElementById('success-icon').textContent = '✅';
-      if (type === 'temporary') {
+      if (isCartCheckout) {
+        document.getElementById('success-title').textContent = 'Order Placed!';
+        document.getElementById('success-msg').textContent   = `Your order of ${displayName} is confirmed.`;
+        document.getElementById('success-sub').textContent   = 'Show this Order ID at the Kalam Hub to collect your components.';
+        document.getElementById('success-btn').href          = 'marketplace.html';
+        document.getElementById('success-btn').textContent   = '← Back to Marketplace';
+      } else if (type === 'temporary') {
         document.getElementById('success-title').textContent = 'Payment Confirmed!';
         document.getElementById('success-msg').textContent   = 'You can now collect "' + compName + '" from the Kalam Hub.';
         document.getElementById('success-sub').textContent   = 'Show this order ID at the Kalam Hub. Return within 7 days.';
@@ -809,15 +875,15 @@
         action: 'submitOrder',
         timestamp : new Date().toLocaleString('en-IN'),
         orderId,
-        id        : compId,
+        id        : isCartCheckout ? cartItems.map(i => i.id).join(',') : compId,
         name      : document.getElementById(nameId).value.trim(),
         roll      : document.getElementById(rollId).value.trim(),
         year      : document.getElementById(yearId).value,
         phone     : document.getElementById(phoneId).value.trim(),
         email     : isTemp ? document.getElementById('t-email').value.trim() : '',
-        component : compName,
-        amount    : compPrice,
-        type      : isTemp ? 'Temporary' : 'Permanent',
+        component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+        amount    : isCartCheckout ? cartTotal : compPrice,
+        type      : isCartCheckout ? 'Cart' : (isTemp ? 'Temporary' : 'Permanent'),
         utr,
         dueDate
       };
@@ -858,27 +924,27 @@
       if (selectedMethod === 'upi') {
         const upi = document.getElementById('p-upi-id').value.trim();
         if (!upi) { alert('Please enter your UPI ID.'); return; }
-        openQRModal(compPrice, 'Buy');
+        openQRModal(effectivePrice, 'Buy');
       } else if (selectedMethod === 'cash') {
         const orderId = 'ECE-' + Date.now().toString().slice(-6);
         const payload = {
           action: 'submitOrder',
           timestamp : new Date().toLocaleString('en-IN'),
           orderId,
-          id        : compId,
+          id        : isCartCheckout ? cartItems.map(i => i.id).join(',') : compId,
           name,
           roll      : document.getElementById('p-roll').value.trim(),
           year      : document.getElementById('p-year').value,
           phone,
-          component : compName,
-          amount    : compPrice,
-          type      : 'Permanent',
+          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+          amount    : effectivePrice,
+          type      : isCartCheckout ? 'Cart' : 'Permanent',
           utr       : 'CASH',
           dueDate   : '',
         };
         submitToSheet(payload, () => showSuccess(orderId, 'permanent'));
       } else {
-        openQRModal(compPrice, 'Buy');
+        openQRModal(effectivePrice, 'Buy');
       }
     }
   </script>

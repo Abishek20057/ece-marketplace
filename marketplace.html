@@ -23,6 +23,10 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-actions">
+        <button class="cart-icon-btn" id="cart-icon-btn" aria-label="Open cart">
+          🛒
+          <span class="cart-count-badge" id="cart-count-badge" style="display:none;">0</span>
+        </button>
         <a href="login.html" class="btn btn-ghost">Login</a>
         <a href="register.html" class="btn btn-primary">Sign Up</a>
       </div>
@@ -116,6 +120,14 @@
     <div class="modal" id="component-modal">
       <button class="modal-close" id="modal-close">✕</button>
       <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- CART MODAL -->
+  <div class="modal-overlay" id="cart-overlay">
+    <div class="modal" id="cart-modal">
+      <button class="modal-close" id="cart-modal-close">✕</button>
+      <div class="modal-body" id="cart-modal-body"></div>
     </div>
   </div>
 

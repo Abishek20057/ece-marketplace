@@ -4,20 +4,37 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Inject a small pulse animation for the cart button (kept here so
-  // no separate CSS file needs to be touched for this fix).
-  const pulseStyle = document.createElement('style');
-  pulseStyle.textContent = `
-    .btn-cart-add.cart-pulse {
-      animation: cartAddPulse 0.35s ease;
-    }
+  // Inject small styles for the cart pulse animation and quantity stepper
+  // (kept here so no separate CSS file needs to be touched for this fix).
+  const cartStyle = document.createElement('style');
+  cartStyle.textContent = `
+    .btn-cart-add.cart-pulse { animation: cartAddPulse 0.35s ease; }
     @keyframes cartAddPulse {
       0%   { transform: scale(1); }
       40%  { transform: scale(1.08); }
       100% { transform: scale(1); }
     }
+    .cart-icon-btn {
+      position: relative; background: none; border: none; cursor: pointer;
+      font-size: 1.3rem; line-height: 1; padding: 0.4rem; margin-right: 0.25rem;
+    }
+    .cart-count-badge {
+      position: absolute; top: -2px; right: -2px; background: var(--electric, #3b82f6);
+      color: #fff; font-size: 0.65rem; font-weight: 700; min-width: 16px; height: 16px;
+      border-radius: 999px; align-items: center; justify-content: center; padding: 0 4px;
+    }
+    .qty-stepper {
+      display: flex; align-items: center; gap: 0.5rem;
+      border: 1.5px solid var(--border, #e2e8f0); border-radius: 8px; padding: 0.25rem 0.5rem;
+    }
+    .qty-stepper .qty-btn {
+      background: none; border: none; cursor: pointer; font-size: 1rem; font-weight: 700;
+      width: 22px; height: 22px; line-height: 1; color: var(--navy, #0f172a);
+    }
+    .qty-stepper .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .qty-stepper .qty-value { min-width: 1.2em; text-align: center; font-weight: 600; }
   `;
-  document.head.appendChild(pulseStyle);
+  document.head.appendChild(cartStyle);
 
   const hamburger = document.getElementById('hamburger');
   if (hamburger) hamburger.addEventListener('click', () => {
@@ -34,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Render immediately with static data (fast first paint)...
   renderGrid();
+  updateCartBadge();
 
   // ...then re-render with live prices/stock/new-components once ready.
   // Also flips a global flag so Borrow/Buy clicks always use fresh data.
@@ -59,6 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('modal-overlay');
   document.getElementById('modal-close').addEventListener('click', () => overlay.classList.remove('active'));
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+
+  const cartIconBtn = document.getElementById('cart-icon-btn');
+  if (cartIconBtn) cartIconBtn.addEventListener('click', openCartPanel);
+
+  const cartOverlay = document.getElementById('cart-overlay');
+  const cartModalClose = document.getElementById('cart-modal-close');
+  if (cartModalClose) cartModalClose.addEventListener('click', closeCartPanel);
+  if (cartOverlay) cartOverlay.addEventListener('click', (e) => { if (e.target === cartOverlay) closeCartPanel(); });
 });
 
 function getFilters() {
@@ -212,7 +238,8 @@ function buildCard(c) {
 
   const dealBadge = (typeof getBadge === 'function') ? getBadge({ ...c, permPrice: sellingPrice, marketPrice }) : null;
 
-  const inCart = (typeof isInCart === 'function') && isInCart(c.id);
+  const cartQty = (typeof getCartQty === 'function') ? getCartQty(c.id) : 0;
+  const inCart  = cartQty > 0;
 
   return `
     <div class="component-card animate-on-scroll ${outOfStock ? 'card-sold-out' : ''}">
@@ -238,10 +265,19 @@ function buildCard(c) {
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
         ${priceBlock}
         <div class="card-footer">
-          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" data-id="${c.id}" ${outOfStock ? 'disabled' : ''}
-            onclick="event.stopPropagation(); ${outOfStock ? '' : `quickAddToCart(${c.id})`}">
-            ${outOfStock ? 'Unavailable' : (inCart ? '✓ In Cart' : '🛒 Add to Cart')}
-          </button>
+          ${outOfStock
+            ? `<button class="btn btn-cart-add" data-id="${c.id}" disabled>Unavailable</button>`
+            : inCart
+              ? `<div class="qty-stepper" data-id="${c.id}" onclick="event.stopPropagation();">
+                   <button class="qty-btn qty-minus" onclick="changeCartQty(${c.id}, -1)">−</button>
+                   <span class="qty-value">${cartQty}</span>
+                   <button class="qty-btn qty-plus" onclick="changeCartQty(${c.id}, 1)" ${cartQty >= qty ? 'disabled' : ''}>+</button>
+                 </div>`
+              : `<button class="btn btn-cart-add" data-id="${c.id}"
+                   onclick="event.stopPropagation(); quickAddToCart(${c.id})">
+                   🛒 Add to Cart
+                 </button>`
+          }
           <span class="btn btn-ghost" style="font-size:0.85rem;" onclick="openModal(COMPONENTS.find(x=>x.id===${c.id}))">Details →</span>
         </div>
       </div>
@@ -358,9 +394,9 @@ function handleBuy(id, name, price) {
   }
 }
 
-// ── Cart (Add to Cart on marketplace grid) ─────────────────
+// ── Cart (Add to Cart, quantity, panel, checkout) ──────────
 // Self-contained: only touches localStorage key 'ece_cart'.
-// Does not interact with payment.html or any other flow.
+// Does not interact with payment.html's existing single-item flow.
 const CART_KEY = 'ece_cart';
 
 function getCart() {
@@ -374,48 +410,164 @@ function getCart() {
 
 function saveCart(cart) {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  updateCartBadge();
 }
 
 function isInCart(id) {
   return getCart().some(item => item.id === Number(id));
 }
 
+function getCartQty(id) {
+  const item = getCart().find(item => item.id === Number(id));
+  return item ? item.qty : 0;
+}
+
 function quickAddToCart(id) {
   const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
   if (!comp) return;
 
-  // Respect stock — never add an out-of-stock item.
-  const qty = (typeof getStock === 'function') ? getStock(comp.id) : 1;
-  if (qty <= 0) return;
-
-  if (isInCart(comp.id)) {
-    // Already added — nothing to do (button already shows "In Cart").
-    pulseCartButton(comp.id);
-    return;
-  }
+  const stockQty = (typeof getStock === 'function') ? getStock(comp.id) : 1;
+  if (stockQty <= 0) return;
 
   const cart = getCart();
-  cart.push({
-    id: comp.id,
-    name: comp.name,
-    type: comp.type.includes('permanent') ? 'permanent' : 'temporary',
-    price: comp.type.includes('permanent') ? comp.permPrice : comp.tempPrice
-  });
+  const existing = cart.find(item => item.id === comp.id);
+  if (existing) {
+    if (existing.qty < stockQty) existing.qty += 1;
+  } else {
+    cart.push({
+      id: comp.id,
+      name: comp.name,
+      type: comp.type.includes('permanent') ? 'permanent' : 'temporary',
+      price: comp.type.includes('permanent') ? comp.permPrice : comp.tempPrice,
+      qty: 1
+    });
+  }
   saveCart(cart);
-
   pulseCartButton(comp.id);
   renderGrid();
 }
 
+// Adjust quantity for an item already in the cart. Clamped to [0, stock].
+// Hitting 0 removes the item entirely.
+function changeCartQty(id, delta) {
+  id = Number(id);
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === id) : null;
+  const stockQty = comp && typeof getStock === 'function' ? getStock(id) : Infinity;
+
+  const cart = getCart();
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+
+  const newQty = item.qty + delta;
+  if (newQty <= 0) {
+    const idx = cart.indexOf(item);
+    cart.splice(idx, 1);
+  } else if (newQty > stockQty) {
+    item.qty = stockQty; // prevent ordering more than stock
+  } else {
+    item.qty = newQty;
+  }
+  saveCart(cart);
+
+  renderGrid();
+  renderCartPanel();
+}
+
 function pulseCartButton(id) {
-  // Find the button for this card and trigger a brief pulse animation.
   const grid = document.getElementById('market-grid');
   if (!grid) return;
   const btn = grid.querySelector(`.btn-cart-add[data-id="${id}"]`);
   if (!btn) return;
   btn.classList.remove('cart-pulse');
-  // Force reflow so the animation can re-trigger on repeated clicks.
   void btn.offsetWidth;
   btn.classList.add('cart-pulse');
   setTimeout(() => btn.classList.remove('cart-pulse'), 350);
+}
+
+// ── Cart badge (navbar) ─────────────────────────────────────
+function updateCartBadge() {
+  const badge = document.getElementById('cart-count-badge');
+  if (!badge) return;
+  const count = getCart().reduce((sum, item) => sum + item.qty, 0);
+  if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── Cart panel (modal) ──────────────────────────────────────
+function openCartPanel() {
+  renderCartPanel();
+  document.getElementById('cart-overlay').classList.add('active');
+}
+
+function closeCartPanel() {
+  document.getElementById('cart-overlay').classList.remove('active');
+}
+
+function cartGrandTotal(cart) {
+  return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+}
+
+function renderCartPanel() {
+  const body = document.getElementById('cart-modal-body');
+  if (!body) return;
+  const cart = getCart();
+
+  if (cart.length === 0) {
+    body.innerHTML = `
+      <h2 style="margin-top:0;">🛒 Your Cart</h2>
+      <p style="color:var(--slate-dk);">Your cart is empty. Add some components from the marketplace.</p>`;
+    return;
+  }
+
+  const rows = cart.map(item => {
+    const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === item.id) : null;
+    const stockQty = comp && typeof getStock === 'function' ? getStock(item.id) : item.qty;
+    const subtotal = item.price * item.qty;
+    return `
+      <div class="cart-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;">${item.name}</div>
+          <div style="font-size:0.8rem;color:var(--slate-dk);">${item.type === 'permanent' ? '♾️ Permanent' : '⏱ Temporary'} · ₹${item.price} each</div>
+        </div>
+        <div class="qty-stepper" data-id="${item.id}">
+          <button class="qty-btn qty-minus" onclick="changeCartQty(${item.id}, -1)">−</button>
+          <span class="qty-value">${item.qty}</span>
+          <button class="qty-btn qty-plus" onclick="changeCartQty(${item.id}, 1)" ${item.qty >= stockQty ? 'disabled' : ''}>+</button>
+        </div>
+        <div style="min-width:64px;text-align:right;font-weight:700;">₹${subtotal}</div>
+      </div>`;
+  }).join('');
+
+  const total = cartGrandTotal(cart);
+
+  body.innerHTML = `
+    <h2 style="margin-top:0;">🛒 Your Cart</h2>
+    <div class="cart-rows">${rows}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1rem;margin-top:0.5rem;border-top:2px solid var(--electric);font-size:1.1rem;font-weight:700;">
+      <span>Grand Total</span>
+      <span style="color:var(--electric);">₹${total}</span>
+    </div>
+    <button class="btn btn-primary btn-full" style="margin-top:1.25rem;" onclick="proceedToCheckout()">Proceed to Checkout →</button>`;
+}
+
+// ── Checkout (cart → payment.html) ──────────────────────────
+function proceedToCheckout() {
+  const cart = getCart();
+  if (cart.length === 0) return;
+
+  const total = cartGrandTotal(cart);
+  const cartJson = encodeURIComponent(JSON.stringify(cart));
+  const dest = `payment.html?cart=${cartJson}&total=${total}`;
+
+  const loggedIn = localStorage.getItem('ece_logged_in') === 'true';
+  if (loggedIn) {
+    window.location.href = dest;
+  } else {
+    localStorage.setItem('ece_after_login', dest);
+    window.location.href = 'login.html';
+  }
 }
