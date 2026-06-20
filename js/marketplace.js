@@ -265,19 +265,10 @@ function buildCard(c) {
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
         ${priceBlock}
         <div class="card-footer">
-          ${outOfStock
-            ? `<button class="btn btn-cart-add" data-id="${c.id}" disabled>Unavailable</button>`
-            : inCart
-              ? `<div class="qty-stepper" data-id="${c.id}" onclick="event.stopPropagation();">
-                   <button class="qty-btn qty-minus" onclick="changeCartQty(${c.id}, -1)">−</button>
-                   <span class="qty-value">${cartQty}</span>
-                   <button class="qty-btn qty-plus" onclick="changeCartQty(${c.id}, 1)" ${cartQty >= qty ? 'disabled' : ''}>+</button>
-                 </div>`
-              : `<button class="btn btn-cart-add" data-id="${c.id}"
-                   onclick="event.stopPropagation(); quickAddToCart(${c.id})">
-                   🛒 Add to Cart
-                 </button>`
-          }
+          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" data-id="${c.id}" ${outOfStock ? 'disabled' : ''}
+            onclick="event.stopPropagation(); ${outOfStock ? '' : `quickAddToCart(${c.id})`}">
+            ${outOfStock ? 'Unavailable' : (inCart ? `✓ In Cart (${cartQty})` : '🛒 Add to Cart')}
+          </button>
           <span class="btn btn-ghost" style="font-size:0.85rem;" onclick="openModal(COMPONENTS.find(x=>x.id===${c.id}))">Details →</span>
         </div>
       </div>
@@ -459,9 +450,9 @@ function changeCartQty(id, delta) {
   if (!item) return;
 
   const newQty = item.qty + delta;
-  if (newQty <= 0) {
-    const idx = cart.indexOf(item);
-    cart.splice(idx, 1);
+  if (newQty < 1) {
+    // Quantity cannot go below 1 via the stepper — use Remove to delete.
+    item.qty = 1;
   } else if (newQty > stockQty) {
     item.qty = stockQty; // prevent ordering more than stock
   } else {
@@ -469,6 +460,15 @@ function changeCartQty(id, delta) {
   }
   saveCart(cart);
 
+  renderGrid();
+  renderCartPanel();
+}
+
+// Removes an item from the cart entirely, regardless of quantity.
+function removeFromCart(id) {
+  id = Number(id);
+  const cart = getCart().filter(item => item.id !== id);
+  saveCart(cart);
   renderGrid();
   renderCartPanel();
 }
@@ -489,12 +489,8 @@ function updateCartBadge() {
   const badge = document.getElementById('cart-count-badge');
   if (!badge) return;
   const count = getCart().reduce((sum, item) => sum + item.qty, 0);
-  if (count > 0) {
-    badge.textContent = count > 99 ? '99+' : String(count);
-    badge.style.display = 'inline-flex';
-  } else {
-    badge.style.display = 'none';
-  }
+  badge.textContent = `🛒 Cart (${count > 99 ? '99+' : count})`;
+  badge.style.display = 'inline-flex';
 }
 
 // ── Cart panel (modal) ──────────────────────────────────────
@@ -509,6 +505,13 @@ function closeCartPanel() {
 
 function cartGrandTotal(cart) {
   return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+}
+
+// Resolves a product image for a cart line item from the live catalog.
+function cartItemImage(id) {
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === id) : null;
+  if (!comp) return '';
+  return comp.image || (typeof COMPONENT_IMAGES !== 'undefined' ? COMPONENT_IMAGES[id] : '') || '';
 }
 
 function renderCartPanel() {
@@ -527,31 +530,54 @@ function renderCartPanel() {
     const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === item.id) : null;
     const stockQty = comp && typeof getStock === 'function' ? getStock(item.id) : item.qty;
     const subtotal = item.price * item.qty;
+    const imgSrc = cartItemImage(item.id);
+    const fallback = (comp && typeof CAT_EMOJI !== 'undefined') ? (CAT_EMOJI[comp.category] || '📦') : '📦';
     return `
-      <div class="cart-row" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border);">
+      <div class="cart-row" style="display:flex;align-items:center;gap:0.85rem;padding:0.85rem 0;border-bottom:1px solid var(--border);">
+        <div style="width:56px;height:56px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
+          ${imgSrc
+            ? `<img src="${imgSrc}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;display:block;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+               <span style="display:none;font-size:1.4rem;">${fallback}</span>`
+            : `<span style="font-size:1.4rem;">${fallback}</span>`
+          }
+        </div>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:600;">${item.name}</div>
-          <div style="font-size:0.8rem;color:var(--slate-dk);">${item.type === 'permanent' ? '♾️ Permanent' : '⏱ Temporary'} · ₹${item.price} each</div>
+          <div style="font-size:0.85rem;color:var(--slate-dk);">₹${item.price}</div>
+          <div class="qty-stepper" data-id="${item.id}" style="margin-top:0.4rem;">
+            <button class="qty-btn qty-minus" onclick="changeCartQty(${item.id}, -1)" ${item.qty <= 1 ? 'disabled' : ''}>−</button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn qty-plus" onclick="changeCartQty(${item.id}, 1)" ${item.qty >= stockQty ? 'disabled' : ''}>+</button>
+          </div>
         </div>
-        <div class="qty-stepper" data-id="${item.id}">
-          <button class="qty-btn qty-minus" onclick="changeCartQty(${item.id}, -1)">−</button>
-          <span class="qty-value">${item.qty}</span>
-          <button class="qty-btn qty-plus" onclick="changeCartQty(${item.id}, 1)" ${item.qty >= stockQty ? 'disabled' : ''}>+</button>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-weight:700;">Subtotal: ₹${subtotal}</div>
+          <button class="btn btn-ghost" style="font-size:0.8rem;color:#dc2626;margin-top:0.4rem;" onclick="removeFromCart(${item.id})">🗑 Remove</button>
         </div>
-        <div style="min-width:64px;text-align:right;font-weight:700;">₹${subtotal}</div>
       </div>`;
   }).join('');
 
-  const total = cartGrandTotal(cart);
+  const itemsTotal = cartGrandTotal(cart);
+  const deliveryCharge = 0;
+  const finalAmount = itemsTotal + deliveryCharge;
 
   body.innerHTML = `
     <h2 style="margin-top:0;">🛒 Your Cart</h2>
     <div class="cart-rows">${rows}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1rem;margin-top:0.5rem;border-top:2px solid var(--electric);font-size:1.1rem;font-weight:700;">
-      <span>Grand Total</span>
-      <span style="color:var(--electric);">₹${total}</span>
+    <div style="margin-top:1rem;padding-top:0.75rem;">
+      <div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.95rem;">
+        <span>Items Total</span><span>₹${itemsTotal}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.95rem;color:var(--slate-dk);">
+        <span>Delivery Charge</span><span>₹${deliveryCharge}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.6rem;margin-top:0.4rem;border-top:2px solid var(--electric);font-size:1.15rem;font-weight:700;">
+        <span>Final Amount</span>
+        <span style="color:var(--electric);">₹${finalAmount}</span>
+      </div>
     </div>
-    <button class="btn btn-primary btn-full" style="margin-top:1.25rem;" onclick="proceedToCheckout()">Proceed to Checkout →</button>`;
+    <button class="btn btn-primary btn-full" style="margin-top:1.25rem;padding:1rem;font-size:1.05rem;" onclick="proceedToCheckout()">Proceed to Payment →</button>`;
 }
 
 // ── Checkout (cart → payment.html) ──────────────────────────
