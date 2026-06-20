@@ -4,6 +4,21 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Inject a small pulse animation for the cart button (kept here so
+  // no separate CSS file needs to be touched for this fix).
+  const pulseStyle = document.createElement('style');
+  pulseStyle.textContent = `
+    .btn-cart-add.cart-pulse {
+      animation: cartAddPulse 0.35s ease;
+    }
+    @keyframes cartAddPulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+  `;
+  document.head.appendChild(pulseStyle);
+
   const hamburger = document.getElementById('hamburger');
   if (hamburger) hamburger.addEventListener('click', () => {
     document.querySelector('.navbar').classList.toggle('nav-mobile-open');
@@ -223,7 +238,7 @@ function buildCard(c) {
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
         ${priceBlock}
         <div class="card-footer">
-          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" ${outOfStock ? 'disabled' : ''}
+          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" data-id="${c.id}" ${outOfStock ? 'disabled' : ''}
             onclick="event.stopPropagation(); ${outOfStock ? '' : `quickAddToCart(${c.id})`}">
             ${outOfStock ? 'Unavailable' : (inCart ? '✓ In Cart' : '🛒 Add to Cart')}
           </button>
@@ -341,4 +356,66 @@ function handleBuy(id, name, price) {
     localStorage.setItem('ece_after_login', dest);
     window.location.href = 'login.html';
   }
+}
+
+// ── Cart (Add to Cart on marketplace grid) ─────────────────
+// Self-contained: only touches localStorage key 'ece_cart'.
+// Does not interact with payment.html or any other flow.
+const CART_KEY = 'ece_cart';
+
+function getCart() {
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+function isInCart(id) {
+  return getCart().some(item => item.id === Number(id));
+}
+
+function quickAddToCart(id) {
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
+  if (!comp) return;
+
+  // Respect stock — never add an out-of-stock item.
+  const qty = (typeof getStock === 'function') ? getStock(comp.id) : 1;
+  if (qty <= 0) return;
+
+  if (isInCart(comp.id)) {
+    // Already added — nothing to do (button already shows "In Cart").
+    pulseCartButton(comp.id);
+    return;
+  }
+
+  const cart = getCart();
+  cart.push({
+    id: comp.id,
+    name: comp.name,
+    type: comp.type.includes('permanent') ? 'permanent' : 'temporary',
+    price: comp.type.includes('permanent') ? comp.permPrice : comp.tempPrice
+  });
+  saveCart(cart);
+
+  pulseCartButton(comp.id);
+  renderGrid();
+}
+
+function pulseCartButton(id) {
+  // Find the button for this card and trigger a brief pulse animation.
+  const grid = document.getElementById('market-grid');
+  if (!grid) return;
+  const btn = grid.querySelector(`.btn-cart-add[data-id="${id}"]`);
+  if (!btn) return;
+  btn.classList.remove('cart-pulse');
+  // Force reflow so the animation can re-trigger on repeated clicks.
+  void btn.offsetWidth;
+  btn.classList.add('cart-pulse');
+  setTimeout(() => btn.classList.remove('cart-pulse'), 350);
 }
