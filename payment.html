@@ -341,9 +341,13 @@
           <span id="license-label"></span>
           <span id="license-val" style="color:#16a34a;"></span>
         </div>
-        <div class="order-row" id="delivery-row" style="display:none;color:var(--slate-dk);">
-          <span>Delivery Charge</span>
-          <span>₹0</span>
+        <div class="order-row" id="temp-total-row" style="display:none;color:var(--slate-dk);">
+          <span>Temporary Total</span>
+          <span id="temp-total-val">₹0</span>
+        </div>
+        <div class="order-row" id="perm-total-row" style="display:none;color:var(--slate-dk);">
+          <span>Permanent Total</span>
+          <span id="perm-total-val">₹0</span>
         </div>
         <div class="order-row total">
           <span id="total-row-label">Total</span>
@@ -574,7 +578,7 @@
     const isTemp    = params.get('type') === 'temporary';
     const compPrice = parseInt(params.get('price')) || 0;
 
-    // ── Cart checkout (multi-item) ──────────────────────────
+    // ── Cart checkout (multi-item, composite id+type rows) ──
     // Activated only when a 'cart' param is present. Does not alter
     // compId/compName/isTemp/compPrice, which remain the single-item
     // path used by the existing Borrow/Buy buttons.
@@ -587,8 +591,14 @@
       }
     } catch (e) { cartItems = null; }
     const isCartCheckout = !!cartItems;
+    const cartTemporaryTotal = isCartCheckout
+      ? (parseInt(params.get('temporaryTotal')) || cartItems.filter(i => i.type === 'temporary').reduce((s, i) => s + (i.price * i.qty), 0))
+      : 0;
+    const cartPermanentTotal = isCartCheckout
+      ? (parseInt(params.get('permanentTotal')) || cartItems.filter(i => i.type === 'permanent').reduce((s, i) => s + (i.price * i.qty), 0))
+      : 0;
     const cartTotal = isCartCheckout
-      ? (parseInt(params.get('total')) || cartItems.reduce((s, i) => s + (i.price * i.qty), 0))
+      ? (parseInt(params.get('total')) || (cartTemporaryTotal + cartPermanentTotal))
       : 0;
     // For a cart checkout, treat it as a single combined "permanent-style"
     // payment of cartTotal — reuses the existing perm payment UI/flow as-is.
@@ -598,11 +608,16 @@
       if (isCartCheckout) {
         try {
           const overrides = JSON.parse(localStorage.getItem('ece_stock_overrides') || '{}');
-          cartItems.forEach(item => {
-            const current = overrides[item.id] !== undefined
-              ? overrides[item.id]
-              : (typeof COMPONENTS !== 'undefined' ? (COMPONENTS.find(c => c.id === item.id) || {}).stock : undefined);
-            overrides[item.id] = Math.max(0, (current !== undefined ? current : item.qty) - item.qty);
+          // Aggregate quantity per component id first, since the same id
+          // can appear twice (once Permanent, once Temporary) as separate rows.
+          const qtyById = {};
+          cartItems.forEach(item => { qtyById[item.id] = (qtyById[item.id] || 0) + item.qty; });
+          Object.keys(qtyById).forEach(idStr => {
+            const id = Number(idStr);
+            const current = overrides[id] !== undefined
+              ? overrides[id]
+              : (typeof COMPONENTS !== 'undefined' ? (COMPONENTS.find(c => c.id === id) || {}).stock : undefined);
+            overrides[id] = Math.max(0, (current !== undefined ? current : qtyById[id]) - qtyById[id]);
           });
           localStorage.setItem('ece_stock_overrides', JSON.stringify(overrides));
           localStorage.removeItem('ece_cart'); // clear cart after successful order
@@ -622,19 +637,30 @@
     }
 
     if (isCartCheckout) {
-      // Render multi-row summary, hide the single-item row.
+      // Render multi-row summary (with purchase type per row), hide the single-item row.
       document.getElementById('single-item-row').style.display = 'none';
       const rowsHtml = cartItems.map(item => `
-        <div class="order-row">
-          <span>${item.name} × ${item.qty}</span>
-          <span>= ₹${item.price * item.qty}</span>
+        <div class="order-row" style="flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.6rem 0;">
+          <div style="display:flex;justify-content:space-between;width:100%;">
+            <span>${item.name} × ${item.qty}</span>
+            <span>= ₹${item.subtotal !== undefined ? item.subtotal : (item.price * item.qty)}</span>
+          </div>
+          <span style="font-size:0.78rem;color:var(--slate-dk);">${item.type === 'permanent' ? '♾️ Permanent' : '⏱ Temporary'}</span>
         </div>`).join('');
       const rowsContainer = document.getElementById('cart-items-rows');
       rowsContainer.innerHTML = rowsHtml;
       rowsContainer.style.display = 'block';
       document.getElementById('license-row').style.display = 'none';
-      document.getElementById('delivery-row').style.display = 'flex';
-      document.getElementById('total-row-label').textContent = 'Final Amount';
+
+      if (cartTemporaryTotal > 0) {
+        document.getElementById('temp-total-row').style.display = 'flex';
+        document.getElementById('temp-total-val').textContent = '₹' + cartTemporaryTotal;
+      }
+      if (cartPermanentTotal > 0) {
+        document.getElementById('perm-total-row').style.display = 'flex';
+        document.getElementById('perm-total-val').textContent = '₹' + cartPermanentTotal;
+      }
+      document.getElementById('total-row-label').textContent = 'Grand Total';
     } else {
       document.getElementById('comp-name-display').textContent  = compName;
       document.getElementById('comp-price-display').textContent = '₹' + compPrice;
@@ -824,7 +850,7 @@
           year      : (document.getElementById(yearId)?.value || ''),
           phone     : (document.getElementById(phoneId)?.value || '').trim(),
           email     : isTemp ? (document.getElementById('t-email')?.value || '').trim() : '',
-          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty} (${i.type === 'permanent' ? 'Permanent' : 'Temporary'})`).join(', ') : compName,
           amount    : displayAmount,
           type      : isCartCheckout ? 'Cart' : (isTemp ? 'Temporary' : 'Permanent'),
           utr       : utrVal,
@@ -887,7 +913,7 @@
         year      : document.getElementById(yearId).value,
         phone     : document.getElementById(phoneId).value.trim(),
         email     : isTemp ? document.getElementById('t-email').value.trim() : '',
-        component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+        component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty} (${i.type === 'permanent' ? 'Permanent' : 'Temporary'})`).join(', ') : compName,
         amount    : isCartCheckout ? cartTotal : compPrice,
         type      : isCartCheckout ? 'Cart' : (isTemp ? 'Temporary' : 'Permanent'),
         utr,
@@ -942,7 +968,7 @@
           roll      : document.getElementById('p-roll').value.trim(),
           year      : document.getElementById('p-year').value,
           phone,
-          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty}`).join(', ') : compName,
+          component : isCartCheckout ? cartItems.map(i => `${i.name} x${i.qty} (${i.type === 'permanent' ? 'Permanent' : 'Temporary'})`).join(', ') : compName,
           amount    : effectivePrice,
           type      : isCartCheckout ? 'Cart' : 'Permanent',
           utr       : 'CASH',

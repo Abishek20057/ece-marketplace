@@ -85,6 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartModalClose = document.getElementById('cart-modal-close');
   if (cartModalClose) cartModalClose.addEventListener('click', closeCartPanel);
   if (cartOverlay) cartOverlay.addEventListener('click', (e) => { if (e.target === cartOverlay) closeCartPanel(); });
+
+  const typeOverlay = document.getElementById('type-select-overlay');
+  const typeClose = document.getElementById('type-select-close');
+  if (typeClose) typeClose.addEventListener('click', closeTypeSelectModal);
+  if (typeOverlay) typeOverlay.addEventListener('click', (e) => { if (e.target === typeOverlay) closeTypeSelectModal(); });
 });
 
 function getFilters() {
@@ -238,9 +243,6 @@ function buildCard(c) {
 
   const dealBadge = (typeof getBadge === 'function') ? getBadge({ ...c, permPrice: sellingPrice, marketPrice }) : null;
 
-  const cartQty = (typeof getCartQty === 'function') ? getCartQty(c.id) : 0;
-  const inCart  = cartQty > 0;
-
   return `
     <div class="component-card animate-on-scroll ${outOfStock ? 'card-sold-out' : ''}">
       ${dealBadge ? `<div class="deal-ribbon ${dealBadge.cls}">${dealBadge.text}</div>` : ''}
@@ -265,9 +267,9 @@ function buildCard(c) {
         <p class="card-desc">${c.description.substring(0, 90)}…</p>
         ${priceBlock}
         <div class="card-footer">
-          <button class="btn btn-cart-add ${inCart ? 'in-cart' : ''}" data-id="${c.id}" ${outOfStock ? 'disabled' : ''}
+          <button class="btn btn-cart-add" data-id="${c.id}" ${outOfStock ? 'disabled' : ''}
             onclick="event.stopPropagation(); ${outOfStock ? '' : `quickAddToCart(${c.id})`}">
-            ${outOfStock ? 'Unavailable' : (inCart ? `✓ In Cart (${cartQty})` : '🛒 Add to Cart')}
+            ${outOfStock ? 'Unavailable' : '🛒 Add to Cart'}
           </button>
           <span class="btn btn-ghost" style="font-size:0.85rem;" onclick="openModal(COMPONENTS.find(x=>x.id===${c.id}))">Details →</span>
         </div>
@@ -388,6 +390,8 @@ function handleBuy(id, name, price) {
 // ── Cart (Add to Cart, quantity, panel, checkout) ──────────
 // Self-contained: only touches localStorage key 'ece_cart'.
 // Does not interact with payment.html's existing single-item flow.
+// Cart items are keyed by composite (id + type) so the same
+// component can exist as two separate rows: Permanent and Temporary.
 const CART_KEY = 'ece_cart';
 
 function getCart() {
@@ -404,15 +408,13 @@ function saveCart(cart) {
   updateCartBadge();
 }
 
-function isInCart(id) {
-  return getCart().some(item => item.id === Number(id));
+function findCartItem(cart, id, type) {
+  return cart.find(item => item.id === Number(id) && item.type === type);
 }
 
-function getCartQty(id) {
-  const item = getCart().find(item => item.id === Number(id));
-  return item ? item.qty : 0;
-}
-
+// ── Add to Cart entry point (called from product card) ──────
+// Shows a purchase-type picker if both types are available;
+// otherwise adds directly using the single available type.
 function quickAddToCart(id) {
   const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
   if (!comp) return;
@@ -420,56 +422,104 @@ function quickAddToCart(id) {
   const stockQty = (typeof getStock === 'function') ? getStock(comp.id) : 1;
   if (stockQty <= 0) return;
 
+  const hasPerm = comp.type.includes('permanent');
+  const hasTemp = comp.type.includes('temporary');
+
+  if (hasPerm && hasTemp) {
+    openTypeSelectModal(comp);
+  } else {
+    addToCartWithType(comp.id, hasPerm ? 'permanent' : 'temporary');
+  }
+}
+
+// ── Purchase type selection modal ────────────────────────────
+function openTypeSelectModal(comp) {
+  const body = document.getElementById('type-select-body');
+  if (!body) { addToCartWithType(comp.id, 'permanent'); return; }
+
+  body.innerHTML = `
+    <h2 style="margin-top:0;">Select Purchase Type</h2>
+    <p style="color:var(--slate-dk);font-size:0.9rem;margin-bottom:1rem;">${comp.name}</p>
+    <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.25rem;">
+      <label style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;">
+        <input type="radio" name="purchase-type" value="permanent" checked />
+        <span>♾️ Permanent — ₹${comp.permPrice}</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;">
+        <input type="radio" name="purchase-type" value="temporary" />
+        <span>⏱ Temporary — ₹${comp.tempPrice}</span>
+      </label>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="confirmTypeSelect(${comp.id})">Add to Cart</button>`;
+
+  document.getElementById('type-select-overlay').classList.add('active');
+}
+
+function closeTypeSelectModal() {
+  document.getElementById('type-select-overlay').classList.remove('active');
+}
+
+function confirmTypeSelect(id) {
+  const selected = document.querySelector('input[name="purchase-type"]:checked');
+  const type = selected ? selected.value : 'permanent';
+  closeTypeSelectModal();
+  addToCartWithType(id, type);
+}
+
+// ── Core add logic (id + type) ───────────────────────────────
+function addToCartWithType(id, type) {
+  const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === Number(id)) : null;
+  if (!comp) return;
+
+  const stockQty = (typeof getStock === 'function') ? getStock(comp.id) : 1;
+  if (stockQty <= 0) return;
+
   const cart = getCart();
-  const existing = cart.find(item => item.id === comp.id);
+  const existing = findCartItem(cart, comp.id, type);
   if (existing) {
     if (existing.qty < stockQty) existing.qty += 1;
   } else {
     cart.push({
       id: comp.id,
       name: comp.name,
-      type: comp.type.includes('permanent') ? 'permanent' : 'temporary',
-      price: comp.type.includes('permanent') ? comp.permPrice : comp.tempPrice,
+      type,
+      price: type === 'permanent' ? comp.permPrice : comp.tempPrice,
       qty: 1
     });
   }
   saveCart(cart);
   pulseCartButton(comp.id);
-  renderGrid();
+  showToast('Item added to cart successfully');
 }
 
-// Adjust quantity for an item already in the cart. Clamped to [0, stock].
-// Hitting 0 removes the item entirely.
-function changeCartQty(id, delta) {
+// Adjust quantity for a specific (id, type) row. Clamped to [1, stock].
+function changeCartQty(id, type, delta) {
   id = Number(id);
   const comp = (typeof COMPONENTS !== 'undefined') ? COMPONENTS.find(c => c.id === id) : null;
   const stockQty = comp && typeof getStock === 'function' ? getStock(id) : Infinity;
 
   const cart = getCart();
-  const item = cart.find(i => i.id === id);
+  const item = findCartItem(cart, id, type);
   if (!item) return;
 
   const newQty = item.qty + delta;
   if (newQty < 1) {
-    // Quantity cannot go below 1 via the stepper — use Remove to delete.
-    item.qty = 1;
+    item.qty = 1; // minimum quantity = 1, use Remove to delete
   } else if (newQty > stockQty) {
-    item.qty = stockQty; // prevent ordering more than stock
+    item.qty = stockQty; // maximum quantity = available stock
   } else {
     item.qty = newQty;
   }
   saveCart(cart);
-
-  renderGrid();
   renderCartPanel();
 }
 
-// Removes an item from the cart entirely, regardless of quantity.
-function removeFromCart(id) {
+// Removes only the matching (id, type) row; other type for the same
+// component (if present) is left untouched.
+function removeFromCart(id, type) {
   id = Number(id);
-  const cart = getCart().filter(item => item.id !== id);
+  const cart = getCart().filter(item => !(item.id === id && item.type === type));
   saveCart(cart);
-  renderGrid();
   renderCartPanel();
 }
 
@@ -482,6 +532,30 @@ function pulseCartButton(id) {
   void btn.offsetWidth;
   btn.classList.add('cart-pulse');
   setTimeout(() => btn.classList.remove('cart-pulse'), 350);
+}
+
+// ── Toast notification ───────────────────────────────────────
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    background: var(--navy, #0f172a); color: #fff; padding: 0.75rem 1.25rem;
+    border-radius: 10px; font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25); opacity: 0; transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  `;
+  container.appendChild(toast);
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  });
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 250);
+  }, 2200);
 }
 
 // ── Cart badge (navbar) ─────────────────────────────────────
@@ -503,8 +577,15 @@ function closeCartPanel() {
   document.getElementById('cart-overlay').classList.remove('active');
 }
 
-function cartGrandTotal(cart) {
-  return cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+// Computes { temporaryTotal, permanentTotal, grandTotal } for the cart.
+function cartTotals(cart) {
+  let temporaryTotal = 0, permanentTotal = 0;
+  cart.forEach(item => {
+    const subtotal = item.price * item.qty;
+    if (item.type === 'temporary') temporaryTotal += subtotal;
+    else permanentTotal += subtotal;
+  });
+  return { temporaryTotal, permanentTotal, grandTotal: temporaryTotal + permanentTotal };
 }
 
 // Resolves a product image for a cart line item from the live catalog.
@@ -532,6 +613,7 @@ function renderCartPanel() {
     const subtotal = item.price * item.qty;
     const imgSrc = cartItemImage(item.id);
     const fallback = (comp && typeof CAT_EMOJI !== 'undefined') ? (CAT_EMOJI[comp.category] || '📦') : '📦';
+    const typeLabel = item.type === 'permanent' ? '♾️ Permanent' : '⏱ Temporary';
     return `
       <div class="cart-row" style="display:flex;align-items:center;gap:0.85rem;padding:0.85rem 0;border-bottom:1px solid var(--border);">
         <div style="width:56px;height:56px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#f1f5f9;display:flex;align-items:center;justify-content:center;">
@@ -544,37 +626,36 @@ function renderCartPanel() {
         </div>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:600;">${item.name}</div>
+          <div style="font-size:0.8rem;color:var(--slate-dk);margin-top:0.1rem;">${typeLabel}</div>
           <div style="font-size:0.85rem;color:var(--slate-dk);">₹${item.price}</div>
-          <div class="qty-stepper" data-id="${item.id}" style="margin-top:0.4rem;">
-            <button class="qty-btn qty-minus" onclick="changeCartQty(${item.id}, -1)" ${item.qty <= 1 ? 'disabled' : ''}>−</button>
+          <div class="qty-stepper" data-id="${item.id}" data-type="${item.type}" style="margin-top:0.4rem;">
+            <button class="qty-btn qty-minus" onclick="changeCartQty(${item.id}, '${item.type}', -1)" ${item.qty <= 1 ? 'disabled' : ''}>−</button>
             <span class="qty-value">${item.qty}</span>
-            <button class="qty-btn qty-plus" onclick="changeCartQty(${item.id}, 1)" ${item.qty >= stockQty ? 'disabled' : ''}>+</button>
+            <button class="qty-btn qty-plus" onclick="changeCartQty(${item.id}, '${item.type}', 1)" ${item.qty >= stockQty ? 'disabled' : ''}>+</button>
           </div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-weight:700;">Subtotal: ₹${subtotal}</div>
-          <button class="btn btn-ghost" style="font-size:0.8rem;color:#dc2626;margin-top:0.4rem;" onclick="removeFromCart(${item.id})">🗑 Remove</button>
+          <div style="font-weight:700;">Subtotal ₹${subtotal}</div>
+          <button class="btn btn-ghost" style="font-size:0.8rem;color:#dc2626;margin-top:0.4rem;" onclick="removeFromCart(${item.id}, '${item.type}')">🗑 Remove</button>
         </div>
       </div>`;
   }).join('');
 
-  const itemsTotal = cartGrandTotal(cart);
-  const deliveryCharge = 0;
-  const finalAmount = itemsTotal + deliveryCharge;
+  const { temporaryTotal, permanentTotal, grandTotal } = cartTotals(cart);
 
   body.innerHTML = `
     <h2 style="margin-top:0;">🛒 Your Cart</h2>
     <div class="cart-rows">${rows}</div>
     <div style="margin-top:1rem;padding-top:0.75rem;">
       <div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.95rem;">
-        <span>Items Total</span><span>₹${itemsTotal}</span>
+        <span>Temporary Components Total</span><span>₹${temporaryTotal}</span>
       </div>
-      <div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.95rem;color:var(--slate-dk);">
-        <span>Delivery Charge</span><span>₹${deliveryCharge}</span>
+      <div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.95rem;">
+        <span>Permanent Components Total</span><span>₹${permanentTotal}</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.6rem;margin-top:0.4rem;border-top:2px solid var(--electric);font-size:1.15rem;font-weight:700;">
-        <span>Final Amount</span>
-        <span style="color:var(--electric);">₹${finalAmount}</span>
+        <span>Grand Total</span>
+        <span style="color:var(--electric);">₹${grandTotal}</span>
       </div>
     </div>
     <button class="btn btn-primary btn-full" style="margin-top:1.25rem;padding:1rem;font-size:1.05rem;" onclick="proceedToCheckout()">Proceed to Payment →</button>`;
@@ -585,9 +666,21 @@ function proceedToCheckout() {
   const cart = getCart();
   if (cart.length === 0) return;
 
-  const total = cartGrandTotal(cart);
-  const cartJson = encodeURIComponent(JSON.stringify(cart));
-  const dest = `payment.html?cart=${cartJson}&total=${total}`;
+  const { temporaryTotal, permanentTotal, grandTotal } = cartTotals(cart);
+
+  // Enrich each item with image + subtotal for payment.html display.
+  const cartPayload = cart.map(item => ({
+    id: item.id,
+    name: item.name,
+    type: item.type,
+    price: item.price,
+    qty: item.qty,
+    subtotal: item.price * item.qty,
+    image: cartItemImage(item.id)
+  }));
+
+  const cartJson = encodeURIComponent(JSON.stringify(cartPayload));
+  const dest = `payment.html?cart=${cartJson}&temporaryTotal=${temporaryTotal}&permanentTotal=${permanentTotal}&total=${grandTotal}`;
 
   const loggedIn = localStorage.getItem('ece_logged_in') === 'true';
   if (loggedIn) {
